@@ -1,7 +1,8 @@
-import { saveRecord, getAllRecords, deleteRecord } from "db.js";
+import { saveRecord as dbSaveRecord, getAllRecords, deleteRecord } from "db.js";
 import { scan } from "ocr.js";
-import { exportData } from "export.js";
+import { exportData as exportFile } from "export.js";
 
+// ✅ expose to HTML
 window.saveRecord = async function () {
   const record = {
     id: Date.now().toString(),
@@ -12,7 +13,7 @@ window.saveRecord = async function () {
     lastEditedAt: Date.now()
   };
 
-  await saveRecord(record);
+  await dbSaveRecord(record);
   loadRecords();
 };
 
@@ -39,7 +40,7 @@ window.deleteItem = async function(id) {
 
 window.exportData = async function () {
   const records = await getAllRecords();
-  exportData(records);
+  exportFile(records);
 };
 
 document.getElementById("scan").addEventListener("change", async (e) => {
