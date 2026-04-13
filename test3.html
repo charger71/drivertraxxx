@@ -33,10 +33,8 @@ input, select, textarea, button {
 
 <h3>New Entry</h3>
 
-<input id="serial" placeholder="Serial ID">
-
-<!-- iPhone "Scan to Text" Input (File Input for Camera Scan) -->
-<input type="file" id="scan" accept="image/*" capture="environment">
+<!-- Use a text input to trigger iOS Scan to Text feature -->
+<input type="text" id="serial" placeholder="Scan Serial ID" aria-label="Scan Serial ID" autocomplete="off">
 
 <select id="status">
   <option>CLEAN</option>
@@ -148,49 +146,19 @@ function exportData() {
    OCR SCAN FOR SERIAL ID (iPhone's Native OCR)
 ========================= */
 
-// This handles the input for scanning QR codes, serials, etc. via the camera.
-document.getElementById("scan").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-
-  // Check if the file is an image (i.e., it's not a video, etc.)
-  if (file && file.type.startsWith("image")) {
-    const reader = new FileReader();
-
-    reader.onload = function(event) {
-      const img = new Image();
-      img.onload = function() {
-        // Trigger native OCR functionality if the device supports it (iOS Safari, etc.)
-        const serialId = img.src;
-
-        // Use a simple image to text extraction process (could be native OCR, fallback to JS)
-        extractTextFromImage(img);
-      };
-
-      img.src = event.target.result;
-    };
-
-    reader.readAsDataURL(file);
+document.getElementById("serial").addEventListener("focus", () => {
+  if (window.hasOwnProperty("webkitSpeechRecognition")) {
+    // This allows iOS to show the "Scan Document" button in Safari
+    document.getElementById("serial").setAttribute("inputmode", "numeric");
   }
 });
-
-// If iPhone doesn't do OCR automatically, use Tesseract.js fallback
-function extractTextFromImage(image) {
-  Tesseract.recognize(image, "eng")
-    .then(result => {
-      const text = result.data.text.replace(/[^A-Z0-9]/gi, "").trim();
-      document.getElementById("serial").value = text;
-    })
-    .catch(error => {
-      console.error("OCR failed:", error);
-    });
-}
 
 /* =========================
    INIT
 ========================= */
 
 render();
-
 </script>
+
 </body>
 </html>
