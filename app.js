@@ -1,6 +1,6 @@
-import { saveRecord, getAllRecords, deleteRecord } from "./db.js";
-import { scan } from "./ocr.js";
-import { exportData } from "./export.js";
+import { saveRecord, getAllRecords, deleteRecord } from "db.js";
+import { scan } from "ocr.js";
+import { exportData } from "export.js";
 
 window.saveRecord = async function () {
   const record = {
