@@ -179,7 +179,7 @@
         .then(result => {
           const text = result.data.text.replace(/[^A-Z0-9]/gi, "").trim();
           if (text) {
-            // Fill the serial input with the extracted text
+            // Fill the serial input with the extracted text (not Base64)
             document.getElementById("serial").value = text;
           } else {
             displayError("OCR could not read any text from the image.");
