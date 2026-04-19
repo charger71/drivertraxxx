@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -17,112 +18,132 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; background: var(--bg); color: var(--text); max-width: 600px; margin: 0 auto; }
 
-  /* HEADER */
-  header {
-    background: var(--accent);
-    color: #fff;
-    padding: 14px 16px 0;
-  }
-  header h1 { font-size: 22px; letter-spacing: 1px; }
-  header p { font-size: 12px; opacity: 0.8; margin-bottom: 8px; }
+header { background: var(–accent); color: #fff; padding: 14px 16px 0; }
+header h1 { font-size: 22px; letter-spacing: 1px; }
 
-  /* TABS */
-  .tabs { display: flex; border-top: 1px solid rgba(255,255,255,0.3); }
-  .tab {
-    flex: 1; padding: 10px; text-align: center; font-size: 13px;
-    font-weight: bold; cursor: pointer; color: rgba(255,255,255,0.7);
-    border-bottom: 3px solid transparent; letter-spacing: 0.5px;
-  }
-  .tab.active { color: #fff; border-bottom: 3px solid #fff; }
+.tabs { display: flex; border-top: 1px solid rgba(255,255,255,0.3); margin-top: 8px; }
+.tab {
+flex: 1; padding: 10px; text-align: center; font-size: 13px;
+font-weight: bold; cursor: pointer; color: rgba(255,255,255,0.7);
+border-bottom: 3px solid transparent; letter-spacing: 0.5px;
+}
+.tab.active { color: #fff; border-bottom: 3px solid #fff; }
 
-  /* PANELS */
-  .panel { display: none; padding: 14px 16px; }
-  .panel.active { display: block; }
+.panel { display: none; padding: 14px 16px; }
+.panel.active { display: block; }
 
-  /* FORM ELEMENTS */
-  .field-label { font-size: 11px; font-weight: bold; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; margin-top: 10px; }
-  input[type=text], select, textarea {
-    width: 100%; padding: 11px 12px; font-size: 15px;
-    border: 1px solid var(--border); border-radius: var(--radius);
-    background: var(--card); color: var(--text);
-    text-transform: uppercase; margin-bottom: 4px;
-  }
-  textarea { text-transform: none; height: 70px; resize: vertical; }
-  input[type=file] { font-size: 14px; margin-bottom: 4px; }
+.field-label { font-size: 11px; font-weight: bold; color: var(–muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; margin-top: 10px; }
 
-  .btn {
-    display: inline-block; padding: 11px 18px; font-size: 15px;
-    border: none; border-radius: var(--radius); cursor: pointer;
-    font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;
-    margin-top: 6px; width: 100%;
-  }
-  .btn-primary { background: var(--accent); color: #fff; }
-  .btn-secondary { background: #e8f0fe; color: var(--accent); margin-top: 4px; }
-  .btn-danger { background: var(--danger); color: #fff; padding: 7px 12px; font-size: 13px; width: auto; margin-top: 0; }
-  .btn-sm { padding: 6px 10px; font-size: 12px; width: auto; margin-top: 0; }
+input[type=text], select, textarea {
+width: 100%; padding: 11px 12px; font-size: 15px;
+border: 1px solid var(–border); border-radius: var(–radius);
+background: var(–card); color: var(–text);
+text-transform: uppercase; margin-bottom: 4px;
+}
+textarea { text-transform: none; height: 70px; resize: vertical; }
+input[type=file] { font-size: 14px; margin-bottom: 4px; }
 
-  .img-preview { width: 100%; max-width: 280px; border-radius: var(--radius); border: 1px solid var(--border); margin: 6px 0; display: none; }
-  .error-msg { color: var(--danger); font-size: 13px; margin-top: 4px; }
-  .ocr-status { font-size: 13px; color: var(--muted); margin-top: 4px; display: none; }
+.notag-row {
+display: flex; align-items: center; gap: 12px;
+background: var(–card); border: 2px solid var(–border);
+border-radius: var(–radius); padding: 12px; margin-top: 10px;
+cursor: pointer;
+}
+.notag-row input[type=checkbox] {
+width: 22px; height: 22px; margin: 0; cursor: pointer;
+accent-color: var(–danger); flex-shrink: 0;
+}
+.notag-row label {
+font-size: 15px; font-weight: bold; text-transform: uppercase;
+letter-spacing: 0.5px; cursor: pointer; color: var(–text);
+}
+.notag-row.checked { border-color: var(–danger); background: #fce8e6; }
+.notag-row.checked label { color: var(–danger); }
 
-  /* RECORDS */
-  .filter-bar { background: var(--card); border-radius: var(--radius); padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); }
-  .filter-row { display: flex; gap: 8px; margin-bottom: 6px; }
-  .filter-row input, .filter-row select { margin: 0; font-size: 13px; padding: 8px 10px; text-transform: none; }
-  .filter-row input[type=date] { flex: 1; }
-  .filter-label { font-size: 11px; color: var(--muted); font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
-  .results-count { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.btn {
+display: inline-block; padding: 11px 18px; font-size: 15px;
+border: none; border-radius: var(–radius); cursor: pointer;
+font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;
+margin-top: 6px; width: 100%;
+}
+.btn-primary { background: var(–accent); color: #fff; }
+.btn-secondary { background: #e8f0fe; color: var(–accent); margin-top: 4px; }
+.btn-danger { background: var(–danger); color: #fff; padding: 7px 12px; font-size: 13px; width: auto; margin-top: 0; }
+.btn-sm { padding: 6px 10px; font-size: 12px; width: auto; margin-top: 0; }
 
-  .record {
-    background: var(--card); border-radius: var(--radius);
-    border: 1px solid var(--border); padding: 12px; margin-bottom: 8px;
-  }
-  .record-header { display: flex; justify-content: space-between; align-items: flex-start; }
-  .record-serial { font-size: 17px; font-weight: bold; letter-spacing: 1px; }
-  .record-status {
-    font-size: 11px; font-weight: bold; padding: 3px 8px;
-    border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px;
-  }
-  .status-CLEAN { background: #e6f4ea; color: #137333; }
-  .status-DIRTY { background: #fce8e6; color: #c5221f; }
-  .status-PM { background: #e8f0fe; color: #1a73e8; }
-  .status-MK { background: #fef7e0; color: #f29900; }
-  .status-MR { background: #fef7e0; color: #f29900; }
-  .status-AUDIT { background: #f3e8fd; color: #7b1fa2; }
-  .status-NOTAG { background: #f1f3f4; color: #5f6368; }
-  .status-OTHER { background: #f1f3f4; color: #5f6368; }
-  .status-GLASS { background: #e0f7fa; color: #00796b; }
-  .status-WIDELETE { background: #fce8e6; color: #c5221f; }
+.img-preview { width: 100%; max-width: 280px; border-radius: var(–radius); border: 1px solid var(–border); margin: 6px 0; display: none; }
+.error-msg { color: var(–danger); font-size: 13px; margin-top: 4px; }
+.ocr-status { font-size: 13px; color: var(–muted); margin-top: 4px; display: none; }
 
-  .record-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
-  .record-notes { font-size: 13px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); color: #444; }
-  .record-footer { display: flex; justify-content: flex-end; margin-top: 8px; }
+/* TODAY’S ENTRIES SECTION */
+.today-header {
+display: flex; justify-content: space-between; align-items: center;
+margin-top: 20px; margin-bottom: 8px; padding-top: 16px;
+border-top: 2px solid var(–border);
+}
+.today-title { font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: var(–muted); }
+.today-count {
+background: var(–accent); color: #fff;
+font-size: 12px; font-weight: bold;
+padding: 2px 10px; border-radius: 12px;
+}
+.today-empty { font-size: 13px; color: var(–muted); text-align: center; padding: 16px 0; }
 
-  /* DASHBOARD */
-  .dash-section { margin-bottom: 20px; }
-  .dash-title { font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 10px; }
-  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
-  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; text-align: center; }
-  .stat-num { font-size: 28px; font-weight: bold; color: var(--accent); }
-  .stat-label { font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px; }
-  .bar-chart { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
-  .bar-row { display: flex; align-items: center; margin-bottom: 8px; gap: 8px; }
-  .bar-key { font-size: 12px; font-weight: bold; width: 80px; text-align: right; flex-shrink: 0; text-transform: uppercase; }
-  .bar-track { flex: 1; background: #f1f3f4; border-radius: 4px; height: 18px; overflow: hidden; }
-  .bar-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.3s; }
-  .bar-val { font-size: 12px; color: var(--muted); width: 24px; flex-shrink: 0; }
-  .day-table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--card); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
-  .day-table th { background: #f1f3f4; padding: 8px 10px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
-  .day-table td { padding: 8px 10px; border-top: 1px solid var(--border); }
-  .team-filter-dash { margin-bottom: 12px; }
-  .team-filter-dash select { font-size: 13px; padding: 8px 10px; text-transform: none; }
+/* SHARED RECORD CARD */
+.record { background: var(–card); border-radius: var(–radius); border: 1px solid var(–border); padding: 12px; margin-bottom: 8px; }
+.record-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.record-serial { font-size: 17px; font-weight: bold; letter-spacing: 1px; }
+.record-badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.record-status { font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.badge-notag { background: #fce8e6; color: #c5221f; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.status-CLEAN { background: #e6f4ea; color: #137333; }
+.status-DIRTY { background: #fce8e6; color: #c5221f; }
+.status-PM { background: #e8f0fe; color: #1a73e8; }
+.status-MK { background: #fef7e0; color: #f29900; }
+.status-MR { background: #fef7e0; color: #f29900; }
+.status-AUDIT { background: #f3e8fd; color: #7b1fa2; }
+.status-OTHER { background: #f1f3f4; color: #5f6368; }
+.status-GLASS { background: #e0f7fa; color: #00796b; }
+.status-WIDELETE { background: #fce8e6; color: #c5221f; }
+.record-meta { font-size: 12px; color: var(–muted); margin-top: 4px; }
+.record-notes { font-size: 13px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(–border); color: #444; }
+.record-footer { display: flex; justify-content: flex-end; margin-top: 8px; }
+
+/* RECORDS TAB */
+.filter-bar { background: var(–card); border-radius: var(–radius); padding: 12px; margin-bottom: 10px; border: 1px solid var(–border); }
+.filter-row { display: flex; gap: 8px; margin-bottom: 6px; }
+.filter-row input, .filter-row select { margin: 0; font-size: 13px; padding: 8px 10px; text-transform: none; flex: 1; }
+.filter-label { font-size: 11px; color: var(–muted); font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
+.results-count { font-size: 12px; color: var(–muted); margin-bottom: 8px; }
+
+/* DASHBOARD */
+.dash-section { margin-bottom: 20px; }
+.dash-title { font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: var(–muted); margin-bottom: 10px; }
+.stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
+.stat-card { background: var(–card); border: 1px solid var(–border); border-radius: var(–radius); padding: 12px; text-align: center; }
+.stat-card.clickable { cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+.stat-card.clickable:hover { border-color: var(–accent); box-shadow: 0 2px 8px rgba(26,115,232,0.15); }
+.stat-num { font-size: 28px; font-weight: bold; color: var(–accent); }
+.stat-label { font-size: 11px; text-transform: uppercase; color: var(–muted); letter-spacing: 0.5px; }
+.bar-chart { background: var(–card); border: 1px solid var(–border); border-radius: var(–radius); padding: 12px; }
+.bar-row { display: flex; align-items: center; margin-bottom: 8px; gap: 8px; }
+.bar-key { font-size: 12px; font-weight: bold; width: 80px; text-align: right; flex-shrink: 0; text-transform: uppercase; }
+.bar-track { flex: 1; background: #f1f3f4; border-radius: 4px; height: 18px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(–accent); border-radius: 4px; transition: width 0.3s; }
+.bar-val { font-size: 12px; color: var(–muted); width: 24px; flex-shrink: 0; }
+.day-table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(–card); border-radius: var(–radius); overflow: hidden; border: 1px solid var(–border); }
+.day-table th { background: #f1f3f4; padding: 8px 10px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(–muted); }
+.day-table td { padding: 8px 10px; border-top: 1px solid var(–border); }
+.day-table tr.has-entries { cursor: pointer; }
+.day-table tr.has-entries:hover td { background: #e8f0fe; }
+.day-table td.tap-hint { font-size: 11px; color: var(–accent); }
 </style>
+
 </head>
 <body>
 
 <header>
   <h1>DRIVERTRAXXX</h1>
-  <p id="headerTeam">Loading...</p>
   <div class="tabs">
     <div class="tab active" onclick="showTab('entry')">NEW ENTRY</div>
     <div class="tab" onclick="showTab('records')">RECORDS</div>
@@ -131,38 +152,23 @@
 </header>
 
 <!-- ==================== ENTRY PANEL ==================== -->
+
 <div class="panel active" id="panel-entry">
 
-  <div class="field-label">Team / Location</div>
-  <select id="teamSelect" onchange="saveTeamPref()">
-    <option value="">-- SELECT TEAM --</option>
-    <option>TEAM A</option>
-    <option>TEAM B</option>
-    <option>TEAM C</option>
-    <option>TEAM D</option>
-    <option>NORTH</option>
-    <option>SOUTH</option>
-    <option>EAST</option>
-    <option>WEST</option>
-    <option>WAREHOUSE 1</option>
-    <option>WAREHOUSE 2</option>
-    <option>WAREHOUSE 3</option>
-  </select>
-
   <div class="field-label">Serial ID</div>
-  <input type="text" id="serial" placeholder="Scan or type Serial ID" autocomplete="off">
+  <input type="text" id="serial" placeholder="Scan or type Serial ID" autocomplete="off"
+    oninput="this.value = this.value.toUpperCase()">
 
   <div class="field-label">Capture Image (OCR)</div>
   <input type="file" id="scan" accept="image/*" capture="camera">
   <img id="imagePreview" class="img-preview" alt="Captured Image">
-  <div class="ocr-status" id="ocrStatus">⏳ Processing OCR...</div>
+  <div class="ocr-status" id="ocrStatus">&#9203; Processing OCR...</div>
   <div id="ocrError" class="error-msg"></div>
 
   <div class="field-label">Status</div>
   <select id="status">
     <option>CLEAN</option>
     <option>DIRTY</option>
-    <option>NO TAG</option>
     <option>PM</option>
     <option>MK</option>
     <option>MR</option>
@@ -172,41 +178,52 @@
     <option>OTHER</option>
   </select>
 
+  <div class="notag-row" id="noTagRow" onclick="document.getElementById('noTag').click()">
+    <input type="checkbox" id="noTag" onclick="event.stopPropagation(); toggleNoTagStyle()">
+    <label for="noTag">No Tag</label>
+  </div>
+
   <div class="field-label">Notes</div>
   <textarea id="notes" placeholder="Optional notes..."></textarea>
 
-  <button class="btn btn-primary" onclick="saveRecord()">💾 SAVE RECORD</button>
-  <button class="btn btn-secondary" onclick="showTab('records')">VIEW RECORDS →</button>
+<button class="btn btn-primary" onclick="saveRecord()">💾 SAVE RECORD</button>
+
+  <!-- TODAY'S ENTRIES -->
+
+  <div class="today-header">
+    <span class="today-title">Today's Entries</span>
+    <span class="today-count" id="todayCount">0</span>
+  </div>
+  <div id="todayRecords"></div>
 </div>
 
 <!-- ==================== RECORDS PANEL ==================== -->
+
 <div class="panel" id="panel-records">
 
   <div class="filter-bar">
-    <div class="filter-label">Filter Records</div>
+    <div class="filter-label" id="recordsHeading">Filter Records</div>
     <div class="filter-row">
-      <input type="text" id="fSearch" placeholder="Search serial..." onInput="renderRecords()">
-      <select id="fStatus" onchange="renderRecords()" style="flex:1">
+      <input type="text" id="fSearch" placeholder="Search serial..."
+        oninput="this.value=this.value.toUpperCase(); renderRecords()">
+      <select id="fStatus" onchange="renderRecords()">
         <option value="">All Statuses</option>
-        <option>CLEAN</option><option>DIRTY</option><option>NO TAG</option>
+        <option>CLEAN</option><option>DIRTY</option>
         <option>PM</option><option>MK</option><option>MR</option>
         <option>AUDIT</option><option>WI/DELETE</option><option>GLASS</option><option>OTHER</option>
       </select>
     </div>
     <div class="filter-row">
-      <select id="fTeam" onchange="renderRecords()" style="flex:1">
-        <option value="">All Teams</option>
-        <option>TEAM A</option><option>TEAM B</option><option>TEAM C</option><option>TEAM D</option>
-        <option>NORTH</option><option>SOUTH</option><option>EAST</option><option>WEST</option>
-        <option>WAREHOUSE 1</option><option>WAREHOUSE 2</option><option>WAREHOUSE 3</option>
+      <select id="fNoTag" onchange="renderRecords()">
+        <option value="">All Records</option>
+        <option value="yes">No Tag Only</option>
+        <option value="no">Has Tag Only</option>
       </select>
-    </div>
-    <div class="filter-row">
       <input type="date" id="fDateFrom" onchange="renderRecords()">
       <input type="date" id="fDateTo" onchange="renderRecords()">
     </div>
     <button class="btn btn-secondary" style="margin-top:6px" onclick="clearFilters()">Clear Filters</button>
-    <button class="btn btn-primary" style="margin-top:4px" onclick="exportCSV()">📥 EXPORT CSV</button>
+    <button class="btn btn-primary" style="margin-top:4px" onclick="exportCSV()">&#128229; EXPORT CSV</button>
   </div>
 
   <div class="results-count" id="resultsCount"></div>
@@ -214,63 +231,40 @@
 </div>
 
 <!-- ==================== DASHBOARD PANEL ==================== -->
+
 <div class="panel" id="panel-dashboard">
 
-  <div class="dash-section team-filter-dash">
-    <div class="filter-label">Filter by Team</div>
-    <select id="dashTeam" onchange="renderDashboard()" style="width:100%">
-      <option value="">All Teams</option>
-      <option>TEAM A</option><option>TEAM B</option><option>TEAM C</option><option>TEAM D</option>
-      <option>NORTH</option><option>SOUTH</option><option>EAST</option><option>WEST</option>
-      <option>WAREHOUSE 1</option><option>WAREHOUSE 2</option><option>WAREHOUSE 3</option>
-    </select>
-  </div>
-
   <div class="dash-section">
-    <div class="dash-title">📊 Overview</div>
+    <div class="dash-title">&#128202; Overview</div>
     <div class="stat-grid" id="dashOverview"></div>
   </div>
 
   <div class="dash-section">
-    <div class="dash-title">📋 By Status</div>
+    <div class="dash-title">&#128203; By Status</div>
     <div class="bar-chart" id="dashStatus"></div>
   </div>
 
   <div class="dash-section">
-    <div class="dash-title">📅 Last 7 Days</div>
-    <div class="day-table" id="dashDays" style="overflow:auto"></div>
+    <div class="dash-title">&#128197; Last 7 Days <span style="font-size:11px;font-weight:normal">(tap a day to view entries)</span></div>
+    <div id="dashDays"></div>
   </div>
 
   <div class="dash-section">
-    <div class="dash-title">🗓️ This Week vs Last Week</div>
+    <div class="dash-title">&#128467; This Week vs Last Week</div>
     <div class="stat-grid" id="dashWeeks"></div>
   </div>
 
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
 <script>
 
-// ============================
-// DATA LAYER
-// ============================
 const DB_KEY = "drivertraxxx_records";
-const TEAM_KEY = "drivertraxxx_team";
-
 function getRecords() { return JSON.parse(localStorage.getItem(DB_KEY) || "[]"); }
 function setRecords(r) { localStorage.setItem(DB_KEY, JSON.stringify(r)); }
-function getTeamPref() { return localStorage.getItem(TEAM_KEY) || ""; }
-
-function saveTeamPref() {
-  const t = document.getElementById("teamSelect").value;
-  localStorage.setItem(TEAM_KEY, t);
-  updateHeaderTeam();
-}
-
-function updateHeaderTeam() {
-  const t = getTeamPref();
-  document.getElementById("headerTeam").textContent = t ? "Team: " + t : "No team selected";
-}
+function statusClass(s) { return "status-" + s.replace(/[^A-Z]/g,""); }
+function todayStr() { return new Date().toISOString().slice(0,10); }
 
 // ============================
 // TABS
@@ -281,65 +275,115 @@ function showTab(name) {
   document.getElementById("panel-" + name).classList.add("active");
   const idx = {entry:0, records:1, dashboard:2}[name];
   document.querySelectorAll(".tab")[idx].classList.add("active");
+  if (name === "entry") renderTodayEntries();
   if (name === "records") renderRecords();
   if (name === "dashboard") renderDashboard();
+}
+
+// ============================
+// NO TAG CHECKBOX
+// ============================
+function toggleNoTagStyle() {
+  const checked = document.getElementById("noTag").checked;
+  document.getElementById("noTagRow").classList.toggle("checked", checked);
+}
+
+// ============================
+// RECORD CARD HTML (shared)
+// ============================
+function recordCard(r, onDelete) {
+  return `
+    <div class="record">
+      <div class="record-header">
+        <div class="record-serial">${r.serialId}</div>
+        <div class="record-badges">
+          <span class="record-status ${statusClass(r.status)}">${r.status}</span>
+          ${r.noTag ? '<span class="badge-notag">NO TAG</span>' : ""}
+        </div>
+      </div>
+      <div class="record-meta">&#128336; ${new Date(r.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
+      ${r.notes ? `<div class="record-notes">${r.notes}</div>` : ""}
+      <div class="record-footer">
+        <button class="btn btn-danger btn-sm" onclick="${onDelete}('${r.id}')">Delete</button>
+      </div>
+    </div>`;
 }
 
 // ============================
 // SAVE RECORD
 // ============================
 function saveRecord() {
-  const serial = document.getElementById("serial").value.trim();
-  const team = document.getElementById("teamSelect").value;
+  const serial = document.getElementById("serial").value.trim().toUpperCase();
   if (!serial) { alert("Please enter or scan a Serial ID."); return; }
-  if (!team) { alert("Please select a Team/Location."); return; }
 
   const records = getRecords();
   records.unshift({
     id: Date.now().toString(),
-    serialId: serial.toUpperCase(),
+    serialId: serial,
     status: document.getElementById("status").value,
-    team: team,
+    noTag: document.getElementById("noTag").checked,
     notes: document.getElementById("notes").value,
     timestamp: Date.now()
   });
   setRecords(records);
 
-  // Reset form
   document.getElementById("serial").value = "";
   document.getElementById("notes").value = "";
   document.getElementById("status").selectedIndex = 0;
+  document.getElementById("noTag").checked = false;
+  toggleNoTagStyle();
   document.getElementById("imagePreview").style.display = "none";
   document.getElementById("scan").value = "";
 
-  alert("✅ Record saved!");
+  renderTodayEntries();
+  alert("Record saved!");
 }
 
 // ============================
-// DELETE RECORD
+// TODAY'S ENTRIES (entry tab)
+// ============================
+function renderTodayEntries() {
+  const today = todayStr();
+  const records = getRecords().filter(r => new Date(r.timestamp).toISOString().slice(0,10) === today);
+  document.getElementById("todayCount").textContent = records.length;
+  if (records.length === 0) {
+    document.getElementById("todayRecords").innerHTML = '<div class="today-empty">No entries yet today.</div>';
+    return;
+  }
+  document.getElementById("todayRecords").innerHTML = records.map(r => recordCard(r, "deleteTodayRecord")).join("");
+}
+
+function deleteTodayRecord(id) {
+  if (!confirm("Delete this record? This cannot be undone.")) return;
+  setRecords(getRecords().filter(r => r.id !== id));
+  renderTodayEntries();
+}
+
+// ============================
+// DELETE (records tab)
 // ============================
 function deleteRecord(id) {
-  if (!confirm("Delete this record?")) return;
+  if (!confirm("Delete this record? This cannot be undone.")) return;
   setRecords(getRecords().filter(r => r.id !== id));
   renderRecords();
 }
 
 // ============================
-// FILTER HELPERS
+// FILTER
 // ============================
 function getFiltered() {
   const search = document.getElementById("fSearch").value.trim().toUpperCase();
   const status = document.getElementById("fStatus").value;
-  const team = document.getElementById("fTeam").value;
+  const noTagFilter = document.getElementById("fNoTag").value;
   const from = document.getElementById("fDateFrom").value;
   const to = document.getElementById("fDateTo").value;
 
   return getRecords().filter(r => {
     if (search && !r.serialId.includes(search)) return false;
     if (status && r.status !== status) return false;
-    if (team && r.team !== team) return false;
-    const d = new Date(r.timestamp);
-    const ds = d.toISOString().slice(0,10);
+    if (noTagFilter === "yes" && !r.noTag) return false;
+    if (noTagFilter === "no" && r.noTag) return false;
+    const ds = new Date(r.timestamp).toISOString().slice(0,10);
     if (from && ds < from) return false;
     if (to && ds > to) return false;
     return true;
@@ -348,44 +392,48 @@ function getFiltered() {
 
 function clearFilters() {
   ["fSearch","fDateFrom","fDateTo"].forEach(id => document.getElementById(id).value = "");
-  ["fStatus","fTeam"].forEach(id => document.getElementById(id).selectedIndex = 0);
+  ["fStatus","fNoTag"].forEach(id => document.getElementById(id).selectedIndex = 0);
+  document.getElementById("recordsHeading").textContent = "Filter Records";
   renderRecords();
 }
 
 // ============================
-// STATUS CSS CLASS
+// DRILL INTO DATE / WEEK
 // ============================
-function statusClass(s) {
-  return "status-" + s.replace(/[^A-Z]/g,"");
+function viewByDate(dateStr) {
+  document.getElementById("fDateFrom").value = dateStr;
+  document.getElementById("fDateTo").value = dateStr;
+  document.getElementById("fSearch").value = "";
+  document.getElementById("fStatus").selectedIndex = 0;
+  document.getElementById("fNoTag").selectedIndex = 0;
+  document.getElementById("recordsHeading").textContent = "Entries for " + dateStr;
+  showTab("records");
+}
+
+function viewByWeek(fromStr, toStr, label) {
+  document.getElementById("fDateFrom").value = fromStr;
+  document.getElementById("fDateTo").value = toStr;
+  document.getElementById("fSearch").value = "";
+  document.getElementById("fStatus").selectedIndex = 0;
+  document.getElementById("fNoTag").selectedIndex = 0;
+  document.getElementById("recordsHeading").textContent = label;
+  showTab("records");
 }
 
 // ============================
-// RENDER RECORDS
+// RENDER RECORDS TAB
 // ============================
 function renderRecords() {
   const records = getFiltered();
-  document.getElementById("resultsCount").textContent = records.length + " record" + (records.length !== 1 ? "s" : "") + " found";
+  document.getElementById("resultsCount").textContent =
+    records.length + " record" + (records.length !== 1 ? "s" : "") + " found";
 
   if (records.length === 0) {
-    document.getElementById("records").innerHTML = '<p style="color:var(--muted);text-align:center;padding:24px">No records match your filters.</p>';
+    document.getElementById("records").innerHTML =
+      '<p style="color:var(--muted);text-align:center;padding:24px">No records match your filters.</p>';
     return;
   }
-
-  document.getElementById("records").innerHTML = records.map(r => `
-    <div class="record">
-      <div class="record-header">
-        <div class="record-serial">${r.serialId}</div>
-        <div class="record-status ${statusClass(r.status)}">${r.status}</div>
-      </div>
-      <div class="record-meta">
-        📍 ${r.team || "—"} &nbsp;|&nbsp; 🕐 ${new Date(r.timestamp).toLocaleString()}
-      </div>
-      ${r.notes ? `<div class="record-notes">${r.notes}</div>` : ""}
-      <div class="record-footer">
-        <button class="btn btn-danger btn-sm" onclick="deleteRecord('${r.id}')">Delete</button>
-      </div>
-    </div>
-  `).join("");
+  document.getElementById("records").innerHTML = records.map(r => recordCard(r, "deleteRecord")).join("");
 }
 
 // ============================
@@ -394,21 +442,15 @@ function renderRecords() {
 function exportCSV() {
   const records = getFiltered();
   if (records.length === 0) { alert("No records to export."); return; }
-
-  const rows = [["ID","Serial ID","Status","Team","Notes","Timestamp"]];
-  records.forEach(r => {
-    rows.push([
-      r.id,
-      r.serialId,
-      r.status,
-      r.team || "",
-      (r.notes || "").replace(/,/g, ";"),
-      new Date(r.timestamp).toLocaleString()
-    ]);
-  });
-
+  const rows = [["ID","Serial ID","Status","No Tag","Notes","Timestamp"]];
+  records.forEach(r => rows.push([
+    r.id, r.serialId, r.status,
+    r.noTag ? "YES" : "NO",
+    (r.notes || "").replace(/,/g,";"),
+    new Date(r.timestamp).toLocaleString()
+  ]));
   const csv = rows.map(r => r.join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
+  const blob = new Blob([csv], {type:"text/csv"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = `drivertraxxx_${new Date().toISOString().slice(0,10)}.csv`;
@@ -420,91 +462,114 @@ function exportCSV() {
 // ============================
 function startOfWeek(d) {
   const dt = new Date(d);
-  const day = dt.getDay();
-  dt.setDate(dt.getDate() - day);
+  dt.setDate(dt.getDate() - dt.getDay());
   dt.setHours(0,0,0,0);
   return dt;
 }
 
+function isoDate(d) { return d.toISOString().slice(0,10); }
+
 function renderDashboard() {
-  const teamFilter = document.getElementById("dashTeam").value;
-  const all = getRecords().filter(r => !teamFilter || r.team === teamFilter);
-
+  const all = getRecords();
   const now = new Date();
-  const todayStr = now.toISOString().slice(0,10);
-
+  const today = isoDate(now);
   const thisWeekStart = startOfWeek(now);
   const lastWeekStart = new Date(thisWeekStart); lastWeekStart.setDate(lastWeekStart.getDate() - 7);
   const lastWeekEnd = new Date(thisWeekStart);
 
-  let todayCount = 0, thisWeekCount = 0, lastWeekCount = 0;
+  let todayCount=0, thisWeekCount=0, lastWeekCount=0, noTagCount=0;
   all.forEach(r => {
     const d = new Date(r.timestamp);
-    const ds = d.toISOString().slice(0,10);
-    if (ds === todayStr) todayCount++;
+    if (isoDate(d) === today) todayCount++;
     if (d >= thisWeekStart) thisWeekCount++;
     if (d >= lastWeekStart && d < lastWeekEnd) lastWeekCount++;
+    if (r.noTag) noTagCount++;
   });
 
+  const thisWeekEnd = isoDate(now);
+  const thisWeekFromStr = isoDate(thisWeekStart);
+  const lastWeekFromStr = isoDate(lastWeekStart);
+  const lastWeekToStr = isoDate(new Date(lastWeekEnd.getTime() - 86400000));
+
   document.getElementById("dashOverview").innerHTML = `
-    <div class="stat-card"><div class="stat-num">${all.length}</div><div class="stat-label">Total Records</div></div>
-    <div class="stat-card"><div class="stat-num">${todayCount}</div><div class="stat-label">Today</div></div>
-    <div class="stat-card"><div class="stat-num">${thisWeekCount}</div><div class="stat-label">This Week</div></div>
-    <div class="stat-card"><div class="stat-num">${lastWeekCount}</div><div class="stat-label">Last Week</div></div>
+    <div class="stat-card clickable" onclick="viewByDate('${today}')">
+      <div class="stat-num">${todayCount}</div><div class="stat-label">Today &#8594;</div>
+    </div>
+    <div class="stat-card clickable" onclick="viewByWeek('${thisWeekFromStr}','${thisWeekEnd}','This Week')">
+      <div class="stat-num">${thisWeekCount}</div><div class="stat-label">This Week &#8594;</div>
+    </div>
+    <div class="stat-card"><div class="stat-num">${all.length}</div><div class="stat-label">Total</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--danger)">${noTagCount}</div><div class="stat-label">No Tag</div></div>
   `;
 
-  const statuses = ["CLEAN","DIRTY","NO TAG","PM","MK","MR","AUDIT","WI/DELETE","GLASS","OTHER"];
-  const statusCounts = {};
-  statuses.forEach(s => statusCounts[s] = 0);
-  all.forEach(r => { if (statusCounts[r.status] !== undefined) statusCounts[r.status]++; else statusCounts["OTHER"]++; });
-  const maxStatus = Math.max(...Object.values(statusCounts), 1);
+  const statuses = ["CLEAN","DIRTY","PM","MK","MR","AUDIT","WI/DELETE","GLASS","OTHER"];
+  const sc = {};
+  statuses.forEach(s => sc[s] = 0);
+  all.forEach(r => { sc[r.status] !== undefined ? sc[r.status]++ : sc["OTHER"]++; });
+  const maxS = Math.max(...Object.values(sc), 1);
   document.getElementById("dashStatus").innerHTML = statuses
-    .filter(s => statusCounts[s] > 0)
+    .filter(s => sc[s] > 0)
     .map(s => `
       <div class="bar-row">
         <div class="bar-key">${s}</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(statusCounts[s]/maxStatus*100)}%"></div></div>
-        <div class="bar-val">${statusCounts[s]}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(sc[s]/maxS*100)}%"></div></div>
+        <div class="bar-val">${sc[s]}</div>
       </div>
-    `).join("") || '<p style="color:var(--muted);padding:8px">No data</p>';
+    `).join("") || '<p style="color:var(--muted);padding:8px">No data yet.</p>';
 
+  // Last 7 days — clickable rows
   const days = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(now);
-    d.setDate(d.getDate() - i);
-    days.push(d.toISOString().slice(0,10));
+  for (let i=6; i>=0; i--) {
+    const d = new Date(now); d.setDate(d.getDate()-i);
+    days.push(isoDate(d));
   }
-  const dayCounts = {};
-  days.forEach(d => dayCounts[d] = 0);
-  all.forEach(r => {
-    const ds = new Date(r.timestamp).toISOString().slice(0,10);
-    if (dayCounts[ds] !== undefined) dayCounts[ds]++;
-  });
-  const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const dc = {};
+  days.forEach(d => dc[d]=0);
+  all.forEach(r => { const ds=isoDate(new Date(r.timestamp)); if(dc[ds]!==undefined) dc[ds]++; });
+  const dn = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
   document.getElementById("dashDays").innerHTML = `
     <table class="day-table" style="width:100%">
-      <thead><tr><th>Date</th><th>Day</th><th>Entries</th></tr></thead>
+      <thead><tr><th>Date</th><th>Day</th><th>Entries</th><th></th></tr></thead>
       <tbody>
         ${days.map(d => {
-          const dt = new Date(d + "T12:00:00");
-          return `<tr>
-            <td>${d}</td>
-            <td>${dayNames[dt.getDay()]}</td>
-            <td><b>${dayCounts[d]}</b></td>
-          </tr>`;
+          const dt = new Date(d+"T12:00:00");
+          const cnt = dc[d];
+          const isToday = d === today;
+          if (cnt > 0) {
+            return `<tr class="has-entries" onclick="viewByDate('${d}')">
+              <td>${d}${isToday ? ' <b style="color:var(--accent)">(today)</b>' : ''}</td>
+              <td>${dn[dt.getDay()]}</td>
+              <td><b>${cnt}</b></td>
+              <td class="tap-hint">View &#8594;</td>
+            </tr>`;
+          } else {
+            return `<tr>
+              <td>${d}${isToday ? ' <b style="color:var(--accent)">(today)</b>' : ''}</td>
+              <td>${dn[dt.getDay()]}</td>
+              <td style="color:var(--muted)">0</td>
+              <td></td>
+            </tr>`;
+          }
         }).join("")}
       </tbody>
-    </table>
-  `;
+    </table>`;
 
+  // Week comparison — clickable
   const delta = thisWeekCount - lastWeekCount;
-  const deltaStr = delta > 0 ? "▲ +" + delta + " vs last week" : delta < 0 ? "▼ " + delta + " vs last week" : "Same as last week";
-  const deltaColor = delta > 0 ? "#137333" : delta < 0 ? "#c5221f" : "#5f6368";
+  const dStr = delta>0 ? "&#9650; +"+delta+" vs last week" : delta<0 ? "&#9660; "+delta+" vs last week" : "Same as last week";
+  const dColor = delta>0 ? "#137333" : delta<0 ? "#c5221f" : "#5f6368";
   document.getElementById("dashWeeks").innerHTML = `
-    <div class="stat-card"><div class="stat-num">${thisWeekCount}</div><div class="stat-label">This Week</div></div>
-    <div class="stat-card"><div class="stat-num">${lastWeekCount}</div><div class="stat-label">Last Week</div></div>
-    <div class="stat-card" style="grid-column:span 2"><div class="stat-num" style="font-size:18px;color:${deltaColor}">${deltaStr}</div><div class="stat-label">Week-over-Week</div></div>
-  `;
+    <div class="stat-card clickable" onclick="viewByWeek('${thisWeekFromStr}','${thisWeekEnd}','This Week')">
+      <div class="stat-num">${thisWeekCount}</div><div class="stat-label">This Week &#8594;</div>
+    </div>
+    <div class="stat-card clickable" onclick="viewByWeek('${lastWeekFromStr}','${lastWeekToStr}','Last Week')">
+      <div class="stat-num">${lastWeekCount}</div><div class="stat-label">Last Week &#8594;</div>
+    </div>
+    <div class="stat-card" style="grid-column:span 2">
+      <div class="stat-num" style="font-size:18px;color:${dColor}">${dStr}</div>
+      <div class="stat-label">Week-over-Week</div>
+    </div>`;
 }
 
 // ============================
@@ -513,7 +578,6 @@ function renderDashboard() {
 document.getElementById("scan").addEventListener("change", async (e) => {
   const file = e.target.files[0];
   if (!file || !file.type.startsWith("image")) return;
-
   const reader = new FileReader();
   reader.onload = (event) => {
     const preview = document.getElementById("imagePreview");
@@ -521,12 +585,11 @@ document.getElementById("scan").addEventListener("change", async (e) => {
     preview.style.display = "block";
     document.getElementById("ocrStatus").style.display = "block";
     document.getElementById("ocrError").textContent = "";
-
     const img = new Image();
     img.onload = () => {
       Tesseract.recognize(img, "eng")
         .then(result => {
-          const text = result.data.text.replace(/[^A-Z0-9]/gi, "").trim().toUpperCase();
+          const text = result.data.text.replace(/[^A-Z0-9]/gi,"").trim().toUpperCase();
           document.getElementById("ocrStatus").style.display = "none";
           if (text) {
             document.getElementById("serial").value = text;
@@ -547,14 +610,9 @@ document.getElementById("scan").addEventListener("change", async (e) => {
 // ============================
 // INIT
 // ============================
-(function init() {
-  const savedTeam = getTeamPref();
-  if (savedTeam) {
-    const sel = document.getElementById("teamSelect");
-    for (let o of sel.options) { if (o.value === savedTeam) { o.selected = true; break; } }
-  }
-  updateHeaderTeam();
-})();
+renderTodayEntries();
+
 </script>
+
 </body>
 </html>
