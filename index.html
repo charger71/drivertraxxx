@@ -1,61 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DriverTraxxx</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DriverTraxxx</title>
+<style>
+  :root {
+    --bg: #f0f0f0;
+    --card: #ffffff;
+    --accent: #1a73e8;
+    --danger: #d93025;
+    --text: #202124;
+    --muted: #5f6368;
+    --border: #dadce0;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: var(--bg); color: var(--text); max-width: 600px; margin: 0 auto; }
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 16px;
-      background: #f7f7f7;
-    }
+  /* HEADER */
+  header {
+    background: var(--accent);
+    color: #fff;
+    padding: 14px 16px 0;
+  }
+  header h1 { font-size: 22px; letter-spacing: 1px; }
+  header p { font-size: 12px; opacity: 0.8; margin-bottom: 8px; }
 
-    input, select, textarea, button {
-      width: 100%;
-      margin: 6px 0;
-      padding: 12px;
-      font-size: 16px;
-      text-transform: Uppercase;
-    }
+  /* TABS */
+  .tabs { display: flex; border-top: 1px solid rgba(255,255,255,0.3); }
+  .tab {
+    flex: 1; padding: 10px; text-align: center; font-size: 13px;
+    font-weight: bold; cursor: pointer; color: rgba(255,255,255,0.7);
+    border-bottom: 3px solid transparent; letter-spacing: 0.5px;
+  }
+  .tab.active { color: #fff; border-bottom: 3px solid #fff; }
 
-    .record {
-      background: white;
-      padding: 10px;
-      margin-top: 8px;
-      border-radius: 6px;
-      text-transform: Uppercase;
-    }
+  /* PANELS */
+  .panel { display: none; padding: 14px 16px; }
+  .panel.active { display: block; }
 
-    .image-preview {
-      width: 100%;
-      max-width: 300px;
-      margin-top: 8px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      display: none;
-    }
+  /* FORM ELEMENTS */
+  .field-label { font-size: 11px; font-weight: bold; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; margin-top: 10px; }
+  input[type=text], select, textarea {
+    width: 100%; padding: 11px 12px; font-size: 15px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--card); color: var(--text);
+    text-transform: uppercase; margin-bottom: 4px;
+  }
+  textarea { text-transform: none; height: 70px; resize: vertical; }
+  input[type=file] { font-size: 14px; margin-bottom: 4px; }
 
-    .error-message {
-      color: red;
-      font-size: 14px;
-    }
-  </style>
+  .btn {
+    display: inline-block; padding: 11px 18px; font-size: 15px;
+    border: none; border-radius: var(--radius); cursor: pointer;
+    font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;
+    margin-top: 6px; width: 100%;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-secondary { background: #e8f0fe; color: var(--accent); margin-top: 4px; }
+  .btn-danger { background: var(--danger); color: #fff; padding: 7px 12px; font-size: 13px; width: auto; margin-top: 0; }
+  .btn-sm { padding: 6px 10px; font-size: 12px; width: auto; margin-top: 0; }
+
+  .img-preview { width: 100%; max-width: 280px; border-radius: var(--radius); border: 1px solid var(--border); margin: 6px 0; display: none; }
+  .error-msg { color: var(--danger); font-size: 13px; margin-top: 4px; }
+  .ocr-status { font-size: 13px; color: var(--muted); margin-top: 4px; display: none; }
+
+  /* RECORDS */
+  .filter-bar { background: var(--card); border-radius: var(--radius); padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); }
+  .filter-row { display: flex; gap: 8px; margin-bottom: 6px; }
+  .filter-row input, .filter-row select { margin: 0; font-size: 13px; padding: 8px 10px; text-transform: none; }
+  .filter-row input[type=date] { flex: 1; }
+  .filter-label { font-size: 11px; color: var(--muted); font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
+  .results-count { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+
+  .record {
+    background: var(--card); border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 12px; margin-bottom: 8px;
+  }
+  .record-header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .record-serial { font-size: 17px; font-weight: bold; letter-spacing: 1px; }
+  .record-status {
+    font-size: 11px; font-weight: bold; padding: 3px 8px;
+    border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .status-CLEAN { background: #e6f4ea; color: #137333; }
+  .status-DIRTY { background: #fce8e6; color: #c5221f; }
+  .status-PM { background: #e8f0fe; color: #1a73e8; }
+  .status-MK { background: #fef7e0; color: #f29900; }
+  .status-MR { background: #fef7e0; color: #f29900; }
+  .status-AUDIT { background: #f3e8fd; color: #7b1fa2; }
+  .status-NOTAG { background: #f1f3f4; color: #5f6368; }
+  .status-OTHER { background: #f1f3f4; color: #5f6368; }
+  .status-GLASS { background: #e0f7fa; color: #00796b; }
+  .status-WIDELETE { background: #fce8e6; color: #c5221f; }
+
+  .record-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .record-notes { font-size: 13px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); color: #444; }
+  .record-footer { display: flex; justify-content: flex-end; margin-top: 8px; }
+
+  /* DASHBOARD */
+  .dash-section { margin-bottom: 20px; }
+  .dash-title { font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 10px; }
+  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; text-align: center; }
+  .stat-num { font-size: 28px; font-weight: bold; color: var(--accent); }
+  .stat-label { font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px; }
+  .bar-chart { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
+  .bar-row { display: flex; align-items: center; margin-bottom: 8px; gap: 8px; }
+  .bar-key { font-size: 12px; font-weight: bold; width: 80px; text-align: right; flex-shrink: 0; text-transform: uppercase; }
+  .bar-track { flex: 1; background: #f1f3f4; border-radius: 4px; height: 18px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.3s; }
+  .bar-val { font-size: 12px; color: var(--muted); width: 24px; flex-shrink: 0; }
+  .day-table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--card); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+  .day-table th { background: #f1f3f4; padding: 8px 10px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+  .day-table td { padding: 8px 10px; border-top: 1px solid var(--border); }
+  .team-filter-dash { margin-bottom: 12px; }
+  .team-filter-dash select { font-size: 13px; padding: 8px 10px; text-transform: none; }
+</style>
 </head>
 <body>
 
-  <h2>DriverTraxxx</h2>
+<header>
+  <h1>DRIVERTRAXXX</h1>
+  <p id="headerTeam">Loading...</p>
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('entry')">NEW ENTRY</div>
+    <div class="tab" onclick="showTab('records')">RECORDS</div>
+    <div class="tab" onclick="showTab('dashboard')">DASHBOARD</div>
+  </div>
+</header>
 
-  <h3>New Entry</h3>
+<!-- ==================== ENTRY PANEL ==================== -->
+<div class="panel active" id="panel-entry">
 
-  <input type="text" id="serial" placeholder="Scan Serial ID" aria-label="Scan Serial ID" autocomplete="off">
+  <div class="field-label">Team / Location</div>
+  <select id="teamSelect" onchange="saveTeamPref()">
+    <option value="">-- SELECT TEAM --</option>
+    <option>TEAM A</option>
+    <option>TEAM B</option>
+    <option>TEAM C</option>
+    <option>TEAM D</option>
+    <option>NORTH</option>
+    <option>SOUTH</option>
+    <option>EAST</option>
+    <option>WEST</option>
+    <option>WAREHOUSE 1</option>
+    <option>WAREHOUSE 2</option>
+    <option>WAREHOUSE 3</option>
+  </select>
 
-  <!-- Camera file input for image capture -->
+  <div class="field-label">Serial ID</div>
+  <input type="text" id="serial" placeholder="Scan or type Serial ID" autocomplete="off">
+
+  <div class="field-label">Capture Image (OCR)</div>
   <input type="file" id="scan" accept="image/*" capture="camera">
+  <img id="imagePreview" class="img-preview" alt="Captured Image">
+  <div class="ocr-status" id="ocrStatus">⏳ Processing OCR...</div>
+  <div id="ocrError" class="error-msg"></div>
 
-  <!-- Image preview -->
-  <img id="imagePreview" class="image-preview" alt="Captured Image Preview">
-
+  <div class="field-label">Status</div>
   <select id="status">
     <option>CLEAN</option>
     <option>DIRTY</option>
@@ -69,149 +172,389 @@
     <option>OTHER</option>
   </select>
 
-  <textarea id="notes" placeholder="Notes"></textarea>
+  <div class="field-label">Notes</div>
+  <textarea id="notes" placeholder="Optional notes..."></textarea>
 
-  <button onclick="saveRecord()">Save</button>
-  <button onclick="exportData()">Export JSON</button>
+  <button class="btn btn-primary" onclick="saveRecord()">💾 SAVE RECORD</button>
+  <button class="btn btn-secondary" onclick="showTab('records')">VIEW RECORDS →</button>
+</div>
 
-  <h3>Records</h3>
+<!-- ==================== RECORDS PANEL ==================== -->
+<div class="panel" id="panel-records">
+
+  <div class="filter-bar">
+    <div class="filter-label">Filter Records</div>
+    <div class="filter-row">
+      <input type="text" id="fSearch" placeholder="Search serial..." onInput="renderRecords()">
+      <select id="fStatus" onchange="renderRecords()" style="flex:1">
+        <option value="">All Statuses</option>
+        <option>CLEAN</option><option>DIRTY</option><option>NO TAG</option>
+        <option>PM</option><option>MK</option><option>MR</option>
+        <option>AUDIT</option><option>WI/DELETE</option><option>GLASS</option><option>OTHER</option>
+      </select>
+    </div>
+    <div class="filter-row">
+      <select id="fTeam" onchange="renderRecords()" style="flex:1">
+        <option value="">All Teams</option>
+        <option>TEAM A</option><option>TEAM B</option><option>TEAM C</option><option>TEAM D</option>
+        <option>NORTH</option><option>SOUTH</option><option>EAST</option><option>WEST</option>
+        <option>WAREHOUSE 1</option><option>WAREHOUSE 2</option><option>WAREHOUSE 3</option>
+      </select>
+    </div>
+    <div class="filter-row">
+      <input type="date" id="fDateFrom" onchange="renderRecords()">
+      <input type="date" id="fDateTo" onchange="renderRecords()">
+    </div>
+    <button class="btn btn-secondary" style="margin-top:6px" onclick="clearFilters()">Clear Filters</button>
+    <button class="btn btn-primary" style="margin-top:4px" onclick="exportCSV()">📥 EXPORT CSV</button>
+  </div>
+
+  <div class="results-count" id="resultsCount"></div>
   <div id="records"></div>
+</div>
 
-  <!-- Include Tesseract.js for OCR processing -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<!-- ==================== DASHBOARD PANEL ==================== -->
+<div class="panel" id="panel-dashboard">
 
-  <script>
-    // ==========================
-    // Local Storage DB Functions
-    // ==========================
-    const DB_KEY = "drivertraxxx_records";
+  <div class="dash-section team-filter-dash">
+    <div class="filter-label">Filter by Team</div>
+    <select id="dashTeam" onchange="renderDashboard()" style="width:100%">
+      <option value="">All Teams</option>
+      <option>TEAM A</option><option>TEAM B</option><option>TEAM C</option><option>TEAM D</option>
+      <option>NORTH</option><option>SOUTH</option><option>EAST</option><option>WEST</option>
+      <option>WAREHOUSE 1</option><option>WAREHOUSE 2</option><option>WAREHOUSE 3</option>
+    </select>
+  </div>
 
-    function getRecords() {
-      return JSON.parse(localStorage.getItem(DB_KEY) || "[]");
-    }
+  <div class="dash-section">
+    <div class="dash-title">📊 Overview</div>
+    <div class="stat-grid" id="dashOverview"></div>
+  </div>
 
-    function setRecords(records) {
-      localStorage.setItem(DB_KEY, JSON.stringify(records));
-    }
+  <div class="dash-section">
+    <div class="dash-title">📋 By Status</div>
+    <div class="bar-chart" id="dashStatus"></div>
+  </div>
 
-    // ==========================
-    // Save Record
-    // ==========================
-    function saveRecord() {
-      const records = getRecords();
-      const record = {
-        id: Date.now().toString(),
-        serialId: document.getElementById("serial").value,
-        status: document.getElementById("status").value,
-        notes: document.getElementById("notes").value,
-        timestamp: Date.now(),
-        lastEditedAt: Date.now()
-      };
-      records.unshift(record);
-      setRecords(records);
-      render();
-    }
+  <div class="dash-section">
+    <div class="dash-title">📅 Last 7 Days</div>
+    <div class="day-table" id="dashDays" style="overflow:auto"></div>
+  </div>
 
-    // ==========================
-    // Delete Record
-    // ==========================
-    function deleteRecord(id) {
-      let records = getRecords();
-      records = records.filter(r => r.id !== id);
-      setRecords(records);
-      render();
-    }
+  <div class="dash-section">
+    <div class="dash-title">🗓️ This Week vs Last Week</div>
+    <div class="stat-grid" id="dashWeeks"></div>
+  </div>
 
-    // ==========================
-    // Render Records
-    // ==========================
-    function render() {
-      const records = getRecords();
-      document.getElementById("records").innerHTML = records
-        .map(r => `
-          <div class="record">
-            <b>${r.serialId}</b><br>
-            ${r.status}<br>
-            ${new Date(r.timestamp).toLocaleString()}<br>
-            <button onclick="deleteRecord('${r.id}')">Delete</button>
-          </div>
-        `)
-        .join("");
-    }
+</div>
 
-    // ==========================
-    // Export Data
-    // ==========================
-    function exportData() {
-      const records = getRecords();
-      const blob = new Blob([JSON.stringify(records, null, 2)], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "drivertraxxx.json";
-      a.click();
-    }
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
 
-    // ==========================
-    // OCR Scan (QR/Text) via Tesseract.js
-    // ==========================
-    document.getElementById("scan").addEventListener("change", async (e) => {
-      const file = e.target.files[0];
+// ============================
+// DATA LAYER
+// ============================
+const DB_KEY = "drivertraxxx_records";
+const TEAM_KEY = "drivertraxxx_team";
 
-      if (file && file.type.startsWith("image")) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          const img = new Image();
-          img.onload = function() {
-            // Show the image preview
-            document.getElementById("imagePreview").style.display = "block";
-            document.getElementById("imagePreview").src = event.target.result;
+function getRecords() { return JSON.parse(localStorage.getItem(DB_KEY) || "[]"); }
+function setRecords(r) { localStorage.setItem(DB_KEY, JSON.stringify(r)); }
+function getTeamPref() { return localStorage.getItem(TEAM_KEY) || ""; }
 
-            // Use OCR (Tesseract.js) to extract text from the image
-            extractTextFromImage(img);
-          };
-          img.src = event.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
+function saveTeamPref() {
+  const t = document.getElementById("teamSelect").value;
+  localStorage.setItem(TEAM_KEY, t);
+  updateHeaderTeam();
+}
 
-    // ==========================
-    // Extract Text from Image (Using OCR)
-    // ==========================
-    function extractTextFromImage(image) {
-      Tesseract.recognize(image, "eng")
+function updateHeaderTeam() {
+  const t = getTeamPref();
+  document.getElementById("headerTeam").textContent = t ? "Team: " + t : "No team selected";
+}
+
+// ============================
+// TABS
+// ============================
+function showTab(name) {
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.getElementById("panel-" + name).classList.add("active");
+  const idx = {entry:0, records:1, dashboard:2}[name];
+  document.querySelectorAll(".tab")[idx].classList.add("active");
+  if (name === "records") renderRecords();
+  if (name === "dashboard") renderDashboard();
+}
+
+// ============================
+// SAVE RECORD
+// ============================
+function saveRecord() {
+  const serial = document.getElementById("serial").value.trim();
+  const team = document.getElementById("teamSelect").value;
+  if (!serial) { alert("Please enter or scan a Serial ID."); return; }
+  if (!team) { alert("Please select a Team/Location."); return; }
+
+  const records = getRecords();
+  records.unshift({
+    id: Date.now().toString(),
+    serialId: serial.toUpperCase(),
+    status: document.getElementById("status").value,
+    team: team,
+    notes: document.getElementById("notes").value,
+    timestamp: Date.now()
+  });
+  setRecords(records);
+
+  // Reset form
+  document.getElementById("serial").value = "";
+  document.getElementById("notes").value = "";
+  document.getElementById("status").selectedIndex = 0;
+  document.getElementById("imagePreview").style.display = "none";
+  document.getElementById("scan").value = "";
+
+  alert("✅ Record saved!");
+}
+
+// ============================
+// DELETE RECORD
+// ============================
+function deleteRecord(id) {
+  if (!confirm("Delete this record?")) return;
+  setRecords(getRecords().filter(r => r.id !== id));
+  renderRecords();
+}
+
+// ============================
+// FILTER HELPERS
+// ============================
+function getFiltered() {
+  const search = document.getElementById("fSearch").value.trim().toUpperCase();
+  const status = document.getElementById("fStatus").value;
+  const team = document.getElementById("fTeam").value;
+  const from = document.getElementById("fDateFrom").value;
+  const to = document.getElementById("fDateTo").value;
+
+  return getRecords().filter(r => {
+    if (search && !r.serialId.includes(search)) return false;
+    if (status && r.status !== status) return false;
+    if (team && r.team !== team) return false;
+    const d = new Date(r.timestamp);
+    const ds = d.toISOString().slice(0,10);
+    if (from && ds < from) return false;
+    if (to && ds > to) return false;
+    return true;
+  });
+}
+
+function clearFilters() {
+  ["fSearch","fDateFrom","fDateTo"].forEach(id => document.getElementById(id).value = "");
+  ["fStatus","fTeam"].forEach(id => document.getElementById(id).selectedIndex = 0);
+  renderRecords();
+}
+
+// ============================
+// STATUS CSS CLASS
+// ============================
+function statusClass(s) {
+  return "status-" + s.replace(/[^A-Z]/g,"");
+}
+
+// ============================
+// RENDER RECORDS
+// ============================
+function renderRecords() {
+  const records = getFiltered();
+  document.getElementById("resultsCount").textContent = records.length + " record" + (records.length !== 1 ? "s" : "") + " found";
+
+  if (records.length === 0) {
+    document.getElementById("records").innerHTML = '<p style="color:var(--muted);text-align:center;padding:24px">No records match your filters.</p>';
+    return;
+  }
+
+  document.getElementById("records").innerHTML = records.map(r => `
+    <div class="record">
+      <div class="record-header">
+        <div class="record-serial">${r.serialId}</div>
+        <div class="record-status ${statusClass(r.status)}">${r.status}</div>
+      </div>
+      <div class="record-meta">
+        📍 ${r.team || "—"} &nbsp;|&nbsp; 🕐 ${new Date(r.timestamp).toLocaleString()}
+      </div>
+      ${r.notes ? `<div class="record-notes">${r.notes}</div>` : ""}
+      <div class="record-footer">
+        <button class="btn btn-danger btn-sm" onclick="deleteRecord('${r.id}')">Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+// ============================
+// EXPORT CSV
+// ============================
+function exportCSV() {
+  const records = getFiltered();
+  if (records.length === 0) { alert("No records to export."); return; }
+
+  const rows = [["ID","Serial ID","Status","Team","Notes","Timestamp"]];
+  records.forEach(r => {
+    rows.push([
+      r.id,
+      r.serialId,
+      r.status,
+      r.team || "",
+      (r.notes || "").replace(/,/g, ";"),
+      new Date(r.timestamp).toLocaleString()
+    ]);
+  });
+
+  const csv = rows.map(r => r.join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `drivertraxxx_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ============================
+// DASHBOARD
+// ============================
+function startOfWeek(d) {
+  const dt = new Date(d);
+  const day = dt.getDay();
+  dt.setDate(dt.getDate() - day);
+  dt.setHours(0,0,0,0);
+  return dt;
+}
+
+function renderDashboard() {
+  const teamFilter = document.getElementById("dashTeam").value;
+  const all = getRecords().filter(r => !teamFilter || r.team === teamFilter);
+
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0,10);
+
+  const thisWeekStart = startOfWeek(now);
+  const lastWeekStart = new Date(thisWeekStart); lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+  const lastWeekEnd = new Date(thisWeekStart);
+
+  let todayCount = 0, thisWeekCount = 0, lastWeekCount = 0;
+  all.forEach(r => {
+    const d = new Date(r.timestamp);
+    const ds = d.toISOString().slice(0,10);
+    if (ds === todayStr) todayCount++;
+    if (d >= thisWeekStart) thisWeekCount++;
+    if (d >= lastWeekStart && d < lastWeekEnd) lastWeekCount++;
+  });
+
+  document.getElementById("dashOverview").innerHTML = `
+    <div class="stat-card"><div class="stat-num">${all.length}</div><div class="stat-label">Total Records</div></div>
+    <div class="stat-card"><div class="stat-num">${todayCount}</div><div class="stat-label">Today</div></div>
+    <div class="stat-card"><div class="stat-num">${thisWeekCount}</div><div class="stat-label">This Week</div></div>
+    <div class="stat-card"><div class="stat-num">${lastWeekCount}</div><div class="stat-label">Last Week</div></div>
+  `;
+
+  const statuses = ["CLEAN","DIRTY","NO TAG","PM","MK","MR","AUDIT","WI/DELETE","GLASS","OTHER"];
+  const statusCounts = {};
+  statuses.forEach(s => statusCounts[s] = 0);
+  all.forEach(r => { if (statusCounts[r.status] !== undefined) statusCounts[r.status]++; else statusCounts["OTHER"]++; });
+  const maxStatus = Math.max(...Object.values(statusCounts), 1);
+  document.getElementById("dashStatus").innerHTML = statuses
+    .filter(s => statusCounts[s] > 0)
+    .map(s => `
+      <div class="bar-row">
+        <div class="bar-key">${s}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(statusCounts[s]/maxStatus*100)}%"></div></div>
+        <div class="bar-val">${statusCounts[s]}</div>
+      </div>
+    `).join("") || '<p style="color:var(--muted);padding:8px">No data</p>';
+
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    days.push(d.toISOString().slice(0,10));
+  }
+  const dayCounts = {};
+  days.forEach(d => dayCounts[d] = 0);
+  all.forEach(r => {
+    const ds = new Date(r.timestamp).toISOString().slice(0,10);
+    if (dayCounts[ds] !== undefined) dayCounts[ds]++;
+  });
+  const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  document.getElementById("dashDays").innerHTML = `
+    <table class="day-table" style="width:100%">
+      <thead><tr><th>Date</th><th>Day</th><th>Entries</th></tr></thead>
+      <tbody>
+        ${days.map(d => {
+          const dt = new Date(d + "T12:00:00");
+          return `<tr>
+            <td>${d}</td>
+            <td>${dayNames[dt.getDay()]}</td>
+            <td><b>${dayCounts[d]}</b></td>
+          </tr>`;
+        }).join("")}
+      </tbody>
+    </table>
+  `;
+
+  const delta = thisWeekCount - lastWeekCount;
+  const deltaStr = delta > 0 ? "▲ +" + delta + " vs last week" : delta < 0 ? "▼ " + delta + " vs last week" : "Same as last week";
+  const deltaColor = delta > 0 ? "#137333" : delta < 0 ? "#c5221f" : "#5f6368";
+  document.getElementById("dashWeeks").innerHTML = `
+    <div class="stat-card"><div class="stat-num">${thisWeekCount}</div><div class="stat-label">This Week</div></div>
+    <div class="stat-card"><div class="stat-num">${lastWeekCount}</div><div class="stat-label">Last Week</div></div>
+    <div class="stat-card" style="grid-column:span 2"><div class="stat-num" style="font-size:18px;color:${deltaColor}">${deltaStr}</div><div class="stat-label">Week-over-Week</div></div>
+  `;
+}
+
+// ============================
+// OCR
+// ============================
+document.getElementById("scan").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file || !file.type.startsWith("image")) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const preview = document.getElementById("imagePreview");
+    preview.src = event.target.result;
+    preview.style.display = "block";
+    document.getElementById("ocrStatus").style.display = "block";
+    document.getElementById("ocrError").textContent = "";
+
+    const img = new Image();
+    img.onload = () => {
+      Tesseract.recognize(img, "eng")
         .then(result => {
-          const text = result.data.text.replace(/[^A-Z0-9]/gi, "").trim();
+          const text = result.data.text.replace(/[^A-Z0-9]/gi, "").trim().toUpperCase();
+          document.getElementById("ocrStatus").style.display = "none";
           if (text) {
-            // Fill the serial input with the extracted text (not Base64)
             document.getElementById("serial").value = text;
           } else {
-            displayError("OCR could not read any text from the image.");
+            document.getElementById("ocrError").textContent = "OCR couldn't read text. Please type manually.";
           }
         })
-        .catch(error => {
-          console.error("OCR failed:", error);
-          displayError("OCR processing failed.");
+        .catch(() => {
+          document.getElementById("ocrStatus").style.display = "none";
+          document.getElementById("ocrError").textContent = "OCR failed. Please type manually.";
         });
-    }
+    };
+    img.src = event.target.result;
+  };
+  reader.readAsDataURL(file);
+});
 
-    // Display error message if OCR fails
-    function displayError(message) {
-      const errorMessage = document.createElement("div");
-      errorMessage.classList.add("error-message");
-      errorMessage.textContent = message;
-      document.body.appendChild(errorMessage);
-
-      setTimeout(() => {
-        errorMessage.remove();
-      }, 5000);
-    }
-
-    // ==========================
-    // Init
-    // ==========================
-    render();
-  </script>
-
+// ============================
+// INIT
+// ============================
+(function init() {
+  const savedTeam = getTeamPref();
+  if (savedTeam) {
+    const sel = document.getElementById("teamSelect");
+    for (let o of sel.options) { if (o.value === savedTeam) { o.selected = true; break; } }
+  }
+  updateHeaderTeam();
+})();
+</script>
 </body>
 </html>
