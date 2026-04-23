@@ -6,20 +6,21 @@
 <title>DriverTraxxx</title>
 <style>
   :root {
-    --bg: #f0f0f0;
-    --card: #ffffff;
-    --accent: #1a73e8;
-    --danger: #d93025;
-    --text: #202124;
-    --muted: #5f6368;
-    --border: #dadce0;
+    --bg: #0a0a0a;
+    --card: #111111;
+    --accent: #00a651;
+    --accent-dark: #007a3d;
+    --danger: #ff5449;
+    --text: #ffffff;
+    --muted: #888888;
+    --border: #2a2a2a;
     --radius: 8px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; background: var(--bg); color: var(--text); max-width: 600px; margin: 0 auto; }
 
-header { background: var(–accent); color: #fff; padding: 14px 16px 0; }
-header h1 { font-size: 22px; letter-spacing: 1px; }
+header { background: #000000; color: #fff; padding: 14px 16px 0; border-bottom: 3px solid var(–accent); }
+header h1 { font-size: 22px; letter-spacing: 2px; color: var(–accent); }
 
 .tabs { display: flex; border-top: 1px solid rgba(255,255,255,0.3); margin-top: 8px; }
 .tab {
@@ -57,7 +58,7 @@ accent-color: var(–danger); flex-shrink: 0;
 font-size: 15px; font-weight: bold; text-transform: uppercase;
 letter-spacing: 0.5px; cursor: pointer; color: var(–text);
 }
-.notag-row.checked { border-color: var(–danger); background: #fce8e6; }
+.notag-row.checked { border-color: var(–danger); background: #2a0f0f; }
 .notag-row.checked label { color: var(–danger); }
 
 .btn {
@@ -66,8 +67,8 @@ border: none; border-radius: var(–radius); cursor: pointer;
 font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;
 margin-top: 6px; width: 100%;
 }
-.btn-primary { background: var(–accent); color: #fff; }
-.btn-secondary { background: #e8f0fe; color: var(–accent); margin-top: 4px; }
+.btn-primary { background: var(–accent); color: #000; font-weight: 900; }
+.btn-secondary { background: #1a1a1a; color: var(–accent); border: 1px solid var(–accent); margin-top: 4px; }
 .btn-danger { background: var(–danger); color: #fff; padding: 7px 12px; font-size: 13px; width: auto; margin-top: 0; }
 .btn-sm { padding: 6px 10px; font-size: 12px; width: auto; margin-top: 0; }
 
@@ -95,18 +96,18 @@ padding: 2px 10px; border-radius: 12px;
 .record-serial { font-size: 17px; font-weight: bold; letter-spacing: 1px; }
 .record-badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 .record-status { font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-.badge-notag { background: #fce8e6; color: #c5221f; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-.status-CLEAN { background: #e6f4ea; color: #137333; }
-.status-DIRTY { background: #fce8e6; color: #c5221f; }
-.status-PM { background: #e8f0fe; color: #1a73e8; }
-.status-MK { background: #fef7e0; color: #f29900; }
-.status-MR { background: #fef7e0; color: #f29900; }
-.status-AUDIT { background: #f3e8fd; color: #7b1fa2; }
-.status-OTHER { background: #f1f3f4; color: #5f6368; }
-.status-GLASS { background: #e0f7fa; color: #00796b; }
-.status-WIDELETE { background: #fce8e6; color: #c5221f; }
+.badge-notag { background: #3d1a1a; color: #ff7066; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.status-CLEAN { background: #003d1f; color: #00a651; border: 1px solid #00a651; }
+.status-DIRTY { background: #3d1a1a; color: #ff7066; }
+.status-PM { background: #1a1a00; color: #e6e600; }
+.status-MK { background: #2a1a00; color: #f5a623; }
+.status-MR { background: #2a1a00; color: #f5a623; }
+.status-AUDIT { background: #1a001a; color: #cc66ff; }
+.status-OTHER { background: #1a1a1a; color: #888888; }
+.status-GLASS { background: #001a1a; color: #33cccc; }
+.status-WIDELETE { background: #3d1a1a; color: #ff7066; }
 .record-meta { font-size: 12px; color: var(–muted); margin-top: 4px; }
-.record-notes { font-size: 13px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(–border); color: #444; }
+.record-notes { font-size: 13px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(–border); color: #bbb; }
 .record-footer { display: flex; justify-content: flex-end; margin-top: 8px; }
 
 /* RECORDS TAB */
@@ -122,20 +123,20 @@ padding: 2px 10px; border-radius: 12px;
 .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
 .stat-card { background: var(–card); border: 1px solid var(–border); border-radius: var(–radius); padding: 12px; text-align: center; }
 .stat-card.clickable { cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
-.stat-card.clickable:hover { border-color: var(–accent); box-shadow: 0 2px 8px rgba(26,115,232,0.15); }
+.stat-card.clickable:hover { border-color: var(–accent); box-shadow: 0 2px 8px rgba(0,166,81,0.2); }
 .stat-num { font-size: 28px; font-weight: bold; color: var(–accent); }
 .stat-label { font-size: 11px; text-transform: uppercase; color: var(–muted); letter-spacing: 0.5px; }
 .bar-chart { background: var(–card); border: 1px solid var(–border); border-radius: var(–radius); padding: 12px; }
 .bar-row { display: flex; align-items: center; margin-bottom: 8px; gap: 8px; }
 .bar-key { font-size: 12px; font-weight: bold; width: 80px; text-align: right; flex-shrink: 0; text-transform: uppercase; }
-.bar-track { flex: 1; background: #f1f3f4; border-radius: 4px; height: 18px; overflow: hidden; }
+.bar-track { flex: 1; background: #2a2a2a; border-radius: 4px; height: 18px; overflow: hidden; }
 .bar-fill { height: 100%; background: var(–accent); border-radius: 4px; transition: width 0.3s; }
 .bar-val { font-size: 12px; color: var(–muted); width: 24px; flex-shrink: 0; }
 .day-table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(–card); border-radius: var(–radius); overflow: hidden; border: 1px solid var(–border); }
-.day-table th { background: #f1f3f4; padding: 8px 10px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(–muted); }
+.day-table th { background: #2a2a2a; padding: 8px 10px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(–muted); }
 .day-table td { padding: 8px 10px; border-top: 1px solid var(–border); }
 .day-table tr.has-entries { cursor: pointer; }
-.day-table tr.has-entries:hover td { background: #e8f0fe; }
+.day-table tr.has-entries:hover td { background: #003d1f; }
 .day-table td.tap-hint { font-size: 11px; color: var(–accent); }
 </style>
 
@@ -517,37 +518,62 @@ function renderDashboard() {
       </div>
     `).join("") || '<p style="color:var(--muted);padding:8px">No data yet.</p>';
 
-  // Last 7 days — clickable rows
+  // Last 7 days — clickable rows with avg trip time
   const days = [];
   for (let i=6; i>=0; i--) {
     const d = new Date(now); d.setDate(d.getDate()-i);
     days.push(isoDate(d));
   }
-  const dc = {};
-  days.forEach(d => dc[d]=0);
-  all.forEach(r => { const ds=isoDate(new Date(r.timestamp)); if(dc[ds]!==undefined) dc[ds]++; });
+
+  // Group records by day, sorted oldest->newest per day
+  const byDay = {};
+  days.forEach(d => byDay[d] = []);
+  all.forEach(r => {
+    const ds = isoDate(new Date(r.timestamp));
+    if (byDay[ds] !== undefined) byDay[ds].push(r.timestamp);
+  });
+  days.forEach(d => byDay[d].sort((a,b) => a - b));
+
+  function avgTripTime(timestamps) {
+    if (timestamps.length < 2) return null;
+    const gaps = [];
+    for (let i = 1; i < timestamps.length; i++) {
+      gaps.push(timestamps[i] - timestamps[i-1]);
+    }
+    const avgMs = gaps.reduce((a,b) => a+b, 0) / gaps.length;
+    const mins = Math.round(avgMs / 60000);
+    if (mins < 60) return mins + "m";
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  }
+
   const dn = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
   document.getElementById("dashDays").innerHTML = `
     <table class="day-table" style="width:100%">
-      <thead><tr><th>Date</th><th>Day</th><th>Entries</th><th></th></tr></thead>
+      <thead><tr><th>Date</th><th>Day</th><th>Trips</th><th>Avg Time</th><th></th></tr></thead>
       <tbody>
         ${days.map(d => {
           const dt = new Date(d+"T12:00:00");
-          const cnt = dc[d];
+          const cnt = byDay[d].length;
           const isToday = d === today;
+          const avg = avgTripTime(byDay[d]);
+          const dateCell = `${d}${isToday ? ' <b style="color:var(--accent)">(today)</b>' : ''}`;
           if (cnt > 0) {
             return `<tr class="has-entries" onclick="viewByDate('${d}')">
-              <td>${d}${isToday ? ' <b style="color:var(--accent)">(today)</b>' : ''}</td>
+              <td>${dateCell}</td>
               <td>${dn[dt.getDay()]}</td>
               <td><b>${cnt}</b></td>
+              <td style="color:var(--accent);font-weight:bold">${avg || '<span style="color:var(--muted)">—</span>'}</td>
               <td class="tap-hint">View &#8594;</td>
             </tr>`;
           } else {
             return `<tr>
-              <td>${d}${isToday ? ' <b style="color:var(--accent)">(today)</b>' : ''}</td>
+              <td>${dateCell}</td>
               <td>${dn[dt.getDay()]}</td>
               <td style="color:var(--muted)">0</td>
+              <td style="color:var(--muted)">—</td>
               <td></td>
             </tr>`;
           }
