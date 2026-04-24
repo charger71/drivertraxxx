@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,127 +18,148 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; background: var(--bg); color: var(--text); max-width: 600px; margin: 0 auto; }
 
-header { background: #000000; color: #fff; padding: 14px 16px 0; border-bottom: 3px solid var(–accent); }
-header h1 { font-size: 22px; letter-spacing: 2px; color: var(–accent); }
+  header { background: #000000; color: #fff; padding: 14px 16px 0; border-bottom: 3px solid var(--accent); }
+  header h1 { font-size: 22px; letter-spacing: 2px; color: var(--accent); }
 
-.tabs { display: flex; border-top: 1px solid rgba(255,255,255,0.3); margin-top: 8px; }
-.tab {
-flex: 1; padding: 10px; text-align: center; font-size: 13px;
-font-weight: bold; cursor: pointer; color: rgba(255,255,255,0.7);
-border-bottom: 3px solid transparent; letter-spacing: 0.5px;
-}
-.tab.active { color: #fff; border-bottom: 3px solid #fff; }
+  .tabs { display: flex; border-top: 1px solid rgba(255,255,255,0.3); margin-top: 8px; }
+  .tab {
+    flex: 1; padding: 10px; text-align: center; font-size: 13px;
+    font-weight: bold; cursor: pointer; color: rgba(255,255,255,0.7);
+    border-bottom: 3px solid transparent; letter-spacing: 0.5px;
+  }
+  .tab.active { color: #fff; border-bottom: 3px solid #fff; }
 
-.panel { display: none; padding: 14px 16px; }
-.panel.active { display: block; }
+  .panel { display: none; padding: 14px 16px; }
+  .panel.active { display: block; }
 
-.field-label { font-size: 11px; font-weight: bold; color: var(–muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; margin-top: 10px; }
+  .field-label { font-size: 11px; font-weight: bold; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; margin-top: 10px; }
 
-input[type=text], select, textarea {
-width: 100%; padding: 11px 12px; font-size: 15px;
-border: 1px solid var(–border); border-radius: var(–radius);
-background: var(–card); color: var(–text);
-text-transform: uppercase; margin-bottom: 4px;
-}
-textarea { text-transform: none; height: 70px; resize: vertical; }
-input[type=file] { font-size: 14px; margin-bottom: 4px; }
+  input[type=text], select, textarea {
+    width: 100%; padding: 11px 12px; font-size: 15px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--card); color: var(--text);
+    text-transform: uppercase; margin-bottom: 4px;
+  }
+  textarea { text-transform: none; height: 70px; resize: vertical; }
+  input[type=file] { font-size: 14px; margin-bottom: 4px; }
 
-.notag-row {
-display: flex; align-items: center; gap: 12px;
-background: var(–card); border: 2px solid var(–border);
-border-radius: var(–radius); padding: 12px; margin-top: 10px;
-cursor: pointer;
-}
-.notag-row input[type=checkbox] {
-width: 22px; height: 22px; margin: 0; cursor: pointer;
-accent-color: var(–danger); flex-shrink: 0;
-}
-.notag-row label {
-font-size: 15px; font-weight: bold; text-transform: uppercase;
-letter-spacing: 0.5px; cursor: pointer; color: var(–text);
-}
-.notag-row.checked { border-color: var(–danger); background: #2a0f0f; }
-.notag-row.checked label { color: var(–danger); }
+  .notag-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card); border: 2px solid var(--border);
+    border-radius: var(--radius); padding: 12px; margin-top: 10px;
+    cursor: pointer;
+  }
+  .notag-row input[type=checkbox] {
+    width: 22px; height: 22px; margin: 0; cursor: pointer;
+    accent-color: var(--danger); flex-shrink: 0;
+  }
+  .notag-row label {
+    font-size: 15px; font-weight: bold; text-transform: uppercase;
+    letter-spacing: 0.5px; cursor: pointer; color: var(--text);
+  }
+  .notag-row.checked { border-color: var(--danger); background: #2a0f0f; }
+  .notag-row.checked label { color: var(--danger); }
 
-.btn {
-display: inline-block; padding: 11px 18px; font-size: 15px;
-border: none; border-radius: var(–radius); cursor: pointer;
-font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;
-margin-top: 6px; width: 100%;
-}
-.btn-primary { background: var(–accent); color: #000; font-weight: 900; }
-.btn-secondary { background: #1a1a1a; color: var(–accent); border: 1px solid var(–accent); margin-top: 4px; }
-.btn-danger { background: var(–danger); color: #fff; padding: 7px 12px; font-size: 13px; width: auto; margin-top: 0; }
-.btn-sm { padding: 6px 10px; font-size: 12px; width: auto; margin-top: 0; }
+  .btn {
+    display: inline-block; padding: 11px 18px; font-size: 15px;
+    border: none; border-radius: var(--radius); cursor: pointer;
+    font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;
+    margin-top: 6px; width: 100%;
+  }
+  .btn-primary { background: var(--accent); color: #000; font-weight: 900; }
+  .btn-secondary { background: #1a1a1a; color: var(--accent); border: 1px solid var(--accent); margin-top: 4px; }
+  .btn-danger { background: var(--danger); color: #fff; padding: 7px 12px; font-size: 13px; width: auto; margin-top: 0; }
+  .btn-sm { padding: 6px 10px; font-size: 12px; width: auto; margin-top: 0; }
 
-.img-preview { width: 100%; max-width: 280px; border-radius: var(–radius); border: 1px solid var(–border); margin: 6px 0; display: none; }
-.error-msg { color: var(–danger); font-size: 13px; margin-top: 4px; }
-.ocr-status { font-size: 13px; color: var(–muted); margin-top: 4px; display: none; }
+  .img-preview { width: 100%; max-width: 280px; border-radius: var(--radius); border: 1px solid var(--border); margin: 6px 0; display: none; }
+  .error-msg { color: var(--danger); font-size: 13px; margin-top: 4px; }
+  .ocr-status { font-size: 13px; color: var(--muted); margin-top: 4px; display: none; }
 
-/* TODAY’S ENTRIES SECTION */
-.today-header {
-display: flex; justify-content: space-between; align-items: center;
-margin-top: 20px; margin-bottom: 8px; padding-top: 16px;
-border-top: 2px solid var(–border);
-}
-.today-title { font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: var(–muted); }
-.today-count {
-background: var(–accent); color: #fff;
-font-size: 12px; font-weight: bold;
-padding: 2px 10px; border-radius: 12px;
-}
-.today-empty { font-size: 13px; color: var(–muted); text-align: center; padding: 16px 0; }
+  /* TODAY'S ENTRIES SECTION */
+  .today-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 20px; margin-bottom: 8px; padding-top: 16px;
+    border-top: 2px solid var(--border);
+  }
+  .today-title { font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+  .today-count {
+    background: var(--accent); color: #fff;
+    font-size: 12px; font-weight: bold;
+    padding: 2px 10px; border-radius: 12px;
+  }
+  .today-empty { font-size: 13px; color: var(--muted); text-align: center; padding: 16px 0; }
 
-/* SHARED RECORD CARD */
-.record { background: var(–card); border-radius: var(–radius); border: 1px solid var(–border); padding: 12px; margin-bottom: 8px; }
-.record-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-.record-serial { font-size: 17px; font-weight: bold; letter-spacing: 1px; }
-.record-badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-.record-status { font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-.badge-notag { background: #3d1a1a; color: #ff7066; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-.status-CLEAN { background: #003d1f; color: #00a651; border: 1px solid #00a651; }
-.status-DIRTY { background: #3d1a1a; color: #ff7066; }
-.status-PM { background: #1a1a00; color: #e6e600; }
-.status-MK { background: #2a1a00; color: #f5a623; }
-.status-MR { background: #2a1a00; color: #f5a623; }
-.status-AUDIT { background: #1a001a; color: #cc66ff; }
-.status-OTHER { background: #1a1a1a; color: #888888; }
-.status-GLASS { background: #001a1a; color: #33cccc; }
-.status-WIDELETE { background: #3d1a1a; color: #ff7066; }
-.record-meta { font-size: 12px; color: var(–muted); margin-top: 4px; }
-.record-notes { font-size: 13px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(–border); color: #bbb; }
-.record-footer { display: flex; justify-content: flex-end; margin-top: 8px; }
+  /* SHARED RECORD CARD */
+  .record { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 12px; margin-bottom: 8px; }
+  .record-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .record-serial { font-size: 17px; font-weight: bold; letter-spacing: 1px; }
+  .record-badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .record-status { font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-notag { background: #3d1a1a; color: #ff7066; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .status-CLEAN { background: #003d1f; color: #00a651; border: 1px solid #00a651; }
+  .status-DIRTY { background: #3d1a1a; color: #ff7066; }
+  .status-PM { background: #1a1a00; color: #e6e600; }
+  .status-MK { background: #2a1a00; color: #f5a623; }
+  .status-MR { background: #2a1a00; color: #f5a623; }
+  .status-AUDIT { background: #1a001a; color: #cc66ff; }
+  .status-OTHER { background: #1a1a1a; color: #888888; }
+  .status-GLASS { background: #001a1a; color: #33cccc; }
+  .status-WIDELETE { background: #3d1a1a; color: #ff7066; }
+  .record-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .record-notes { font-size: 13px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); color: #bbb; }
+  .record-footer { display: flex; justify-content: flex-end; margin-top: 8px; }
 
-/* RECORDS TAB */
-.filter-bar { background: var(–card); border-radius: var(–radius); padding: 12px; margin-bottom: 10px; border: 1px solid var(–border); }
-.filter-row { display: flex; gap: 8px; margin-bottom: 6px; }
-.filter-row input, .filter-row select { margin: 0; font-size: 13px; padding: 8px 10px; text-transform: none; flex: 1; }
-.filter-label { font-size: 11px; color: var(–muted); font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
-.results-count { font-size: 12px; color: var(–muted); margin-bottom: 8px; }
+  /* RECORDS TAB */
+  .filter-bar { background: var(--card); border-radius: var(--radius); padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); }
+  .filter-row { display: flex; gap: 8px; margin-bottom: 6px; }
+  .filter-row input, .filter-row select { margin: 0; font-size: 13px; padding: 8px 10px; text-transform: none; flex: 1; }
+  .filter-label { font-size: 11px; color: var(--muted); font-weight: bold; text-transform: uppercase; margin-bottom: 4px; }
+  .results-count { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
 
-/* DASHBOARD */
-.dash-section { margin-bottom: 20px; }
-.dash-title { font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: var(–muted); margin-bottom: 10px; }
-.stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
-.stat-card { background: var(–card); border: 1px solid var(–border); border-radius: var(–radius); padding: 12px; text-align: center; }
-.stat-card.clickable { cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
-.stat-card.clickable:hover { border-color: var(–accent); box-shadow: 0 2px 8px rgba(0,166,81,0.2); }
-.stat-num { font-size: 28px; font-weight: bold; color: var(–accent); }
-.stat-label { font-size: 11px; text-transform: uppercase; color: var(–muted); letter-spacing: 0.5px; }
-.bar-chart { background: var(–card); border: 1px solid var(–border); border-radius: var(–radius); padding: 12px; }
-.bar-row { display: flex; align-items: center; margin-bottom: 8px; gap: 8px; }
-.bar-key { font-size: 12px; font-weight: bold; width: 80px; text-align: right; flex-shrink: 0; text-transform: uppercase; }
-.bar-track { flex: 1; background: #2a2a2a; border-radius: 4px; height: 18px; overflow: hidden; }
-.bar-fill { height: 100%; background: var(–accent); border-radius: 4px; transition: width 0.3s; }
-.bar-val { font-size: 12px; color: var(–muted); width: 24px; flex-shrink: 0; }
-.day-table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(–card); border-radius: var(–radius); overflow: hidden; border: 1px solid var(–border); }
-.day-table th { background: #2a2a2a; padding: 8px 10px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(–muted); }
-.day-table td { padding: 8px 10px; border-top: 1px solid var(–border); }
-.day-table tr.has-entries { cursor: pointer; }
-.day-table tr.has-entries:hover td { background: #003d1f; }
-.day-table td.tap-hint { font-size: 11px; color: var(–accent); }
+  /* DASHBOARD */
+  .dash-section { margin-bottom: 20px; }
+  .dash-title { font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 10px; }
+  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; text-align: center; }
+  .stat-card.clickable { cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+  .stat-card.clickable:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,166,81,0.2); }
+  .stat-num { font-size: 28px; font-weight: bold; color: var(--accent); }
+  .stat-label { font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px; }
+  .bar-chart { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
+  .bar-row { display: flex; align-items: center; margin-bottom: 8px; gap: 8px; }
+  .bar-key { font-size: 12px; font-weight: bold; width: 80px; text-align: right; flex-shrink: 0; text-transform: uppercase; }
+  .bar-track { flex: 1; background: #2a2a2a; border-radius: 4px; height: 18px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.3s; }
+  .bar-val { font-size: 12px; color: var(--muted); width: 24px; flex-shrink: 0; }
+  .day-table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--card); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+  .day-table th { background: #2a2a2a; padding: 8px 10px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+  .day-table td { padding: 8px 10px; border-top: 1px solid var(--border); }
+  .day-table tr.has-entries { cursor: pointer; }
+  .day-table tr.has-entries:hover td { background: #003d1f; }
+  .day-table td.tap-hint { font-size: 11px; color: var(--accent); }
+  /* AVG TRIP TIME BANNER */
+  #avgBanner {
+    background: var(--accent);
+    color: #000;
+    text-align: center;
+    padding: 10px 16px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .avg-banner-label {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+  .avg-banner-time {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    line-height: 1.1;
+  }
 </style>
-
 </head>
 <body>
 
@@ -152,8 +172,12 @@ padding: 2px 10px; border-radius: 12px;
   </div>
 </header>
 
-<!-- ==================== ENTRY PANEL ==================== -->
+<div id="avgBanner" style="display:none">
+  <div class="avg-banner-label">TODAY'S AVERAGE TRIP TIME</div>
+  <div class="avg-banner-time" id="avgBannerTime">—</div>
+</div>
 
+<!-- ==================== ENTRY PANEL ==================== -->
 <div class="panel active" id="panel-entry">
 
   <div class="field-label">Serial ID</div>
@@ -187,10 +211,9 @@ padding: 2px 10px; border-radius: 12px;
   <div class="field-label">Notes</div>
   <textarea id="notes" placeholder="Optional notes..."></textarea>
 
-<button class="btn btn-primary" onclick="saveRecord()">💾 SAVE RECORD</button>
+  <button class="btn btn-primary" onclick="saveRecord()">&#128190; SAVE RECORD</button>
 
   <!-- TODAY'S ENTRIES -->
-
   <div class="today-header">
     <span class="today-title">Today's Entries</span>
     <span class="today-count" id="todayCount">0</span>
@@ -199,7 +222,6 @@ padding: 2px 10px; border-radius: 12px;
 </div>
 
 <!-- ==================== RECORDS PANEL ==================== -->
-
 <div class="panel" id="panel-records">
 
   <div class="filter-bar">
@@ -232,7 +254,6 @@ padding: 2px 10px; border-radius: 12px;
 </div>
 
 <!-- ==================== DASHBOARD PANEL ==================== -->
-
 <div class="panel" id="panel-dashboard">
 
   <div class="dash-section">
@@ -258,7 +279,6 @@ padding: 2px 10px; border-radius: 12px;
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
 <script>
 
 const DB_KEY = "drivertraxxx_records";
@@ -311,6 +331,37 @@ function recordCard(r, onDelete) {
 }
 
 // ============================
+// AVG BANNER
+// ============================
+function updateAvgBanner() {
+  const today = todayStr();
+  const timestamps = getRecords()
+    .filter(r => new Date(r.timestamp).toISOString().slice(0,10) === today)
+    .map(r => r.timestamp)
+    .sort((a,b) => a - b);
+
+  const banner = document.getElementById("avgBanner");
+
+  if (timestamps.length < 2) {
+    banner.style.display = "none";
+    return;
+  }
+
+  const gaps = [];
+  for (let i = 1; i < timestamps.length; i++) {
+    gaps.push(timestamps[i] - timestamps[i-1]);
+  }
+  const avgMs = gaps.reduce((a,b) => a+b, 0) / gaps.length;
+  const mins = Math.round(avgMs / 60000);
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  const timeStr = h > 0 ? (m > 0 ? `${h}h ${m}m` : `${h}h`) : `${m}m`;
+
+  document.getElementById("avgBannerTime").textContent = timeStr;
+  banner.style.display = "block";
+}
+
+// ============================
 // SAVE RECORD
 // ============================
 function saveRecord() {
@@ -347,6 +398,7 @@ function renderTodayEntries() {
   const today = todayStr();
   const records = getRecords().filter(r => new Date(r.timestamp).toISOString().slice(0,10) === today);
   document.getElementById("todayCount").textContent = records.length;
+  updateAvgBanner();
   if (records.length === 0) {
     document.getElementById("todayRecords").innerHTML = '<div class="today-empty">No entries yet today.</div>';
     return;
@@ -639,6 +691,5 @@ document.getElementById("scan").addEventListener("change", async (e) => {
 renderTodayEntries();
 
 </script>
-
 </body>
 </html>
