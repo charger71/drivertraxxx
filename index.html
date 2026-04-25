@@ -21,15 +21,15 @@
   header { background: #000000; color: #fff; padding: 14px 16px 0; border-bottom: 3px solid var(--accent); }
   header h1 { font-size: 22px; letter-spacing: 2px; color: var(--accent); }
 
-  .tabs { display: flex; border-top: 1px solid rgba(255,255,255,0.3); margin-top: 8px; }
+  .tabs { display: flex; margin-top: 8px; }
   .tab {
     flex: 1; padding: 10px; text-align: center; font-size: 13px;
-    font-weight: bold; cursor: pointer; color: rgba(255,255,255,0.7);
-    border-bottom: 3px solid transparent; letter-spacing: 0.5px;
+    font-weight: bold; cursor: pointer; color: rgba(255,255,255,0.6);
+    background: rgba(0,0,0,0.3); letter-spacing: 0.5px;
   }
-  .tab.active { color: #fff; border-bottom: 3px solid #fff; }
+  .tab.active { color: #000; background: var(--accent); }
 
-  .panel { display: none; padding: 14px 16px; }
+  .panel { display: none; padding: 20px 20px; }
   .panel.active { display: block; }
 
   .field-label { font-size: 11px; font-weight: bold; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; margin-top: 10px; }
@@ -49,7 +49,7 @@
     cursor: pointer;
   }
   .notag-row input[type=checkbox] {
-    width: 22px; height: 22px; margin: 0; cursor: pointer;
+    width: 11px; height: 11px; margin: 0; cursor: pointer;
     accent-color: var(--danger); flex-shrink: 0;
   }
   .notag-row label {
@@ -148,7 +148,7 @@
 
   /* LARGE SCAN BUTTON */
   .btn-scan-primary {
-    width: 100%; padding: 20px; margin-top: 10px;
+    width: 100%; padding: 26px; margin-top: 10px;
     background: var(--accent); color: #000; border: none;
     border-radius: var(--radius); font-size: 20px; font-weight: 900;
     letter-spacing: 1.5px; cursor: pointer;
@@ -157,10 +157,12 @@
   .btn-scan-primary:active { background: var(--accent-dark); }
 
   .btn-manual-toggle {
-    width: 100%; padding: 10px; margin-top: 8px;
+    width: 50%; padding: 10px; margin-top: 8px;
+    display: block; margin-left: auto; margin-right: auto;
     background: transparent; color: var(--muted);
     border: 1px solid var(--border); border-radius: var(--radius);
     font-size: 13px; cursor: pointer; letter-spacing: 0.5px;
+    text-align: center;
   }
   .btn-manual-toggle:active { color: var(--text); border-color: var(--text); }
 
@@ -268,24 +270,17 @@
   .toast-success { background: var(--accent); color: #000; }
   .toast-warn { background: #b85c00; color: #fff; }
   .toast-error { background: var(--danger); color: #fff; }
-  /* WEATHER BAR */
-  #weatherBar {
-    background: #0a0a0a; border-bottom: 1px solid var(--border);
-    max-width: 600px; margin: 0 auto;
+  /* WEATHER ALERT */
+  #weatherAlert {
+    display: none; max-width: 600px; margin: 0 auto;
+    background: #7a1a00; border-bottom: 2px solid #ff6b35;
+    padding: 10px 16px;
   }
-  .weather-inner {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 7px 16px; gap: 12px; flex-wrap: wrap;
-  }
-  .weather-loading { font-size: 12px; color: var(--muted); }
-  .weather-loc { font-size: 11px; font-weight: bold; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
-  .weather-main { display: flex; align-items: center; gap: 8px; }
-  .weather-icon { font-size: 22px; line-height: 1; }
-  .weather-temp { font-size: 22px; font-weight: 900; color: var(--text); }
-  .weather-desc { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-  .weather-details { display: flex; gap: 10px; }
-  .weather-detail { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 3px; }
-  .weather-detail span { color: var(--text); font-weight: bold; }
+  .weather-alert-inner { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .weather-alert-text { display: flex; align-items: center; gap: 8px; flex: 1; }
+  .weather-alert-icon { font-size: 18px; flex-shrink: 0; }
+  .weather-alert-msg { font-size: 12px; font-weight: bold; color: #ffcdb2; letter-spacing: 0.3px; line-height: 1.3; }
+  .weather-alert-close { background: none; border: none; color: #ffcdb2; font-size: 18px; cursor: pointer; padding: 0 4px; flex-shrink: 0; }
 
   /* AVG BANNER */
   #avgBanner {
@@ -329,9 +324,13 @@
   </div>
 </header>
 
-<div id="weatherBar">
-  <div class="weather-inner" id="weatherInner">
-    <span class="weather-loading">Loading weather...</span>
+<div id="weatherAlert">
+  <div class="weather-alert-inner">
+    <div class="weather-alert-text">
+      <div class="weather-alert-icon">⚠️</div>
+      <div class="weather-alert-msg" id="weatherAlertMsg"></div>
+    </div>
+    <button class="weather-alert-close" onclick="dismissWeatherAlert()">✕</button>
   </div>
 </div>
 
@@ -367,6 +366,7 @@
 
   <div class="field-label">Status</div>
   <select id="status">
+    <option value="">-- SELECT STATUS --</option>
     <option>CLEAN</option>
     <option>DIRTY</option>
     <option>PM</option>
@@ -586,63 +586,53 @@ function recordCard(r, onDelete) {
 }
 
 // ============================
-// WEATHER (SDF / Louisville 40213)
+// WEATHER ALERT (SDF / Louisville 40213)
 // ============================
-const WMO_CODES = {
-  0:"Clear", 1:"Mostly Clear", 2:"Partly Cloudy", 3:"Overcast",
-  45:"Foggy", 48:"Icy Fog",
-  51:"Light Drizzle", 53:"Drizzle", 55:"Heavy Drizzle",
-  61:"Light Rain", 63:"Rain", 65:"Heavy Rain",
-  71:"Light Snow", 73:"Snow", 75:"Heavy Snow", 77:"Snow Grains",
-  80:"Rain Showers", 81:"Showers", 82:"Heavy Showers",
-  85:"Snow Showers", 86:"Heavy Snow Showers",
-  95:"Thunderstorm", 96:"Thunderstorm+Hail", 99:"Thunderstorm+Hail"
+const EXTREME_CODES = {
+  65:"Heavy Rain", 75:"Heavy Snow", 77:"Snow Grains",
+  82:"Violent Showers", 85:"Snow Showers", 86:"Heavy Snow Showers",
+  95:"Thunderstorm", 96:"Thunderstorm + Hail", 99:"Thunderstorm + Heavy Hail"
 };
 
-const WMO_ICON = {
-  0:"☀️", 1:"🌤️", 2:"⛅", 3:"☁️",
-  45:"🌫️", 48:"🌫️",
-  51:"🌦️", 53:"🌦️", 55:"🌧️",
-  61:"🌧️", 63:"🌧️", 65:"🌧️",
-  71:"🌨️", 73:"❄️", 75:"❄️", 77:"🌨️",
-  80:"🌦️", 81:"🌧️", 82:"⛈️",
-  85:"🌨️", 86:"❄️",
-  95:"⛈️", 96:"⛈️", 99:"⛈️"
-};
+const ALERT_DISMISSED_KEY = "drivertraxxx_alert_dismissed";
 
-async function loadWeather() {
-  const el = document.getElementById("weatherInner");
+function dismissWeatherAlert() {
+  const alert = document.getElementById("weatherAlert");
+  alert.style.display = "none";
+  // Remember dismissed for 30 min so it doesn't keep reappearing
+  localStorage.setItem(ALERT_DISMISSED_KEY, Date.now().toString());
+}
+
+async function checkWeatherAlert() {
+  // Don't show if dismissed in last 30 min
+  const dismissed = parseInt(localStorage.getItem(ALERT_DISMISSED_KEY) || "0");
+  if (Date.now() - dismissed < 30 * 60 * 1000) return;
+
   try {
-    // SDF Louisville International Airport coords
-    const url = "https://api.open-meteo.com/v1/forecast?latitude=38.1741&longitude=-85.7368&current=temperature_2m,apparent_temperature,weathercode,windspeed_10m,relativehumidity_2m&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FChicago";
+    const url = "https://api.open-meteo.com/v1/forecast?latitude=38.1741&longitude=-85.7368&current=temperature_2m,weathercode,windspeed_10m&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FChicago";
     const res = await fetch(url);
     const data = await res.json();
     const c = data.current;
     const code = c.weathercode;
-    const icon = WMO_ICON[code] || "🌡️";
-    const desc = WMO_CODES[code] || "Unknown";
     const temp = Math.round(c.temperature_2m);
-    const feels = Math.round(c.apparent_temperature);
     const wind = Math.round(c.windspeed_10m);
-    const humidity = c.relativehumidity_2m;
 
-    el.innerHTML = `
-      <div class="weather-loc">&#128507; SDF Louisville</div>
-      <div class="weather-main">
-        <div class="weather-icon">${icon}</div>
-        <div>
-          <div class="weather-temp">${temp}°F</div>
-          <div class="weather-desc">${desc}</div>
-        </div>
-      </div>
-      <div class="weather-details">
-        <div class="weather-detail">Feels <span>${feels}°</span></div>
-        <div class="weather-detail">💨 <span>${wind}mph</span></div>
-        <div class="weather-detail">💧 <span>${humidity}%</span></div>
-      </div>
-    `;
+    const alerts = [];
+    if (EXTREME_CODES[code]) alerts.push(EXTREME_CODES[code]);
+    if (temp <= 20) alerts.push(`Extreme Cold: ${temp}°F`);
+    if (temp >= 100) alerts.push(`Extreme Heat: ${temp}°F`);
+    if (wind >= 40) alerts.push(`High Winds: ${wind}mph`);
+
+    const alertEl = document.getElementById("weatherAlert");
+    if (alerts.length > 0) {
+      document.getElementById("weatherAlertMsg").textContent =
+        "⚠️ SDF WEATHER ALERT: " + alerts.join(" · ");
+      alertEl.style.display = "block";
+    } else {
+      alertEl.style.display = "none";
+    }
   } catch(e) {
-    el.innerHTML = '<span class="weather-loading">Weather unavailable</span>';
+    // Silently fail — no alert shown if fetch fails
   }
 }
 
@@ -706,6 +696,8 @@ function showToast(msg, type = "success") {
 function saveRecord() {
   const serial = document.getElementById("serial").value.trim().toUpperCase();
   if (!serial) { showToast("Please enter or scan a Serial ID.", "error"); return; }
+  const statusVal = document.getElementById("status").value;
+  if (!statusVal) { showToast("Please select a status.", "error"); return; }
 
   const saveBtn = document.getElementById("saveBtn");
   const gpsEl = document.getElementById("gpsStatus");
@@ -719,7 +711,7 @@ function saveRecord() {
   const recordData = {
     id: Date.now().toString(),
     serialId: serial,
-    status: document.getElementById("status").value,
+    status: statusVal,
     destination: document.getElementById("destination").value,
     noTag: document.getElementById("noTag").checked,
     shuttle: document.getElementById("shuttle").checked,
@@ -1162,9 +1154,8 @@ if (localStorage.getItem(SHUTTLE_KEY) === "1") {
   document.getElementById("shuttle").checked = true;
   document.getElementById("shuttleRow").classList.add("shuttle-checked");
 }
-loadWeather();
-setInterval(loadWeather, 10 * 60 * 1000); // refresh every 10 min
-renderTodayEntries();
+checkWeatherAlert();
+setInterval(checkWeatherAlert, 15 * 60 * 1000); // recheck every 15 minrenderTodayEntries();
 
 </script>
 </body>
