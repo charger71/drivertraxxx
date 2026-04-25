@@ -41,7 +41,6 @@
     text-transform: uppercase; margin-bottom: 4px;
   }
   textarea { text-transform: none; height: 70px; resize: vertical; }
-  input[type=file] { font-size: 14px; margin-bottom: 4px; }
 
   .notag-row {
     display: flex; align-items: center; gap: 12px;
@@ -59,6 +58,8 @@
   }
   .notag-row.checked { border-color: var(--danger); background: #2a0f0f; }
   .notag-row.checked label { color: var(--danger); }
+  .shuttle-row.shuttle-checked { border-color: #4d9bff; background: #0a1a2e; }
+  .shuttle-row.shuttle-checked label { color: #4d9bff; }
 
   .btn {
     display: inline-block; padding: 11px 18px; font-size: 15px;
@@ -71,9 +72,7 @@
   .btn-danger { background: var(--danger); color: #fff; padding: 7px 12px; font-size: 13px; width: auto; margin-top: 0; }
   .btn-sm { padding: 6px 10px; font-size: 12px; width: auto; margin-top: 0; }
 
-  .img-preview { width: 100%; max-width: 280px; border-radius: var(--radius); border: 1px solid var(--border); margin: 6px 0; display: none; }
   .error-msg { color: var(--danger); font-size: 13px; margin-top: 4px; }
-  .ocr-status { font-size: 13px; color: var(--muted); margin-top: 4px; display: none; }
 
   /* TODAY'S ENTRIES SECTION */
   .today-header {
@@ -97,6 +96,7 @@
   .record-status { font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
   .badge-dest { background: #001a0d; color: #00a651; border: 1px solid #00a651; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
   .badge-notag { background: #3d1a1a; color: #ff7066; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-shuttle { background: #0a1a2e; color: #4d9bff; border: 1px solid #4d9bff; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
   .status-CLEAN { background: #003d1f; color: #00a651; border: 1px solid #00a651; }
   .status-DIRTY { background: #3d1a1a; color: #ff7066; }
   .status-PM { background: #1a1a00; color: #e6e600; }
@@ -268,26 +268,53 @@
   .toast-success { background: var(--accent); color: #000; }
   .toast-warn { background: #b85c00; color: #fff; }
   .toast-error { background: var(--danger); color: #fff; }
+  /* WEATHER BAR */
+  #weatherBar {
+    background: #0a0a0a; border-bottom: 1px solid var(--border);
+    max-width: 600px; margin: 0 auto;
+  }
+  .weather-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 16px; gap: 12px; flex-wrap: wrap;
+  }
+  .weather-loading { font-size: 12px; color: var(--muted); }
+  .weather-loc { font-size: 11px; font-weight: bold; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+  .weather-main { display: flex; align-items: center; gap: 8px; }
+  .weather-icon { font-size: 22px; line-height: 1; }
+  .weather-temp { font-size: 22px; font-weight: 900; color: var(--text); }
+  .weather-desc { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .weather-details { display: flex; gap: 10px; }
+  .weather-detail { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 3px; }
+  .weather-detail span { color: var(--text); font-weight: bold; }
+
+  /* AVG BANNER */
   #avgBanner {
     background: var(--accent);
     color: #000;
-    text-align: center;
-    padding: 10px 16px;
     max-width: 600px;
     margin: 0 auto;
+  }
+  .avg-banner-stats {
+    display: flex; align-items: stretch;
+  }
+  .avg-banner-stat {
+    flex: 1; text-align: center; padding: 10px 16px;
+  }
+  .avg-banner-divider {
+    width: 1px; background: rgba(0,0,0,0.2); margin: 8px 0;
   }
   .avg-banner-label {
     font-size: 10px;
     font-weight: 900;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    opacity: 0.75;
+    opacity: 0.7;
   }
   .avg-banner-time {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 900;
     letter-spacing: 2px;
-    line-height: 1.1;
+    line-height: 1.2;
   }
 </style>
 </head>
@@ -302,9 +329,24 @@
   </div>
 </header>
 
+<div id="weatherBar">
+  <div class="weather-inner" id="weatherInner">
+    <span class="weather-loading">Loading weather...</span>
+  </div>
+</div>
+
 <div id="avgBanner" style="display:none">
-  <div class="avg-banner-label">TODAY'S AVERAGE TRIP TIME</div>
-  <div class="avg-banner-time" id="avgBannerTime">—</div>
+  <div class="avg-banner-stats">
+    <div class="avg-banner-stat">
+      <div class="avg-banner-label">AVG TRIP TIME</div>
+      <div class="avg-banner-time" id="avgBannerTime">—</div>
+    </div>
+    <div class="avg-banner-divider"></div>
+    <div class="avg-banner-stat">
+      <div class="avg-banner-label">CARS / HOUR</div>
+      <div class="avg-banner-time" id="avgBannerCph">—</div>
+    </div>
+  </div>
 </div>
 
 <!-- ==================== ENTRY PANEL ==================== -->
@@ -321,12 +363,6 @@
     <div class="field-label">Serial ID</div>
     <input type="text" id="serial" placeholder="Type Serial ID" autocomplete="off"
       oninput="this.value = this.value.toUpperCase()">
-
-    <div class="field-label">Photo OCR (fallback)</div>
-    <input type="file" id="scan" accept="image/*" capture="camera">
-    <img id="imagePreview" class="img-preview" alt="Captured Image">
-    <div class="ocr-status" id="ocrStatus">&#9203; Processing OCR...</div>
-    <div id="ocrError" class="error-msg"></div>
   </div>
 
   <div class="field-label">Status</div>
@@ -356,6 +392,11 @@
   <div class="notag-row" id="noTagRow" onclick="document.getElementById('noTag').click()">
     <input type="checkbox" id="noTag" onclick="event.stopPropagation(); toggleNoTagStyle()">
     <label for="noTag">No Tag</label>
+  </div>
+
+  <div class="notag-row shuttle-row" id="shuttleRow" onclick="document.getElementById('shuttle').click()">
+    <input type="checkbox" id="shuttle" onclick="event.stopPropagation(); toggleShuttleStyle()">
+    <label for="shuttle">Shuttle</label>
   </div>
 
   <div class="field-label">Notes</div>
@@ -436,7 +477,6 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
 
 <!-- BARCODE SCANNER OVERLAY -->
@@ -510,6 +550,14 @@ function toggleNoTagStyle() {
   document.getElementById("noTagRow").classList.toggle("checked", checked);
 }
 
+const SHUTTLE_KEY = "drivertraxxx_shuttle";
+
+function toggleShuttleStyle() {
+  const checked = document.getElementById("shuttle").checked;
+  document.getElementById("shuttleRow").classList.toggle("shuttle-checked", checked);
+  localStorage.setItem(SHUTTLE_KEY, checked ? "1" : "0");
+}
+
 // ============================
 // RECORD CARD HTML (shared)
 // ============================
@@ -524,6 +572,7 @@ function recordCard(r, onDelete) {
         <div class="record-badges">
           <span class="record-status ${statusClass(r.status)}">${r.status}</span>
           ${r.destination ? `<span class="badge-dest">&#128205; ${r.destination}</span>` : ""}
+          ${r.shuttle ? '<span class="badge-shuttle">🚌 SHUTTLE</span>' : ""}
           ${r.noTag ? '<span class="badge-notag">NO TAG</span>' : ""}
         </div>
       </div>
@@ -534,6 +583,67 @@ function recordCard(r, onDelete) {
         <button class="btn btn-danger btn-sm" onclick="${onDelete}('${r.id}')">Delete</button>
       </div>
     </div>`;
+}
+
+// ============================
+// WEATHER (SDF / Louisville 40213)
+// ============================
+const WMO_CODES = {
+  0:"Clear", 1:"Mostly Clear", 2:"Partly Cloudy", 3:"Overcast",
+  45:"Foggy", 48:"Icy Fog",
+  51:"Light Drizzle", 53:"Drizzle", 55:"Heavy Drizzle",
+  61:"Light Rain", 63:"Rain", 65:"Heavy Rain",
+  71:"Light Snow", 73:"Snow", 75:"Heavy Snow", 77:"Snow Grains",
+  80:"Rain Showers", 81:"Showers", 82:"Heavy Showers",
+  85:"Snow Showers", 86:"Heavy Snow Showers",
+  95:"Thunderstorm", 96:"Thunderstorm+Hail", 99:"Thunderstorm+Hail"
+};
+
+const WMO_ICON = {
+  0:"☀️", 1:"🌤️", 2:"⛅", 3:"☁️",
+  45:"🌫️", 48:"🌫️",
+  51:"🌦️", 53:"🌦️", 55:"🌧️",
+  61:"🌧️", 63:"🌧️", 65:"🌧️",
+  71:"🌨️", 73:"❄️", 75:"❄️", 77:"🌨️",
+  80:"🌦️", 81:"🌧️", 82:"⛈️",
+  85:"🌨️", 86:"❄️",
+  95:"⛈️", 96:"⛈️", 99:"⛈️"
+};
+
+async function loadWeather() {
+  const el = document.getElementById("weatherInner");
+  try {
+    // SDF Louisville International Airport coords
+    const url = "https://api.open-meteo.com/v1/forecast?latitude=38.1741&longitude=-85.7368&current=temperature_2m,apparent_temperature,weathercode,windspeed_10m,relativehumidity_2m&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FChicago";
+    const res = await fetch(url);
+    const data = await res.json();
+    const c = data.current;
+    const code = c.weathercode;
+    const icon = WMO_ICON[code] || "🌡️";
+    const desc = WMO_CODES[code] || "Unknown";
+    const temp = Math.round(c.temperature_2m);
+    const feels = Math.round(c.apparent_temperature);
+    const wind = Math.round(c.windspeed_10m);
+    const humidity = c.relativehumidity_2m;
+
+    el.innerHTML = `
+      <div class="weather-loc">&#128507; SDF Louisville</div>
+      <div class="weather-main">
+        <div class="weather-icon">${icon}</div>
+        <div>
+          <div class="weather-temp">${temp}°F</div>
+          <div class="weather-desc">${desc}</div>
+        </div>
+      </div>
+      <div class="weather-details">
+        <div class="weather-detail">Feels <span>${feels}°</span></div>
+        <div class="weather-detail">💨 <span>${wind}mph</span></div>
+        <div class="weather-detail">💧 <span>${humidity}%</span></div>
+      </div>
+    `;
+  } catch(e) {
+    el.innerHTML = '<span class="weather-loading">Weather unavailable</span>';
+  }
 }
 
 // ============================
@@ -553,6 +663,7 @@ function updateAvgBanner() {
     return;
   }
 
+  // Avg trip time
   const gaps = [];
   for (let i = 1; i < timestamps.length; i++) {
     gaps.push(timestamps[i] - timestamps[i-1]);
@@ -563,7 +674,13 @@ function updateAvgBanner() {
   const m = mins % 60;
   const timeStr = h > 0 ? (m > 0 ? `${h}h ${m}m` : `${h}h`) : `${m}m`;
 
+  // Avg cars per hour — total entries over elapsed time since first entry
+  const elapsedMs = timestamps[timestamps.length - 1] - timestamps[0];
+  const elapsedHrs = elapsedMs / 3600000;
+  const cph = elapsedHrs > 0 ? (timestamps.length / elapsedHrs).toFixed(1) : "—";
+
   document.getElementById("avgBannerTime").textContent = timeStr;
+  document.getElementById("avgBannerCph").textContent = cph;
   banner.style.display = "block";
 }
 
@@ -605,6 +722,7 @@ function saveRecord() {
     status: document.getElementById("status").value,
     destination: document.getElementById("destination").value,
     noTag: document.getElementById("noTag").checked,
+    shuttle: document.getElementById("shuttle").checked,
     notes: document.getElementById("notes").value,
     timestamp: Date.now()
   };
@@ -624,8 +742,6 @@ function saveRecord() {
     document.getElementById("destination").selectedIndex = 0;
     document.getElementById("noTag").checked = false;
     toggleNoTagStyle();
-    document.getElementById("imagePreview").style.display = "none";
-    document.getElementById("scan").value = "";
     document.getElementById("manualEntrySection").style.display = "none";
     document.querySelector(".btn-manual-toggle").textContent = "✏️ Enter Manually";
 
@@ -772,10 +888,11 @@ function renderRecords() {
 function exportCSV() {
   const records = getFiltered();
   if (records.length === 0) { showToast("No records to export.", "error"); return; }
-  const rows = [["ID","Serial ID","Status","Destination","No Tag","Notes","Latitude","Longitude","Timestamp"]];
+  const rows = [["ID","Serial ID","Status","Destination","Shuttle","No Tag","Notes","Latitude","Longitude","Timestamp"]];
   records.forEach(r => rows.push([
     r.id, r.serialId, r.status,
     r.destination || "",
+    r.shuttle ? "YES" : "NO",
     r.noTag ? "YES" : "NO",
     (r.notes || "").replace(/,/g,";"),
     r.lat !== undefined ? r.lat.toFixed(6) : "",
@@ -916,7 +1033,7 @@ function renderDashboard() {
   // Week comparison — clickable
   const delta = thisWeekCount - lastWeekCount;
   const dStr = delta>0 ? "&#9650; +"+delta+" vs last week" : delta<0 ? "&#9660; "+delta+" vs last week" : "Same as last week";
-  const dColor = delta>0 ? "#137333" : delta<0 ? "#c5221f" : "#5f6368";
+  const dColor = delta>0 ? "var(--accent)" : delta<0 ? "var(--danger)" : "var(--muted)";
   document.getElementById("dashWeeks").innerHTML = `
     <div class="stat-card clickable" onclick="viewByWeek('${thisWeekFromStr}','${thisWeekEnd}','This Week')">
       <div class="stat-num">${thisWeekCount}</div><div class="stat-label">This Week &#8594;</div>
@@ -1039,43 +1156,14 @@ function toggleTorch() {
 }
 
 // ============================
-// OCR
-// ============================
-document.getElementById("scan").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  if (!file || !file.type.startsWith("image")) return;
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    const preview = document.getElementById("imagePreview");
-    preview.src = event.target.result;
-    preview.style.display = "block";
-    document.getElementById("ocrStatus").style.display = "block";
-    document.getElementById("ocrError").textContent = "";
-    const img = new Image();
-    img.onload = () => {
-      Tesseract.recognize(img, "eng")
-        .then(result => {
-          const text = result.data.text.replace(/[^A-Z0-9]/gi,"").trim().toUpperCase();
-          document.getElementById("ocrStatus").style.display = "none";
-          if (text) {
-            document.getElementById("serial").value = text;
-          } else {
-            document.getElementById("ocrError").textContent = "OCR couldn't read text. Please type manually.";
-          }
-        })
-        .catch(() => {
-          document.getElementById("ocrStatus").style.display = "none";
-          document.getElementById("ocrError").textContent = "OCR failed. Please type manually.";
-        });
-    };
-    img.src = event.target.result;
-  };
-  reader.readAsDataURL(file);
-});
-
-// ============================
 // INIT
 // ============================
+if (localStorage.getItem(SHUTTLE_KEY) === "1") {
+  document.getElementById("shuttle").checked = true;
+  document.getElementById("shuttleRow").classList.add("shuttle-checked");
+}
+loadWeather();
+setInterval(loadWeather, 10 * 60 * 1000); // refresh every 10 min
 renderTodayEntries();
 
 </script>
