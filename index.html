@@ -95,6 +95,7 @@
   .record-serial { font-size: 17px; font-weight: bold; letter-spacing: 1px; }
   .record-badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   .record-status { font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge-dest { background: #001a0d; color: #00a651; border: 1px solid #00a651; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
   .badge-notag { background: #3d1a1a; color: #ff7066; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
   .status-CLEAN { background: #003d1f; color: #00a651; border: 1px solid #00a651; }
   .status-DIRTY { background: #3d1a1a; color: #ff7066; }
@@ -137,7 +138,88 @@
   .day-table tr.has-entries { cursor: pointer; }
   .day-table tr.has-entries:hover td { background: #003d1f; }
   .day-table td.tap-hint { font-size: 11px; color: var(--accent); }
-  /* AVG TRIP TIME BANNER */
+  .gps-status { font-size: 12px; color: var(--muted); margin-top: 6px; min-height: 18px; text-align: center; }
+  .gps-status.acquiring { color: var(--accent); }
+  .gps-status.got { color: var(--accent); }
+  .gps-status.err { color: var(--danger); }
+  .record-gps { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .record-gps a { color: var(--accent); text-decoration: none; }
+  .record-gps a:hover { text-decoration: underline; }
+
+  /* SERIAL ROW + SCAN BUTTON */
+  .serial-row { display: flex; gap: 8px; align-items: stretch; }
+  .serial-row input { flex: 1; }
+  .btn-scan {
+    background: var(--accent); color: #000; border: none;
+    border-radius: var(--radius); padding: 0 14px;
+    font-size: 12px; font-weight: 900; letter-spacing: 0.5px;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .btn-scan:active { background: var(--accent-dark); }
+
+  /* SCANNER OVERLAY */
+  .scanner-overlay {
+    position: fixed; inset: 0; background: #000;
+    z-index: 1000; display: flex; flex-direction: column;
+    max-width: 600px; margin: 0 auto;
+  }
+  .scanner-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 16px; background: #000; border-bottom: 2px solid var(--accent);
+  }
+  .scanner-title { font-size: 16px; font-weight: 900; color: var(--accent); letter-spacing: 1px; }
+  .scanner-close {
+    background: none; border: none; color: #fff; font-size: 20px;
+    cursor: pointer; padding: 4px 8px; line-height: 1;
+  }
+  .scanner-viewport {
+    position: relative; flex: 1; overflow: hidden; background: #000;
+    max-height: 70vh;
+  }
+  #scannerVideo {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .scanner-reticle {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .reticle-corner {
+    position: absolute; width: 28px; height: 28px;
+    border-color: var(--accent); border-style: solid;
+  }
+  .reticle-corner.tl { top: 20%; left: 8%; border-width: 4px 0 0 4px; }
+  .reticle-corner.tr { top: 20%; right: 8%; border-width: 4px 4px 0 0; }
+  .reticle-corner.bl { bottom: 20%; left: 8%; border-width: 0 0 4px 4px; }
+  .reticle-corner.br { bottom: 20%; right: 8%; border-width: 0 4px 4px 0; }
+  .reticle-line {
+    position: absolute; left: 8%; right: 8%;
+    height: 2px; background: var(--accent); opacity: 0.7;
+    animation: scanLine 1.8s ease-in-out infinite;
+  }
+  @keyframes scanLine {
+    0%   { top: 20%; }
+    50%  { top: 80%; }
+    100% { top: 20%; }
+  }
+  .scanner-hint {
+    text-align: center; padding: 12px 16px;
+    font-size: 13px; color: var(--muted); letter-spacing: 0.5px;
+  }
+  .scanner-hint.success { color: var(--accent); font-weight: bold; font-size: 15px; }
+  .scanner-hint.error { color: var(--danger); }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: -80px; left: 50%; transform: translateX(-50%);
+    padding: 13px 24px; border-radius: 24px; font-size: 14px; font-weight: bold;
+    white-space: nowrap; z-index: 9999; transition: bottom 0.3s ease;
+    pointer-events: none; max-width: 90vw; text-align: center;
+  }
+  .toast-show { bottom: 28px; }
+  .toast-success { background: var(--accent); color: #000; }
+  .toast-warn { background: #b85c00; color: #fff; }
+  .toast-error { background: var(--danger); color: #fff; }
   #avgBanner {
     background: var(--accent);
     color: #000;
@@ -164,7 +246,7 @@
 <body>
 
 <header>
-  <h1>DRIVERTRAXXX</h1>
+  <h1><svg width="26" height="26" viewBox="0 0 100 100" fill="#00a651" style="vertical-align:middle;margin-right:8px;margin-bottom:3px" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="46" stroke="#00a651" stroke-width="8" fill="none"/><circle cx="50" cy="50" r="10" fill="#00a651"/><line x1="50" y1="4" x2="50" y2="40" stroke="#00a651" stroke-width="8" stroke-linecap="round"/><line x1="50" y1="60" x2="50" y2="96" stroke="#00a651" stroke-width="8" stroke-linecap="round"/><line x1="4" y1="50" x2="40" y2="50" stroke="#00a651" stroke-width="8" stroke-linecap="round"/><line x1="60" y1="50" x2="96" y2="50" stroke="#00a651" stroke-width="8" stroke-linecap="round"/></svg>DRIVERTRAXXX</h1>
   <div class="tabs">
     <div class="tab active" onclick="showTab('entry')">NEW ENTRY</div>
     <div class="tab" onclick="showTab('records')">RECORDS</div>
@@ -181,10 +263,16 @@
 <div class="panel active" id="panel-entry">
 
   <div class="field-label">Serial ID</div>
-  <input type="text" id="serial" placeholder="Scan or type Serial ID" autocomplete="off"
-    oninput="this.value = this.value.toUpperCase()">
+  <div class="serial-row">
+    <input type="text" id="serial" placeholder="Type or scan barcode" autocomplete="off"
+      oninput="this.value = this.value.toUpperCase()" style="margin-bottom:0">
+    <button class="btn-scan" onclick="openScanner()" title="Scan Barcode">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="4" height="4"/><rect x="17" y="3" width="4" height="4"/><rect x="3" y="17" width="4" height="4"/><line x1="7" y1="5" x2="17" y2="5"/><line x1="19" y1="7" x2="19" y2="17"/><line x1="7" y1="19" x2="17" y2="19"/><line x1="5" y1="7" x2="5" y2="17"/><line x1="10" y1="12" x2="14" y2="12"/><line x1="12" y1="10" x2="12" y2="14"/></svg>
+      SCAN
+    </button>
+  </div>
 
-  <div class="field-label">Capture Image (OCR)</div>
+  <div class="field-label" style="margin-top:10px">Photo OCR (fallback)</div>
   <input type="file" id="scan" accept="image/*" capture="camera">
   <img id="imagePreview" class="img-preview" alt="Captured Image">
   <div class="ocr-status" id="ocrStatus">&#9203; Processing OCR...</div>
@@ -203,6 +291,17 @@
     <option>OTHER</option>
   </select>
 
+  <div class="field-label">Destination</div>
+  <select id="destination">
+    <option value="">-- SELECT DESTINATION --</option>
+    <option>GARAGE</option>
+    <option>QTA</option>
+    <option>BACKLOT</option>
+    <option>ATLANTIC</option>
+    <option>BRANCH</option>
+    <option>OTHER</option>
+  </select>
+
   <div class="notag-row" id="noTagRow" onclick="document.getElementById('noTag').click()">
     <input type="checkbox" id="noTag" onclick="event.stopPropagation(); toggleNoTagStyle()">
     <label for="noTag">No Tag</label>
@@ -211,7 +310,8 @@
   <div class="field-label">Notes</div>
   <textarea id="notes" placeholder="Optional notes..."></textarea>
 
-  <button class="btn btn-primary" onclick="saveRecord()">&#128190; SAVE RECORD</button>
+  <button id="saveBtn" class="btn btn-primary" onclick="saveRecord()">&#128190; SAVE RECORD</button>
+  <div id="gpsStatus" class="gps-status"></div>
 
   <!-- TODAY'S ENTRIES -->
   <div class="today-header">
@@ -242,6 +342,13 @@
         <option value="yes">No Tag Only</option>
         <option value="no">Has Tag Only</option>
       </select>
+      <select id="fDest" onchange="renderRecords()">
+        <option value="">All Destinations</option>
+        <option>GARAGE</option><option>QTA</option><option>BACKLOT</option>
+        <option>ATLANTIC</option><option>BRANCH</option><option>OTHER</option>
+      </select>
+    </div>
+    <div class="filter-row">
       <input type="date" id="fDateFrom" onchange="renderRecords()">
       <input type="date" id="fDateTo" onchange="renderRecords()">
     </div>
@@ -279,6 +386,27 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
+
+<!-- BARCODE SCANNER OVERLAY -->
+<div id="scannerOverlay" class="scanner-overlay" style="display:none">
+  <div class="scanner-header">
+    <span class="scanner-title">&#128247; SCAN BARCODE</span>
+    <button class="scanner-close" onclick="closeScanner()">&#10005;</button>
+  </div>
+  <div class="scanner-viewport">
+    <video id="scannerVideo" autoplay playsinline muted></video>
+    <div class="scanner-reticle">
+      <div class="reticle-corner tl"></div>
+      <div class="reticle-corner tr"></div>
+      <div class="reticle-corner bl"></div>
+      <div class="reticle-corner br"></div>
+      <div class="reticle-line"></div>
+    </div>
+  </div>
+  <div class="scanner-hint" id="scannerHint">Point camera at barcode</div>
+  <button class="btn btn-secondary" style="margin:12px 16px 0;width:calc(100% - 32px)" onclick="closeScanner()">Cancel</button>
+</div>
 <script>
 
 const DB_KEY = "drivertraxxx_records";
@@ -313,16 +441,21 @@ function toggleNoTagStyle() {
 // RECORD CARD HTML (shared)
 // ============================
 function recordCard(r, onDelete) {
+  const gpsHtml = r.lat && r.lng
+    ? `<div class="record-gps">&#128205; <a href="https://maps.google.com/?q=${r.lat},${r.lng}" target="_blank">${r.lat.toFixed(5)}, ${r.lng.toFixed(5)}</a></div>`
+    : r.gpsError ? `<div class="record-gps" style="color:var(--muted)">&#128205; Location unavailable</div>` : "";
   return `
     <div class="record">
       <div class="record-header">
         <div class="record-serial">${r.serialId}</div>
         <div class="record-badges">
           <span class="record-status ${statusClass(r.status)}">${r.status}</span>
+          ${r.destination ? `<span class="badge-dest">&#128205; ${r.destination}</span>` : ""}
           ${r.noTag ? '<span class="badge-notag">NO TAG</span>' : ""}
         </div>
       </div>
       <div class="record-meta">&#128336; ${new Date(r.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
+      ${gpsHtml}
       ${r.notes ? `<div class="record-notes">${r.notes}</div>` : ""}
       <div class="record-footer">
         <button class="btn btn-danger btn-sm" onclick="${onDelete}('${r.id}')">Delete</button>
@@ -362,33 +495,98 @@ function updateAvgBanner() {
 }
 
 // ============================
+// TOAST NOTIFICATION
+// ============================
+function showToast(msg, type = "success") {
+  let toast = document.getElementById("toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "toast";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.className = "toast toast-" + type + " toast-show";
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => { toast.className = "toast"; }, 2800);
+}
+
+// ============================
 // SAVE RECORD
 // ============================
 function saveRecord() {
   const serial = document.getElementById("serial").value.trim().toUpperCase();
-  if (!serial) { alert("Please enter or scan a Serial ID."); return; }
+  if (!serial) { showToast("Please enter or scan a Serial ID.", "error"); return; }
 
-  const records = getRecords();
-  records.unshift({
+  const saveBtn = document.getElementById("saveBtn");
+  const gpsEl = document.getElementById("gpsStatus");
+
+  // Lock button while acquiring
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = "📡 Getting location...";
+  gpsEl.className = "gps-status acquiring";
+  gpsEl.textContent = "Acquiring GPS coordinates...";
+
+  const recordData = {
     id: Date.now().toString(),
     serialId: serial,
     status: document.getElementById("status").value,
+    destination: document.getElementById("destination").value,
     noTag: document.getElementById("noTag").checked,
     notes: document.getElementById("notes").value,
     timestamp: Date.now()
-  });
-  setRecords(records);
+  };
 
-  document.getElementById("serial").value = "";
-  document.getElementById("notes").value = "";
-  document.getElementById("status").selectedIndex = 0;
-  document.getElementById("noTag").checked = false;
-  toggleNoTagStyle();
-  document.getElementById("imagePreview").style.display = "none";
-  document.getElementById("scan").value = "";
+  function doSave(lat, lng, gpsError) {
+    if (lat !== null) { recordData.lat = lat; recordData.lng = lng; }
+    if (gpsError) { recordData.gpsError = true; }
 
-  renderTodayEntries();
-  alert("Record saved!");
+    const records = getRecords();
+    records.unshift(recordData);
+    setRecords(records);
+
+    // Reset form
+    document.getElementById("serial").value = "";
+    document.getElementById("notes").value = "";
+    document.getElementById("status").selectedIndex = 0;
+    document.getElementById("destination").selectedIndex = 0;
+    document.getElementById("noTag").checked = false;
+    toggleNoTagStyle();
+    document.getElementById("imagePreview").style.display = "none";
+    document.getElementById("scan").value = "";
+
+    // Restore button
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = "&#128190; SAVE RECORD";
+    gpsEl.className = "gps-status";
+    gpsEl.textContent = "";
+
+    renderTodayEntries();
+
+    if (gpsError) {
+      showToast("✅ Saved — no GPS location", "warn");
+    } else {
+      showToast("✅ Record saved with GPS", "success");
+    }
+  }
+
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        gpsEl.className = "gps-status got";
+        gpsEl.textContent = "✓ Location acquired";
+        doSave(pos.coords.latitude, pos.coords.longitude, false);
+      },
+      err => {
+        gpsEl.className = "gps-status err";
+        gpsEl.textContent = "⚠️ Location unavailable — saving anyway";
+        saveBtn.innerHTML = "&#128190; Saving...";
+        setTimeout(() => doSave(null, null, true), 800);
+      },
+      { timeout: 8000, maximumAge: 30000, enableHighAccuracy: true }
+    );
+  } else {
+    doSave(null, null, true);
+  }
 }
 
 // ============================
@@ -428,6 +626,7 @@ function getFiltered() {
   const search = document.getElementById("fSearch").value.trim().toUpperCase();
   const status = document.getElementById("fStatus").value;
   const noTagFilter = document.getElementById("fNoTag").value;
+  const dest = document.getElementById("fDest").value;
   const from = document.getElementById("fDateFrom").value;
   const to = document.getElementById("fDateTo").value;
 
@@ -436,6 +635,7 @@ function getFiltered() {
     if (status && r.status !== status) return false;
     if (noTagFilter === "yes" && !r.noTag) return false;
     if (noTagFilter === "no" && r.noTag) return false;
+    if (dest && r.destination !== dest) return false;
     const ds = new Date(r.timestamp).toISOString().slice(0,10);
     if (from && ds < from) return false;
     if (to && ds > to) return false;
@@ -445,7 +645,7 @@ function getFiltered() {
 
 function clearFilters() {
   ["fSearch","fDateFrom","fDateTo"].forEach(id => document.getElementById(id).value = "");
-  ["fStatus","fNoTag"].forEach(id => document.getElementById(id).selectedIndex = 0);
+  ["fStatus","fNoTag","fDest"].forEach(id => document.getElementById(id).selectedIndex = 0);
   document.getElementById("recordsHeading").textContent = "Filter Records";
   renderRecords();
 }
@@ -459,6 +659,7 @@ function viewByDate(dateStr) {
   document.getElementById("fSearch").value = "";
   document.getElementById("fStatus").selectedIndex = 0;
   document.getElementById("fNoTag").selectedIndex = 0;
+  document.getElementById("fDest").selectedIndex = 0;
   document.getElementById("recordsHeading").textContent = "Entries for " + dateStr;
   showTab("records");
 }
@@ -469,6 +670,7 @@ function viewByWeek(fromStr, toStr, label) {
   document.getElementById("fSearch").value = "";
   document.getElementById("fStatus").selectedIndex = 0;
   document.getElementById("fNoTag").selectedIndex = 0;
+  document.getElementById("fDest").selectedIndex = 0;
   document.getElementById("recordsHeading").textContent = label;
   showTab("records");
 }
@@ -494,12 +696,15 @@ function renderRecords() {
 // ============================
 function exportCSV() {
   const records = getFiltered();
-  if (records.length === 0) { alert("No records to export."); return; }
-  const rows = [["ID","Serial ID","Status","No Tag","Notes","Timestamp"]];
+  if (records.length === 0) { showToast("No records to export.", "error"); return; }
+  const rows = [["ID","Serial ID","Status","Destination","No Tag","Notes","Latitude","Longitude","Timestamp"]];
   records.forEach(r => rows.push([
     r.id, r.serialId, r.status,
+    r.destination || "",
     r.noTag ? "YES" : "NO",
     (r.notes || "").replace(/,/g,";"),
+    r.lat !== undefined ? r.lat.toFixed(6) : "",
+    r.lng !== undefined ? r.lng.toFixed(6) : "",
     new Date(r.timestamp).toLocaleString()
   ]));
   const csv = rows.map(r => r.join(",")).join("\n");
@@ -648,6 +853,69 @@ function renderDashboard() {
       <div class="stat-num" style="font-size:18px;color:${dColor}">${dStr}</div>
       <div class="stat-label">Week-over-Week</div>
     </div>`;
+}
+
+// ============================
+// BARCODE SCANNER (ZXing)
+// ============================
+let codeReader = null;
+let scannerActive = false;
+
+function openScanner() {
+  const overlay = document.getElementById("scannerOverlay");
+  const hint = document.getElementById("scannerHint");
+  overlay.style.display = "flex";
+  hint.className = "scanner-hint";
+  hint.textContent = "Point camera at barcode";
+
+  if (!window.ZXing) {
+    hint.className = "scanner-hint error";
+    hint.textContent = "Scanner library not loaded. Use Photo OCR below.";
+    return;
+  }
+
+  try {
+    codeReader = new ZXing.BrowserMultiFormatReader();
+    scannerActive = true;
+
+    codeReader.listVideoInputDevices().then(devices => {
+      // Prefer rear camera
+      const rearCam = devices.find(d =>
+        /back|rear|environment/i.test(d.label)
+      ) || devices[devices.length - 1];
+
+      const deviceId = rearCam ? rearCam.deviceId : undefined;
+
+      codeReader.decodeFromVideoDevice(deviceId, "scannerVideo", (result, err) => {
+        if (!scannerActive) return;
+        if (result) {
+          const code = result.getText().trim().toUpperCase();
+          document.getElementById("serial").value = code;
+          hint.className = "scanner-hint success";
+          hint.textContent = "✓ Got it: " + code;
+          navigator.vibrate && navigator.vibrate(100);
+          setTimeout(() => closeScanner(), 700);
+        }
+        // Suppress "not found" errors — they fire every frame
+      });
+    }).catch(err => {
+      hint.className = "scanner-hint error";
+      hint.textContent = "Camera access denied. Check permissions.";
+    });
+
+  } catch(e) {
+    hint.className = "scanner-hint error";
+    hint.textContent = "Scanner unavailable. Use Photo OCR below.";
+  }
+}
+
+function closeScanner() {
+  scannerActive = false;
+  if (codeReader) {
+    try { codeReader.reset(); } catch(e) {}
+    codeReader = null;
+  }
+  document.getElementById("scannerOverlay").style.display = "none";
 }
 
 // ============================
