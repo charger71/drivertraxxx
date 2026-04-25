@@ -298,6 +298,66 @@
   .weather-alert-msg { font-size: 12px; font-weight: 600; color: #f0b080; letter-spacing: 0.3px; line-height: 1.4; }
   .weather-alert-close { background: none; border: none; color: #f0b080; font-size: 16px; cursor: pointer; padding: 0 4px; flex-shrink: 0; opacity: 0.7; }
 
+  /* HEADER TOP ROW */
+  .header-top { display: flex; justify-content: space-between; align-items: center; }
+
+  /* HAMBURGER */
+  .btn-hamburger {
+    background: none; border: none; cursor: pointer;
+    padding: 6px; display: flex; flex-direction: column;
+    gap: 5px; justify-content: center;
+  }
+  .btn-hamburger span {
+    display: block; width: 24px; height: 2px;
+    background: var(--accent); border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  /* SLIDE MENU OVERLAY */
+  .menu-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 1998;
+  }
+  .menu-overlay.open { display: block; }
+
+  /* SLIDE MENU */
+  .slide-menu {
+    position: fixed; top: 0; right: -280px; width: 260px; height: 100%;
+    background: #13161a; z-index: 1999;
+    display: flex; flex-direction: column;
+    transition: right 0.28s ease; border-left: 1px solid var(--border);
+  }
+  .slide-menu.open { right: 0; }
+
+  .menu-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 16px; border-bottom: 2px solid var(--accent);
+  }
+  .menu-title { font-size: 13px; font-weight: 800; letter-spacing: 2px; color: var(--accent); }
+  .menu-close { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; padding: 0; }
+
+  .menu-nav { flex: 1; padding: 12px 0; }
+  .menu-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 20px; font-size: 15px; font-weight: 600;
+    color: var(--text2); cursor: pointer; transition: background 0.15s, color 0.15s;
+    text-decoration: none; border-left: 3px solid transparent;
+  }
+  .menu-item:hover { background: var(--card); color: var(--accent); border-left-color: var(--accent); }
+  .menu-item:active { background: var(--card2); }
+  .menu-icon { font-size: 18px; width: 24px; text-align: center; }
+
+  .menu-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .menu-version { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; }
+
+  /* TRAINING */
+  .training-header { margin-bottom: 20px; }
+  .training-placeholder {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px;
+    color: var(--text2); font-size: 15px; line-height: 1.7;
+  }
+
   /* AVG BANNER */
   #avgBanner { background: var(--accent); color: #000; max-width: 600px; margin: 0 auto; }
   .avg-banner-stats { display: flex; align-items: stretch; }
@@ -310,7 +370,12 @@
 <body>
 
 <header>
-  <h1><svg width="26" height="26" viewBox="0 0 100 100" fill="#00a651" style="vertical-align:middle;margin-right:8px;margin-bottom:3px" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="46" stroke="#00a651" stroke-width="8" fill="none"/><circle cx="50" cy="50" r="10" fill="#00a651"/><line x1="50" y1="4" x2="50" y2="40" stroke="#00a651" stroke-width="8" stroke-linecap="round"/><line x1="50" y1="60" x2="50" y2="96" stroke="#00a651" stroke-width="8" stroke-linecap="round"/><line x1="4" y1="50" x2="40" y2="50" stroke="#00a651" stroke-width="8" stroke-linecap="round"/><line x1="60" y1="50" x2="96" y2="50" stroke="#00a651" stroke-width="8" stroke-linecap="round"/></svg>DRIVERTRAXXX</h1>
+  <div class="header-top">
+    <h1><svg width="26" height="26" viewBox="0 0 100 100" fill="#00a651" style="vertical-align:middle;margin-right:8px;margin-bottom:3px" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="46" stroke="#00a651" stroke-width="8" fill="none"/><circle cx="50" cy="50" r="10" fill="#00a651"/><line x1="50" y1="4" x2="50" y2="40" stroke="#00a651" stroke-width="8" stroke-linecap="round"/><line x1="50" y1="60" x2="50" y2="96" stroke="#00a651" stroke-width="8" stroke-linecap="round"/><line x1="4" y1="50" x2="40" y2="50" stroke="#00a651" stroke-width="8" stroke-linecap="round"/><line x1="60" y1="50" x2="96" y2="50" stroke="#00a651" stroke-width="8" stroke-linecap="round"/></svg>DRIVERTRAXXX</h1>
+    <button class="btn-hamburger" onclick="openMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
   <div class="tabs">
     <div class="tab active" onclick="showTab('entry')">NEW ENTRY</div>
     <div class="tab" onclick="showTab('records')">RECORDS</div>
@@ -342,7 +407,64 @@
   </div>
 </div>
 
-<!-- ==================== ENTRY PANEL ==================== -->
+<!-- SLIDE-OUT MENU -->
+<div id="menuOverlay" class="menu-overlay" onclick="closeMenu()"></div>
+<div id="slideMenu" class="slide-menu">
+  <div class="menu-header">
+    <span class="menu-title">MENU</span>
+    <button class="menu-close" onclick="closeMenu()">&#10005;</button>
+  </div>
+  <nav class="menu-nav">
+    <a class="menu-item" onclick="showTab('entry'); closeMenu()">
+      <span class="menu-icon">&#128190;</span> New Entry
+    </a>
+    <a class="menu-item" onclick="showTab('records'); closeMenu()">
+      <span class="menu-icon">&#128203;</span> Records
+    </a>
+    <a class="menu-item" onclick="showTab('dashboard'); closeMenu()">
+      <span class="menu-icon">&#128202;</span> Dashboard
+    </a>
+    <a class="menu-item" onclick="showTab('training'); closeMenu()">
+      <span class="menu-icon">&#127891;</span> Training
+    </a>
+  </nav>
+  <div class="menu-footer">
+    <div class="menu-version">DriverTraxxx v1.0</div>
+  </div>
+</div>
+
+<!-- ==================== TRAINING PANEL ==================== -->
+<div class="panel" id="panel-training">
+  <div class="training-header">
+    <div class="dash-title">&#127891; Training</div>
+  </div>
+  <div class="training-placeholder">
+    <h3 style="color:var(--accent);font-size:16px;margin-bottom:12px">Clean Car Notes</h3>
+    <p style="color:var(--text2);font-size:14px;margin-bottom:16px;line-height:1.7">If you are unsure of current needs, ask a CXR or Manager.</p>
+    <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:12px">
+      <li style="background:var(--card2);border-radius:0 var(--radius) var(--radius) 0;padding:12px 16px;border-left:5px solid var(--accent)">
+        <strong style="color:var(--text);font-size:14px">Executive</strong>
+        <p style="color:var(--text2);font-size:13px;margin-top:4px">0 – 10,000 miles ONLY &mdash; No Trax, Sentra, Spark, etc.</p>
+      </li>
+      <li style="background:var(--card2);border-radius:0 var(--radius) var(--radius) 0;padding:12px 16px;border-left:5px solid var(--accent)">
+        <strong style="color:var(--text);font-size:14px">Emerald</strong>
+        <p style="color:var(--text2);font-size:13px;margin-top:4px">10,000 – 20,000 miles ONLY</p>
+      </li>
+      <li style="background:var(--card2);border-radius:0 var(--radius) var(--radius) 0;padding:12px 16px;border-left:5px solid var(--accent)">
+        <strong style="color:var(--text);font-size:14px">Enterprise</strong>
+        <p style="color:var(--text2);font-size:13px;margin-top:4px">20,000 miles and ABOVE</p>
+      </li>
+      <li style="background:var(--card2);border-radius:0 var(--radius) var(--radius) 0;padding:12px 16px;border-left:5px solid var(--accent)">
+        <strong style="color:var(--text);font-size:14px">Alamo</strong>
+        <p style="color:var(--text2);font-size:13px;margin-top:4px">Overflow of 20,000 miles and ABOVE</p>
+      </li>
+      <li style="background:var(--card2);border-radius:0 var(--radius) var(--radius) 0;padding:12px 16px;border-left:5px solid var(--accent)">
+        <strong style="color:var(--text);font-size:14px">Luxuries</strong>
+        <p style="color:var(--text2);font-size:13px;margin-top:4px">~20,000 or UNDER in Premiere spots, rest on WALL or Enterprise/Alamo</p>
+      </li>
+    </ul>
+  </div>
+</div>
 <div class="panel active" id="panel-entry">
 
   <button class="btn-scan-primary" onclick="openScanner()">
@@ -508,6 +630,18 @@ function statusClass(s) { return "status-" + s.replace(/[^A-Z]/g,""); }
 function todayStr() { return new Date().toISOString().slice(0,10); }
 
 // ============================
+// SLIDE MENU
+// ============================
+function openMenu() {
+  document.getElementById("slideMenu").classList.add("open");
+  document.getElementById("menuOverlay").classList.add("open");
+}
+function closeMenu() {
+  document.getElementById("slideMenu").classList.remove("open");
+  document.getElementById("menuOverlay").classList.remove("open");
+}
+
+// ============================
 // TABS
 // ============================
 function showTab(name) {
@@ -515,7 +649,7 @@ function showTab(name) {
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   document.getElementById("panel-" + name).classList.add("active");
   const idx = {entry:0, records:1, dashboard:2}[name];
-  document.querySelectorAll(".tab")[idx].classList.add("active");
+  if (idx !== undefined) document.querySelectorAll(".tab")[idx].classList.add("active");
   if (name === "entry") renderTodayEntries();
   if (name === "records") renderRecords();
   if (name === "dashboard") renderDashboard();
