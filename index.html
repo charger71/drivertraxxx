@@ -765,23 +765,70 @@ async function checkWeatherAlert() {
 }
 
 // ============================
+// SHIFT DETECTION
+// ============================
+const SHIFT_GAP_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+// Get all records sorted oldest->newest for today (EST)
+function getTodayRecordsEST() {
+  const now = new Date();
+  const estDate = new Date(now.toLocaleString("en-US", {timeZone:"America/New_York"}));
+  const estDateStr = `${estDate.getFullYear()}-${String(estDate.getMonth()+1).padStart(2,"0")}-${String(estDate.getDate()).padStart(2,"0")}`;
+  return getRecords()
+    .filter(r => {
+      const d = new Date(new Date(r.timestamp).toLocaleString("en-US", {timeZone:"America/New_York"}));
+      const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+      return ds === estDateStr;
+    })
+    .sort((a,b) => a.timestamp - b.timestamp);
+}
+
+// Get current shift number for a set of sorted records
+// A new shift starts when gap >= 6 hours
+function getShiftGroups(sortedRecords) {
+  if (sortedRecords.length === 0) return [];
+  const shifts = [[sortedRecords[0]]];
+  for (let i = 1; i < sortedRecords.length; i++) {
+    const gap = sortedRecords[i].timestamp - sortedRecords[i-1].timestamp;
+    if (gap >= SHIFT_GAP_MS) {
+      shifts.push([]);
+    }
+    shifts[shifts.length-1].push(sortedRecords[i]);
+  }
+  return shifts;
+}
+
+// Get the current shift's records (last group)
+function getCurrentShiftRecords() {
+  const today = getTodayRecordsEST();
+  const shifts = getShiftGroups(today);
+  return shifts.length > 0 ? shifts[shifts.length-1] : [];
+}
+
+// Get the shift number for a given record timestamp within today's records
+function getShiftNumber(timestamp, sortedTodayRecords) {
+  const shifts = getShiftGroups(sortedTodayRecords);
+  for (let i = 0; i < shifts.length; i++) {
+    if (shifts[i].some(r => r.timestamp === timestamp)) return i + 1;
+  }
+  return 1;
+}
+
+// ============================
 // AVG BANNER
 // ============================
 function updateAvgBanner() {
-  const today = todayStr();
-  const timestamps = getRecords()
-    .filter(r => new Date(r.timestamp).toISOString().slice(0,10) === today)
-    .map(r => r.timestamp)
-    .sort((a,b) => a - b);
-
+  const shiftRecords = getCurrentShiftRecords();
   const banner = document.getElementById("avgBanner");
 
-  if (timestamps.length < 2) {
+  if (shiftRecords.length < 2) {
     banner.style.display = "none";
     return;
   }
 
-  // Avg trip time
+  const timestamps = shiftRecords.map(r => r.timestamp);
+
+  // Avg trip time — gaps between consecutive entries
   const gaps = [];
   for (let i = 1; i < timestamps.length; i++) {
     gaps.push(timestamps[i] - timestamps[i-1]);
@@ -792,8 +839,8 @@ function updateAvgBanner() {
   const m = mins % 60;
   const timeStr = h > 0 ? (m > 0 ? `${h}h ${m}m` : `${h}h`) : `${m}m`;
 
-  // Avg cars per hour — total entries over elapsed time since first entry
-  const elapsedMs = timestamps[timestamps.length - 1] - timestamps[0];
+  // Cars per hour over shift elapsed time
+  const elapsedMs = timestamps[timestamps.length-1] - timestamps[0];
   const elapsedHrs = elapsedMs / 3600000;
   const cph = elapsedHrs > 0 ? (timestamps.length / elapsedHrs).toFixed(1) : "—";
 
@@ -836,6 +883,14 @@ function saveRecord() {
   gpsEl.className = "gps-status acquiring";
   gpsEl.textContent = "Acquiring GPS coordinates...";
 
+  // Determine shift number for this record
+  const todayRecs = getTodayRecordsEST();
+  const lastRec = todayRecs.length > 0 ? todayRecs[todayRecs.length-1] : null;
+  const isNewShift = !lastRec || (Date.now() - lastRec.timestamp >= SHIFT_GAP_MS);
+  const currentShiftNum = isNewShift
+    ? getShiftGroups(todayRecs).length + 1
+    : getShiftGroups(todayRecs).length || 1;
+
   const recordData = {
     id: Date.now().toString(),
     serialId: serial,
@@ -843,6 +898,7 @@ function saveRecord() {
     destination: document.getElementById("destination").value,
     noTag: document.getElementById("noTag").checked,
     shuttle: document.getElementById("shuttle").checked,
+    shiftNum: currentShiftNum,
     notes: document.getElementById("notes").value,
     timestamp: Date.now()
   };
@@ -904,15 +960,26 @@ function saveRecord() {
 // TODAY'S ENTRIES (entry tab)
 // ============================
 function renderTodayEntries() {
-  const today = todayStr();
-  const records = getRecords().filter(r => new Date(r.timestamp).toISOString().slice(0,10) === today);
-  document.getElementById("todayCount").textContent = records.length;
+  const todayRecords = getTodayRecordsEST();
+  const shifts = getShiftGroups(todayRecords);
+  const currentShift = shifts.length > 0 ? shifts[shifts.length-1] : [];
+  const shiftNum = shifts.length;
+
+  document.getElementById("todayCount").textContent = currentShift.length;
   updateAvgBanner();
-  if (records.length === 0) {
-    document.getElementById("todayRecords").innerHTML = '<div class="today-empty">No entries yet today.</div>';
+
+  // Update today label to show shift info
+  document.querySelector(".today-title").textContent =
+    shiftNum > 1 ? `Shift ${shiftNum} Entries` : "Today's Entries";
+
+  if (currentShift.length === 0) {
+    document.getElementById("todayRecords").innerHTML = '<div class="today-empty">No entries yet this shift.</div>';
     return;
   }
-  document.getElementById("todayRecords").innerHTML = records.map(r => recordCard(r, "deleteTodayRecord")).join("");
+
+  // Show newest first
+  const sorted = [...currentShift].reverse();
+  document.getElementById("todayRecords").innerHTML = sorted.map(r => recordCard(r, "deleteTodayRecord")).join("");
 }
 
 function deleteTodayRecord(id) {
@@ -1094,14 +1161,15 @@ function renderDashboard() {
     days.push(isoDate(d));
   }
 
-  // Group records by day, sorted oldest->newest per day
+  // Group records by day in EST, sorted oldest->newest
   const byDay = {};
   days.forEach(d => byDay[d] = []);
   all.forEach(r => {
-    const ds = isoDate(new Date(r.timestamp));
-    if (byDay[ds] !== undefined) byDay[ds].push(r.timestamp);
+    const estD = new Date(new Date(r.timestamp).toLocaleString("en-US", {timeZone:"America/New_York"}));
+    const ds = `${estD.getFullYear()}-${String(estD.getMonth()+1).padStart(2,"0")}-${String(estD.getDate()).padStart(2,"0")}`;
+    if (byDay[ds] !== undefined) byDay[ds].push({ts: r.timestamp});
   });
-  days.forEach(d => byDay[d].sort((a,b) => a - b));
+  days.forEach(d => byDay[d].sort((a,b) => a.ts - b.ts));
 
   function avgTripTime(timestamps) {
     if (timestamps.length < 2) return null;
@@ -1117,35 +1185,59 @@ function renderDashboard() {
     return m > 0 ? `${h}h ${m}m` : `${h}h`;
   }
 
+  function getDayShifts(records) {
+    if (records.length === 0) return [];
+    const shifts = [[records[0]]];
+    for (let i = 1; i < records.length; i++) {
+      if (records[i].ts - records[i-1].ts >= SHIFT_GAP_MS) shifts.push([]);
+      shifts[shifts.length-1].push(records[i]);
+    }
+    return shifts;
+  }
+
+  function fmtTime(ts) {
+    return new Date(ts).toLocaleTimeString("en-US", {hour:"numeric", minute:"2-digit", timeZone:"America/New_York"});
+  }
+
   const dn = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
   document.getElementById("dashDays").innerHTML = `
     <table class="day-table" style="width:100%">
-      <thead><tr><th>Date</th><th>Day</th><th>Trips</th><th>Avg Time</th><th></th></tr></thead>
+      <thead><tr><th>Date</th><th>Shift</th><th>Cars</th><th>Avg</th><th></th></tr></thead>
       <tbody>
         ${days.map(d => {
           const dt = new Date(d+"T12:00:00");
-          const cnt = byDay[d].length;
+          const dayName = dn[dt.getDay()];
           const isToday = d === today;
-          const avg = avgTripTime(byDay[d]);
-          const dateCell = `${d}${isToday ? ' <b style="color:var(--accent)">(today)</b>' : ''}`;
-          if (cnt > 0) {
-            return `<tr class="has-entries" onclick="viewByDate('${d}')">
-              <td>${dateCell}</td>
-              <td>${dn[dt.getDay()]}</td>
-              <td><b>${cnt}</b></td>
-              <td style="color:var(--accent);font-weight:bold">${avg || '<span style="color:var(--muted)">—</span>'}</td>
-              <td class="tap-hint">View &#8594;</td>
-            </tr>`;
-          } else {
+          const records = byDay[d];
+          const shifts = getDayShifts(records);
+
+          if (shifts.length === 0) {
             return `<tr>
-              <td>${dateCell}</td>
-              <td>${dn[dt.getDay()]}</td>
+              <td>${d}${isToday ? ' <b style="color:var(--accent)">(today)</b>' : ''}<br><span style="color:var(--muted);font-size:11px">${dayName}</span></td>
+              <td style="color:var(--muted)">—</td>
               <td style="color:var(--muted)">0</td>
               <td style="color:var(--muted)">—</td>
               <td></td>
             </tr>`;
           }
+
+          return shifts.map((shift, si) => {
+            const shiftLabel = shifts.length > 1 ? `Shift ${si+1}` : "Shift 1";
+            const startTime = fmtTime(shift[0].ts);
+            const endTime = fmtTime(shift[shift.length-1].ts);
+            const avg = avgTripTime(shift.map(r => r.ts));
+            return `<tr class="has-entries" onclick="viewByDate('${d}')">
+              ${si === 0 ? `<td rowspan="${shifts.length}">${d}${isToday ? ' <b style="color:var(--accent)">(today)</b>' : ''}<br><span style="color:var(--muted);font-size:11px">${dayName}</span></td>` : ''}
+              <td>
+                <span style="font-size:11px;font-weight:700;color:var(--accent)">${shiftLabel}</span><br>
+                <span style="font-size:10px;color:var(--muted)">${startTime} – ${endTime}</span>
+              </td>
+              <td><b>${shift.length}</b></td>
+              <td style="color:var(--accent);font-weight:700">${avg || '<span style="color:var(--muted)">—</span>'}</td>
+              <td class="tap-hint">View &#8594;</td>
+            </tr>`;
+          }).join("");
         }).join("")}
       </tbody>
     </table>`;
