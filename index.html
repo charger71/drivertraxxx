@@ -350,6 +350,20 @@
   .menu-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
   .menu-version { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; }
 
+  /* DATA & BACKUP */
+  .data-section {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px; margin-bottom: 14px;
+  }
+  .data-section-danger { border-color: #3d1515; }
+  .data-section-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text); margin-bottom: 6px; }
+  .data-section-desc { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 14px; }
+  .data-status-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .data-label { font-size: 12px; color: var(--muted); }
+  .data-value { font-size: 12px; font-weight: 700; color: var(--text2); }
+  .data-import-status { font-size: 12px; margin-top: 10px; color: var(--accent); min-height: 18px; }
+  .menu-sync-status { font-size: 10px; color: var(--muted); margin-top: 6px; }
+
   /* TRAINING */
   .training-header { margin-bottom: 20px; }
   .training-placeholder {
@@ -427,9 +441,16 @@
     <a class="menu-item" onclick="showTab('training'); closeMenu()">
       <span class="menu-icon">&#127891;</span> Training
     </a>
+    <a class="menu-item" onclick="showTab('data'); closeMenu()">
+      <span class="menu-icon">&#128252;</span> Data & Backup
+    </a>
+    <a class="menu-item" onclick="showTab('profile'); closeMenu()">
+      <span class="menu-icon">&#128100;</span> Profile
+    </a>
   </nav>
   <div class="menu-footer">
     <div class="menu-version">DriverTraxxx v1.0</div>
+    <div class="menu-sync-status" id="menuSyncStatus"></div>
   </div>
 </div>
 
@@ -465,6 +486,53 @@
     </ul>
   </div>
 </div>
+<div class="panel" id="panel-data">
+  <div class="dash-title">&#128252; Data & Backup</div>
+
+  <div class="data-section">
+    <div class="data-section-title">Auto Backup</div>
+    <div class="data-section-desc">A snapshot of all records is automatically saved every 30 minutes.</div>
+    <div class="data-status-row">
+      <span class="data-label">Last backup:</span>
+      <span id="lastBackupTime" class="data-value">—</span>
+    </div>
+    <div class="data-status-row">
+      <span class="data-label">Records in backup:</span>
+      <span id="backupRecordCount" class="data-value">—</span>
+    </div>
+    <button class="btn btn-secondary" onclick="runBackup(true)">&#128190; Back Up Now</button>
+  </div>
+
+  <div class="data-section">
+    <div class="data-section-title">Export & Import</div>
+    <div class="data-section-desc">Export all records as a JSON file to save or transfer to another device. Import a previously exported file to restore records.</div>
+    <button class="btn btn-primary" onclick="exportJSON()">&#8659; Export All Data</button>
+    <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">&#8657; Import Data</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+    <div id="importStatus" class="data-import-status"></div>
+  </div>
+
+  <div class="data-section data-section-danger">
+    <div class="data-section-title" style="color:var(--danger)">Restore from Backup</div>
+    <div class="data-section-desc">If something goes wrong, restore from the last auto backup. This will overwrite current records.</div>
+    <button class="btn btn-danger" style="width:100%;margin-top:10px" onclick="restoreBackup()">&#9888; Restore from Last Backup</button>
+  </div>
+</div>
+
+<!-- ==================== PROFILE PANEL ==================== -->
+<div class="panel" id="panel-profile">
+  <div class="dash-title">&#128100; Profile</div>
+
+  <div class="data-section">
+    <div class="data-section-title">Driver Name</div>
+    <div class="data-section-desc">Your name will appear in the dashboard and in exported file names.</div>
+    <input type="text" id="profileName" placeholder="Enter your name" autocomplete="off"
+      style="text-transform:none; margin-bottom:0"
+      oninput="previewProfileName()">
+    <button class="btn btn-primary" onclick="saveProfile()">&#128190; Save Profile</button>
+  </div>
+</div>
+
 <div class="panel active" id="panel-entry">
 
   <button class="btn-scan-primary" onclick="openScanner()">
@@ -505,14 +573,15 @@
     <option>OTHER</option>
   </select>
 
-  <div class="notag-row" id="noTagRow" onclick="document.getElementById('noTag').click()">
-    <input type="checkbox" id="noTag" onclick="event.stopPropagation(); toggleNoTagStyle()">
-    <label for="noTag">No Tag</label>
-  </div>
-
-  <div class="notag-row shuttle-row" id="shuttleRow" onclick="document.getElementById('shuttle').click()">
-    <input type="checkbox" id="shuttle" onclick="event.stopPropagation(); toggleShuttleStyle()">
-    <label for="shuttle">Shuttle</label>
+  <div class="checkbox-row" style="display:flex;gap:10px;margin-top:12px">
+    <div class="notag-row" id="noTagRow" style="flex:1;margin-top:0" onclick="document.getElementById('noTag').click()">
+      <input type="checkbox" id="noTag" onclick="event.stopPropagation(); toggleNoTagStyle()">
+      <label for="noTag">No Tag</label>
+    </div>
+    <div class="notag-row shuttle-row" id="shuttleRow" style="flex:1;margin-top:0" onclick="document.getElementById('shuttle').click()">
+      <input type="checkbox" id="shuttle" onclick="event.stopPropagation(); toggleShuttleStyle()">
+      <label for="shuttle">Shuttle</label>
+    </div>
   </div>
 
   <div class="field-label">Notes</div>
@@ -570,6 +639,11 @@
 
 <!-- ==================== DASHBOARD PANEL ==================== -->
 <div class="panel" id="panel-dashboard">
+
+  <div id="dashDriverName" style="display:none;margin-bottom:20px">
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700">Driver</div>
+    <div id="dashDriverNameText" style="font-size:22px;font-weight:900;color:var(--text);letter-spacing:1px"></div>
+  </div>
 
   <div class="dash-section">
     <div class="dash-title">&#128202; Overview</div>
@@ -651,7 +725,8 @@ function showTab(name) {
   if (idx !== undefined) document.querySelectorAll(".tab")[idx].classList.add("active");
   if (name === "entry") renderTodayEntries();
   if (name === "records") renderRecords();
-  if (name === "dashboard") renderDashboard();
+  if (name === "dashboard") { applyProfile(); renderDashboard(); }
+  if (name === "profile") applyProfile();
 }
 
 // ============================
@@ -1106,7 +1181,7 @@ function exportCSV() {
   const blob = new Blob([csv], {type:"text/csv"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `drivertraxxx_${new Date().toISOString().slice(0,10)}.csv`;
+  a.download = getDriverFileName("drivertraxxx", "csv");
   a.click();
 }
 
@@ -1365,6 +1440,162 @@ function toggleTorch() {
 }
 
 // ============================
+// PROFILE
+// ============================
+const PROFILE_KEY = "drivertraxxx_profile";
+
+function getProfile() {
+  try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || "{}"); } catch(e) { return {}; }
+}
+
+function saveProfile() {
+  const name = document.getElementById("profileName").value.trim();
+  if (!name) { showToast("Please enter your name.", "error"); return; }
+  const profile = { name };
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+  applyProfile();
+  showToast("✅ Profile saved", "success");
+}
+
+function previewProfileName() {
+  // Live preview in dashboard title as user types
+  const name = document.getElementById("profileName").value.trim();
+  const el = document.getElementById("dashDriverNameText");
+  if (el && name) {
+    el.textContent = name;
+    document.getElementById("dashDriverName").style.display = "block";
+  }
+}
+
+function applyProfile() {
+  const profile = getProfile();
+  const name = profile.name || "";
+  const nameEl = document.getElementById("dashDriverNameText");
+  const nameSection = document.getElementById("dashDriverName");
+  if (nameEl) nameEl.textContent = name;
+  if (nameSection) nameSection.style.display = name ? "block" : "none";
+  // Pre-fill profile input if on profile tab
+  const input = document.getElementById("profileName");
+  if (input && name) input.value = name;
+}
+
+function getDriverFileName(base, ext) {
+  const profile = getProfile();
+  const name = profile.name ? "_" + profile.name.replace(/\s+/g,"_") : "";
+  const date = new Date().toISOString().slice(0,10);
+  return `${base}${name}_${date}.${ext}`;
+}
+const BACKUP_KEY = "drivertraxxx_backup";
+const BACKUP_TIME_KEY = "drivertraxxx_backup_time";
+const BACKUP_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
+
+function runBackup(manual = false) {
+  const records = getRecords();
+  const backupData = { records, timestamp: Date.now(), version: 1 };
+  try {
+    localStorage.setItem(BACKUP_KEY, JSON.stringify(backupData));
+    localStorage.setItem(BACKUP_TIME_KEY, Date.now().toString());
+    updateBackupStatus();
+    if (manual) showToast("✅ Backup saved", "success");
+  } catch(e) {
+    if (manual) showToast("Backup failed — storage may be full", "error");
+  }
+}
+
+function updateBackupStatus() {
+  const ts = localStorage.getItem(BACKUP_TIME_KEY);
+  const backup = localStorage.getItem(BACKUP_KEY);
+  const timeEl = document.getElementById("lastBackupTime");
+  const countEl = document.getElementById("backupRecordCount");
+  const menuStatus = document.getElementById("menuSyncStatus");
+
+  if (!ts || !timeEl) return;
+
+  const d = new Date(parseInt(ts));
+  const timeStr = d.toLocaleTimeString("en-US", {hour:"numeric", minute:"2-digit", timeZone:"America/New_York"});
+  const dateStr = d.toLocaleDateString("en-US", {month:"short", day:"numeric", timeZone:"America/New_York"});
+
+  if (timeEl) timeEl.textContent = `${dateStr} at ${timeStr}`;
+
+  if (backup && countEl) {
+    try {
+      const parsed = JSON.parse(backup);
+      countEl.textContent = parsed.records ? parsed.records.length + " records" : "—";
+    } catch(e) { countEl.textContent = "—"; }
+  }
+
+  if (menuStatus) menuStatus.textContent = `Backed up ${timeStr}`;
+}
+
+function restoreBackup() {
+  const backup = localStorage.getItem(BACKUP_KEY);
+  if (!backup) { showToast("No backup found", "error"); return; }
+  if (!confirm("Restore from last backup? This will overwrite your current records.")) return;
+  try {
+    const parsed = JSON.parse(backup);
+    if (!parsed.records) throw new Error("Invalid backup");
+    setRecords(parsed.records);
+    renderTodayEntries();
+    updateBackupStatus();
+    showToast(`✅ Restored ${parsed.records.length} records`, "success");
+  } catch(e) {
+    showToast("Restore failed — backup may be corrupt", "error");
+  }
+}
+
+function exportJSON() {
+  const records = getRecords();
+  if (records.length === 0) { showToast("No records to export", "error"); return; }
+  const data = { records, profile: getProfile(), exportedAt: new Date().toISOString(), version: 1 };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = getDriverFileName("drivertraxxx_backup", "json");
+  a.click();
+  showToast(`✅ Exported ${records.length} records`, "success");
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById("importStatus");
+  statusEl.textContent = "Reading file...";
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed.records || !Array.isArray(parsed.records)) throw new Error("Invalid format");
+
+      const existing = getRecords();
+      // Merge — avoid duplicates by id
+      const existingIds = new Set(existing.map(r => r.id));
+      const newRecords = parsed.records.filter(r => !existingIds.has(r.id));
+      const merged = [...existing, ...newRecords].sort((a,b) => b.timestamp - a.timestamp);
+
+      if (!confirm(`Import ${newRecords.length} new records? (${parsed.records.length - newRecords.length} duplicates skipped)`)) {
+        statusEl.textContent = "";
+        event.target.value = "";
+        return;
+      }
+
+      setRecords(merged);
+      if (parsed.profile) localStorage.setItem(PROFILE_KEY, JSON.stringify(parsed.profile));
+      applyProfile();
+      renderTodayEntries();
+      runBackup();
+      statusEl.textContent = `✅ Imported ${newRecords.length} new records`;
+      showToast(`✅ Imported ${newRecords.length} records`, "success");
+    } catch(err) {
+      statusEl.textContent = "❌ Invalid file — could not import";
+      showToast("Import failed — invalid file", "error");
+    }
+    event.target.value = "";
+  };
+  reader.readAsText(file);
+}
+
+// ============================
 // INIT
 // ============================
 if (localStorage.getItem(SHUTTLE_KEY) === "1") {
@@ -1372,7 +1603,11 @@ if (localStorage.getItem(SHUTTLE_KEY) === "1") {
   document.getElementById("shuttleRow").classList.add("shuttle-checked");
 }
 checkWeatherAlert();
-setInterval(checkWeatherAlert, 15 * 60 * 1000); // recheck every 15 min
+setInterval(checkWeatherAlert, 15 * 60 * 1000);
+runBackup();
+setInterval(runBackup, BACKUP_INTERVAL_MS);
+updateBackupStatus();
+applyProfile();
 renderTodayEntries();
 
 </script>
