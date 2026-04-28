@@ -979,30 +979,37 @@ function dismissWeatherAlert() {
   localStorage.setItem(ALERT_DISMISSED_KEY, Date.now().toString());
 }
 
+// For testing: call testWeatherAlert() in browser console to force show alert
+function testWeatherAlert() {
+  localStorage.removeItem(ALERT_DISMISSED_KEY);
+  checkWeatherAlert();
+}
+
 async function checkWeatherAlert() {
   // Don't show if dismissed in last 30 min
   const dismissed = parseInt(localStorage.getItem(ALERT_DISMISSED_KEY) || "0");
   if (Date.now() - dismissed < 30 * 60 * 1000) return;
 
   try {
-    const url = "https://api.open-meteo.com/v1/forecast?latitude=38.1741&longitude=-85.7368&current=temperature_2m,weathercode,windspeed_10m&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FChicago";
+    const url = "https://api.open-meteo.com/v1/forecast?latitude=38.1741&longitude=-85.7368&current=temperature_2m,weather_code,windspeed_10m&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FNew_York";
     const res = await fetch(url);
     const data = await res.json();
     const c = data.current;
-    const code = c.weathercode;
+    // Support both old and new field name
+    const code = c.weather_code !== undefined ? c.weather_code : c.weathercode;
     const temp = Math.round(c.temperature_2m);
     const wind = Math.round(c.windspeed_10m);
 
     const alerts = [];
     if (EXTREME_CODES[code]) alerts.push(EXTREME_CODES[code]);
-    if (temp <= 20) alerts.push(`Extreme Cold: ${temp}°F`);
-    if (temp >= 100) alerts.push(`Extreme Heat: ${temp}°F`);
+    if (temp <= 20) alerts.push(`Extreme Cold: ${temp}F`);
+    if (temp >= 100) alerts.push(`Extreme Heat: ${temp}F`);
     if (wind >= 40) alerts.push(`High Winds: ${wind}mph`);
 
     const alertEl = document.getElementById("weatherAlert");
     if (alerts.length > 0) {
       document.getElementById("weatherAlertMsg").textContent =
-        "⚠️ SDF WEATHER ALERT: " + alerts.join(" · ");
+        "SDF WEATHER ALERT: " + alerts.join(" - ");
       alertEl.style.display = "block";
     } else {
       alertEl.style.display = "none";
