@@ -996,46 +996,50 @@ async function checkWeatherAlert() {
 
   // 1. NWS official alerts for Jefferson County KY (SDF area)
   try {
-    const nwsRes = await fetch("https://api.weather.gov/alerts/active?zone=KYZ001", {
-      headers: { "User-Agent": "DriverTraxxx/1.0" }
+    const nwsRes = await fetch("https://api.weather.gov/alerts/active?point=38.1741,-85.7368", {
+      headers: {
+        "Accept": "application/geo+json",
+        "User-Agent": "DriverTraxxx/1.0 (louisville-airport-ops)"
+      }
     });
-    const nwsData = await nwsRes.json();
-    console.log("NWS alerts:", nwsData);
-    if (nwsData.features && nwsData.features.length > 0) {
-      nwsData.features.forEach(f => {
-        const event = f.properties.event;
-        const severity = f.properties.severity;
-        if (event) alerts.push(event);
-      });
+    if (nwsRes.ok) {
+      const nwsData = await nwsRes.json();
+      console.log("NWS alerts:", nwsData);
+      if (nwsData.features && nwsData.features.length > 0) {
+        nwsData.features.forEach(f => {
+          const event = f.properties && f.properties.event;
+          if (event) alerts.push(event);
+        });
+      }
+    } else {
+      console.warn("NWS returned:", nwsRes.status);
     }
   } catch(e) {
-    console.warn("NWS fetch failed:", e);
+    console.warn("NWS fetch failed:", e.message);
   }
 
-  // 2. Open-Meteo as backup for extreme conditions
+  // 2. Open-Meteo as backup for extreme conditions not covered by NWS alerts
   try {
     const url = "https://api.open-meteo.com/v1/forecast?latitude=38.1741&longitude=-85.7368&current=temperature_2m,weather_code,windspeed_10m&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FNew_York";
     const res = await fetch(url);
     const raw = await res.text();
-    const data = typeof raw === "string" ? JSON.parse(raw) : raw;
-    console.log("Current:", data.current);
-
+    const data = JSON.parse(raw);
     const c = data.current;
     if (c) {
       const code = c.weather_code !== undefined ? c.weather_code : c.weathercode;
       const temp = Math.round(c.temperature_2m);
       const wind = Math.round(c.windspeed_10m);
-
+      console.log(`Weather code: ${code}, Temp: ${temp}F, Wind: ${wind}mph`);
       if (EXTREME_CODES[code]) alerts.push(EXTREME_CODES[code]);
       if (temp <= 20) alerts.push(`Extreme Cold: ${temp}F`);
       if (temp >= 100) alerts.push(`Extreme Heat: ${temp}F`);
       if (wind >= 30) alerts.push(`High Winds: ${wind}mph`);
     }
   } catch(e) {
-    console.warn("Open-Meteo fetch failed:", e);
+    console.warn("Open-Meteo fetch failed:", e.message);
   }
 
-  // Deduplicate
+  // Deduplicate and display
   const unique = [...new Set(alerts)];
   const alertEl = document.getElementById("weatherAlert");
 
