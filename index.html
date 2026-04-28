@@ -994,11 +994,16 @@ async function checkWeatherAlert() {
     const url = "https://api.open-meteo.com/v1/forecast?latitude=38.1741&longitude=-85.7368&current=temperature_2m,weather_code,windspeed_10m&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FNew_York";
     const res = await fetch(url);
     const data = await res.json();
+    console.log("Weather API response:", JSON.stringify(data, null, 2));
+
     const c = data.current;
-    // Support both old and new field name
+    if (!c) { console.warn("No current data in response"); return; }
+    console.log("Current fields:", Object.keys(c));
+
     const code = c.weather_code !== undefined ? c.weather_code : c.weathercode;
     const temp = Math.round(c.temperature_2m);
     const wind = Math.round(c.windspeed_10m);
+    console.log(`Code: ${code}, Temp: ${temp}F, Wind: ${wind}mph`);
 
     const alerts = [];
     if (EXTREME_CODES[code]) alerts.push(EXTREME_CODES[code]);
@@ -1013,9 +1018,10 @@ async function checkWeatherAlert() {
       alertEl.style.display = "block";
     } else {
       alertEl.style.display = "none";
+      console.log("No extreme weather - alert hidden");
     }
   } catch(e) {
-    // Silently fail - no alert shown if fetch fails
+    console.error("Weather check failed:", e);
   }
 }
 
