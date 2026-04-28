@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 
 <html lang="en">
@@ -229,7 +230,9 @@ padding: 16px 20px 12px;
 position: fixed; inset: 0; background: #000;
 z-index: 1000; display: flex; flex-direction: column;
 max-width: 600px; margin: 0 auto;
+opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
 }
+.scanner-overlay.open { opacity: 1; pointer-events: all; }
 .scanner-header {
 display: flex; justify-content: space-between; align-items: center;
 padding: 14px 16px; background: #000; border-bottom: 2px solid var(–accent);
@@ -779,7 +782,7 @@ color: var(–text2); font-size: 15px; line-height: 1.7;
 
 <!-- BARCODE SCANNER OVERLAY -->
 
-<div id="scannerOverlay" class="scanner-overlay" style="display:none">
+<div id="scannerOverlay" class="scanner-overlay">
   <div class="scanner-header">
     <span class="scanner-title">&#128247; SCAN BARCODE</span>
     <button class="scanner-close" onclick="closeScanner()">&#10005;</button>
@@ -1491,7 +1494,7 @@ let activeStream = null;
 function openScanner() {
 const overlay = document.getElementById(“scannerOverlay”);
 const hint = document.getElementById(“scannerHint”);
-overlay.style.display = “flex”;
+overlay.classList.add(“open”);
 hint.className = “scanner-status scanning”;
 hint.innerHTML = ‘<span class="scanner-dot">●</span> Starting camera…’;
 torchOn = false;
@@ -1573,7 +1576,7 @@ activeStream.getTracks().forEach(t => t.stop());
 activeStream = null;
 }
 torchOn = false;
-document.getElementById(“scannerOverlay”).style.display = “none”;
+document.getElementById(“scannerOverlay”).classList.remove(“open”);
 }
 
 function toggleTorch() {
