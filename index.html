@@ -975,6 +975,35 @@ function setRecords(r) { localStorage.setItem(DB_KEY, JSON.stringify(r)); }
 function statusClass(s) { return "status-" + s.replace(/[^A-Z]/g,""); }
 
 // ============================
+// INPUT SANITIZATION
+// ============================
+function sanitizeText(str) {
+  if (!str) return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+    .replace(/\//g, "&#x2F;");
+}
+
+function sanitizeSerial(str) {
+  // Serial IDs: only alphanumeric, hyphens, max 30 chars
+  return str.replace(/[^A-Z0-9\-]/g, "").slice(0, 30);
+}
+
+function sanitizeNotes(str) {
+  // Notes: strip HTML tags, limit to 500 chars
+  return str.replace(/<[^>]*>/g, "").replace(/[<>]/g, "").slice(0, 500).trim();
+}
+
+function sanitizeName(str) {
+  // Names: letters, spaces, hyphens, apostrophes only, max 60 chars
+  return str.replace(/[^a-zA-Z0-9 '\-\.]/g, "").slice(0, 60).trim();
+}
+
+// ============================
 // TOAST
 // ============================
 function showToast(msg, type = "success") {
@@ -1158,7 +1187,7 @@ async function decodeVIN(vin) {
 // SAVE RECORD
 // ============================
 function saveRecord() {
-  const serial = document.getElementById("serial").value.trim().toUpperCase();
+  const serial = sanitizeSerial(document.getElementById("serial").value.trim().toUpperCase());
   if (!serial) { showToast("Please enter or scan a Serial ID.", "error"); return; }
   const statusVal = document.getElementById("status").value;
   if (!statusVal) { showToast("Please select a status.", "error"); return; }
@@ -1185,7 +1214,7 @@ function saveRecord() {
     noTag: document.getElementById("noTag").checked,
     shuttle: document.getElementById("shuttle").checked,
     shiftNum: currentShiftNum,
-    notes: document.getElementById("notes").value,
+    notes: sanitizeNotes(document.getElementById("notes").value),
     timestamp: Date.now()
   };
 
@@ -1394,25 +1423,31 @@ function recordCard(r, onDelete) {
   let vinInfo = "";
   if (r.vinData) {
     const icons = getVehicleSVG(r.vinData);
-    const name = [r.vinData.year, r.vinData.make, r.vinData.model].filter(Boolean).join(" ");
-    const trim = r.vinData.trim ? `<span style="color:var(--muted);font-size:12px"> ${r.vinData.trim}</span>` : "";
+    const name = [r.vinData.year, r.vinData.make, r.vinData.model].filter(Boolean).map(sanitizeText).join(" ");
+    const trim = r.vinData.trim ? `<span style="color:var(--muted);font-size:12px"> ${sanitizeText(r.vinData.trim)}</span>` : "";
     vinInfo = `<div class="record-vin" style="display:flex;align-items:center;gap:6px">${icons.vehicle}${icons.fuel}<span><b>${name}</b>${trim}</span></div>`;
   }
+  const safeSerial = sanitizeText(r.serialId || "");
+  const safeStatus = sanitizeText(r.status || "");
+  const safeDest = r.destination ? sanitizeText(r.destination) : "";
+  const safeNotes = r.notes ? sanitizeText(r.notes) : "";
+  const safeTires = r.tires && r.tires.length > 0 ? r.tires.map(sanitizeText).join(", ") : "";
+
   return `
     <div class="record" onclick="openDetail('${r.id}', '${onDelete}')">
       <div class="record-header">
-        <div class="record-serial">${r.serialId}</div>
+        <div class="record-serial">${safeSerial}</div>
         <div class="record-badges">
-          <span class="record-status ${statusClass(r.status)}">${r.status}</span>
-          ${r.destination ? `<span class="badge-dest"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${r.destination}</span>` : ""}
+          <span class="record-status ${statusClass(r.status)}">${safeStatus}</span>
+          ${safeDest ? `<span class="badge-dest"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${safeDest}</span>` : ""}
           ${r.shuttle ? `<span class="badge-shuttle"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="22" height="12" rx="2"/><path d="M16 6V4a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v2"/><line x1="12" y1="6" x2="12" y2="18"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><line x1="1" y1="12" x2="23" y2="12"/></svg> SHUTTLE</span>` : ""}
           ${r.noTag ? '<span class="badge-notag">NO TAG</span>' : ""}
         </div>
       </div>
       ${vinInfo}
       <div class="record-meta"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${new Date(r.timestamp).toLocaleTimeString("en-US", {hour:'2-digit',minute:'2-digit', timeZone:"America/New_York"})}</div>
-      ${r.tires && r.tires.length > 0 ? `<div class="record-meta" style="margin-top:4px">Tires: <b style="color:var(--danger)">${r.tires.join(", ")}</b></div>` : ""}
-      ${r.notes ? `<div class="record-notes">${r.notes}</div>` : ""}
+      ${safeTires ? `<div class="record-meta" style="margin-top:4px">Tires: <b style="color:var(--danger)">${safeTires}</b></div>` : ""}
+      ${safeNotes ? `<div class="record-notes">${safeNotes}</div>` : ""}
     </div>`;
 }
 
@@ -1478,7 +1513,7 @@ function openDetail(id, onDelete) {
   const r = records.find(rec => rec.id === id);
   if (!r) return;
 
-  document.getElementById("detailSerial").textContent = r.serialId;
+  document.getElementById("detailSerial").textContent = r.serialId || "";
   document.getElementById("detailTime").textContent =
     new Date(r.timestamp).toLocaleString("en-US", {
       weekday:"short", month:"short", day:"numeric",
@@ -1486,8 +1521,8 @@ function openDetail(id, onDelete) {
     });
 
   document.getElementById("detailBadges").innerHTML = `
-    <span class="record-status ${statusClass(r.status)}">${r.status}</span>
-    ${r.destination ? `<span class="badge-dest">${r.destination}</span>` : ""}
+    <span class="record-status ${statusClass(r.status)}">${sanitizeText(r.status)}</span>
+    ${r.destination ? `<span class="badge-dest">${sanitizeText(r.destination)}</span>` : ""}
     ${r.shuttle ? '<span class="badge-shuttle">SHUTTLE</span>' : ""}
     ${r.noTag ? '<span class="badge-notag">NO TAG</span>' : ""}
   `;
@@ -1495,9 +1530,9 @@ function openDetail(id, onDelete) {
   // Vehicle info
   const vinSection = document.getElementById("detailVinSection");
   if (r.vinData) {
-    const name = [r.vinData.year, r.vinData.make, r.vinData.model].filter(Boolean).join(" ");
-    const trim = r.vinData.trim || "";
-    const specs = [r.vinData.bodyClass, r.vinData.engine, r.vinData.fuelType].filter(Boolean).join("  ·  ");
+    const name = [r.vinData.year, r.vinData.make, r.vinData.model].filter(Boolean).map(sanitizeText).join(" ");
+    const trim = sanitizeText(r.vinData.trim || "");
+    const specs = [r.vinData.bodyClass, r.vinData.engine, r.vinData.fuelType].filter(Boolean).map(sanitizeText).join("  ·  ");
     const icons = getVehicleSVG({...r.vinData, _size: 36});
     document.getElementById("detailVinIcon").innerHTML = icons.vehicle + icons.fuel;
     document.getElementById("detailVinName").textContent = name + (trim ? "  " + trim : "");
@@ -1866,7 +1901,7 @@ function getProfile() {
 }
 
 function saveProfile() {
-  const name = document.getElementById("profileName").value.trim();
+  const name = sanitizeName(document.getElementById("profileName").value.trim());
   if (!name) { showToast("Please enter your name.", "error"); return; }
   const location = document.getElementById("profileLocation").value;
   const profile = { name, location };
@@ -1876,7 +1911,7 @@ function saveProfile() {
 }
 
 function previewProfileName() {
-  const name = document.getElementById("profileName").value.trim();
+  const name = sanitizeName(document.getElementById("profileName").value.trim());
   const el = document.getElementById("dashDriverNameText");
   if (el && name) {
     el.textContent = name;
