@@ -11,7 +11,7 @@
 <title>DriverTraxxx</title>
 <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
- 
+
 <style>
   :root {
     --bg: #1a1d21;
@@ -30,10 +30,10 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: var(--bg); color: var(--text); max-width: 600px; margin: 0 auto; line-height: 1.4; }
- 
+
   header { background: #13161a; color: #fff; padding: 16px var(--space) 0; border-bottom: 2px solid var(--accent); }
   header h1 { font-size: 20px; letter-spacing: 2px; color: var(--accent); font-weight: 900; }
- 
+
   .tabs { display: flex; margin-top: 10px; }
   .tab {
     flex: 1; padding: 11px 8px; text-align: center; font-size: 12px;
@@ -41,16 +41,16 @@
     background: #13161a; letter-spacing: 0.8px; transition: all 0.15s;
   }
   .tab.active { color: #000; background: var(--accent); }
- 
+
   .panel { display: none; padding: 20px var(--space); }
   .panel.active { display: block; }
- 
+
   .field-label {
     font-size: 10px; font-weight: 700; color: var(--muted);
     text-transform: uppercase; letter-spacing: 1px;
     margin-bottom: 6px; margin-top: 20px;
   }
- 
+
   input[type=text], select, textarea {
     width: 100%; padding: 13px 14px; font-size: 15px;
     border: 1px solid var(--border); border-radius: var(--radius);
@@ -62,7 +62,7 @@
     outline: none; border-color: var(--accent);
   }
   textarea { text-transform: none; height: 80px; resize: vertical; }
- 
+
   .notag-row {
     display: flex; align-items: center; gap: 14px;
     background: var(--card); border: 1.5px solid var(--border);
@@ -81,7 +81,7 @@
   .notag-row.checked label { color: var(--danger); }
   .shuttle-row.shuttle-checked { border-color: #4d9bff; background: #0d1e36; }
   .shuttle-row.shuttle-checked label { color: #4d9bff; }
- 
+
   .btn {
     display: inline-block; padding: 13px 18px; font-size: 14px;
     border: none; border-radius: var(--radius); cursor: pointer;
@@ -93,9 +93,9 @@
   .btn-secondary { background: var(--card2); color: var(--accent); border: 1px solid var(--border); margin-top: 10px; }
   .btn-danger { background: var(--danger); color: #fff; padding: 7px 12px; font-size: 12px; width: auto; margin-top: 0; border-radius: 6px; }
   .btn-sm { padding: 6px 10px; font-size: 12px; width: auto; margin-top: 0; }
- 
+
   .error-msg { color: var(--danger); font-size: 13px; margin-top: 6px; }
- 
+
   /* TODAY'S ENTRIES SECTION */
   .today-header {
     display: flex; justify-content: space-between; align-items: center;
@@ -109,7 +109,7 @@
     padding: 3px 10px; border-radius: 20px;
   }
   .today-empty { font-size: 14px; color: var(--muted); text-align: center; padding: 20px 0; }
- 
+
   /* SHARED RECORD CARD */
   .record {
     background: var(--card); border-radius: var(--radius);
@@ -133,16 +133,17 @@
   .status-TI { background: #2d1515; color: #e85550; border: 1px solid #e85550; }
   .status-WIDELETE { background: #2d1515; color: #e87070; }
   .record-meta { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .record-vin { font-size: 13px; color: var(--accent); margin-top: 6px; font-weight: 600; letter-spacing: 0.3px; }
   .record-notes { font-size: 13px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); color: var(--text2); line-height: 1.5; }
   .record-footer { display: flex; justify-content: flex-end; margin-top: 10px; }
- 
+
   /* RECORDS TAB */
   .filter-bar { background: var(--card); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 14px; border: 1px solid var(--border); }
   .filter-row { display: flex; gap: 8px; margin-bottom: 8px; }
   .filter-row input, .filter-row select { margin: 0; font-size: 13px; padding: 9px 10px; text-transform: none; flex: 1; }
   .filter-label { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
   .results-count { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
- 
+
   /* DASHBOARD */
   .dash-section { margin-bottom: 24px; }
   .dash-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
@@ -171,7 +172,7 @@
   .record-gps { font-size: 11px; color: var(--muted); margin-top: 4px; }
   .record-gps a { color: var(--accent); text-decoration: none; }
   .record-gps a:hover { text-decoration: underline; }
- 
+
   /* LARGE SCAN BUTTON */
   .btn-scan-primary {
     width: 100%; padding: 26px; margin-top: 20px;
@@ -181,7 +182,7 @@
     display: flex; align-items: center; justify-content: center; gap: 12px;
   }
   .btn-scan-primary:active { background: var(--accent-dark); }
- 
+
   .btn-manual-toggle {
     width: 50%; padding: 10px; margin-top: 16px;
     display: block; margin-left: auto; margin-right: auto;
@@ -191,7 +192,7 @@
     text-align: center;
   }
   .btn-manual-toggle:active { color: var(--text); border-color: var(--text); }
- 
+
   /* RECORD DETAIL OVERLAY */
   .detail-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.6);
@@ -225,11 +226,11 @@
   .detail-map { width: 100%; height: 220px; border-radius: var(--radius); border: 1px solid var(--border); }
   .detail-no-gps { background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; text-align: center; font-size: 13px; color: var(--muted); }
   .detail-actions { padding: 16px 20px 0; }
- 
+
   /* RECORD DETAIL - card tap cursor */
   .record { cursor: pointer; transition: border-color 0.15s; }
   .record:hover { border-color: var(--accent); }
- 
+
   /* SCANNER OVERLAY */
   .scanner-overlay {
     position: fixed; inset: 0; background: #000;
@@ -337,7 +338,7 @@
     padding: 11px; font-size: 14px; font-weight: bold;
     cursor: pointer; letter-spacing: 0.5px;
   }
- 
+
   /* TOAST */
   .toast {
     position: fixed; bottom: -80px; left: 50%; transform: translateX(-50%);
@@ -360,10 +361,10 @@
   .weather-alert-icon { font-size: 16px; flex-shrink: 0; }
   .weather-alert-msg { font-size: 12px; font-weight: 600; color: #f0b080; letter-spacing: 0.3px; line-height: 1.4; }
   .weather-alert-close { background: none; border: none; color: #f0b080; font-size: 16px; cursor: pointer; padding: 0 4px; flex-shrink: 0; opacity: 0.7; }
- 
+
   /* HEADER TOP ROW */
   .header-top { display: flex; justify-content: space-between; align-items: center; }
- 
+
   /* HAMBURGER */
   .btn-hamburger {
     background: none; border: none; cursor: pointer;
@@ -375,14 +376,14 @@
     background: var(--accent); border-radius: 2px;
     transition: all 0.2s;
   }
- 
+
   /* SLIDE MENU OVERLAY */
   .menu-overlay {
     display: none; position: fixed; inset: 0;
     background: rgba(0,0,0,0.5); z-index: 1998;
   }
   .menu-overlay.open { display: block; }
- 
+
   /* SLIDE MENU */
   .slide-menu {
     position: fixed; top: 0; right: -280px; width: 260px; height: 100%;
@@ -391,14 +392,14 @@
     transition: right 0.28s ease; border-left: 1px solid var(--border);
   }
   .slide-menu.open { right: 0; }
- 
+
   .menu-header {
     display: flex; justify-content: space-between; align-items: center;
     padding: 18px 16px; border-bottom: 2px solid var(--accent);
   }
   .menu-title { font-size: 13px; font-weight: 800; letter-spacing: 2px; color: var(--accent); }
   .menu-close { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; padding: 0; }
- 
+
   .menu-nav { flex: 1; padding: 12px 0; }
   .menu-item {
     display: flex; align-items: center; gap: 14px;
@@ -409,10 +410,10 @@
   .menu-item:hover { background: var(--card); color: var(--accent); border-left-color: var(--accent); }
   .menu-item:active { background: var(--card2); }
   .menu-icon { font-size: 18px; width: 24px; text-align: center; }
- 
+
   .menu-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
   .menu-version { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; }
- 
+
   /* TIRE SELECTOR */
   .tire-diagram {
     position: relative;
@@ -513,7 +514,7 @@
   .tire-selected-label.has-selection {
     color: var(--danger);
   }
- 
+
   /* DATA & BACKUP */
   .data-section {
     background: var(--card); border: 1px solid var(--border);
@@ -527,7 +528,7 @@
   .data-value { font-size: 12px; font-weight: 700; color: var(--text2); }
   .data-import-status { font-size: 12px; margin-top: 10px; color: var(--accent); min-height: 18px; }
   .menu-sync-status { font-size: 10px; color: var(--muted); margin-top: 6px; }
- 
+
   /* TRAINING */
   .training-header { margin-bottom: 20px; }
   .training-placeholder {
@@ -535,7 +536,7 @@
     border-radius: var(--radius); padding: 24px;
     color: var(--text2); font-size: 15px; line-height: 1.7;
   }
- 
+
   /* AVG BANNER */
   #avgBanner { background: var(--accent); color: #000; max-width: 600px; margin: 0 auto; }
   .avg-banner-stats { display: flex; align-items: stretch; }
@@ -546,7 +547,7 @@
 </style>
 </head>
 <body>
- 
+
 <header>
   <div class="header-top">
     <h1><svg width="26" height="26" viewBox="0 0 100 100" fill="#00a651" style="vertical-align:middle;margin-right:8px;margin-bottom:3px" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="46" stroke="#00a651" stroke-width="8" fill="none"/><circle cx="50" cy="50" r="10" fill="#00a651"/><line x1="50" y1="4" x2="50" y2="40" stroke="#00a651" stroke-width="8" stroke-linecap="round"/><line x1="50" y1="60" x2="50" y2="96" stroke="#00a651" stroke-width="8" stroke-linecap="round"/><line x1="4" y1="50" x2="40" y2="50" stroke="#00a651" stroke-width="8" stroke-linecap="round"/><line x1="60" y1="50" x2="96" y2="50" stroke="#00a651" stroke-width="8" stroke-linecap="round"/></svg>DRIVERTRAXXX</h1>
@@ -560,7 +561,7 @@
     <div class="tab" onclick="showTab('dashboard')">DASHBOARD</div>
   </div>
 </header>
- 
+
 <div id="weatherAlert">
   <div class="weather-alert-inner">
     <div class="weather-alert-text">
@@ -570,7 +571,7 @@
     <button class="weather-alert-close" onclick="dismissWeatherAlert()">✕</button>
   </div>
 </div>
- 
+
 <div id="avgBanner" style="display:none">
   <div class="avg-banner-stats">
     <div class="avg-banner-stat">
@@ -584,7 +585,7 @@
     </div>
   </div>
 </div>
- 
+
 <!-- SLIDE-OUT MENU -->
 <div id="menuOverlay" class="menu-overlay" onclick="closeMenu()"></div>
 <div id="slideMenu" class="slide-menu">
@@ -617,7 +618,7 @@
     <div class="menu-sync-status" id="menuSyncStatus"></div>
   </div>
 </div>
- 
+
 <!-- ==================== TRAINING PANEL ==================== -->
 <div class="panel" id="panel-training">
   <div class="training-header">
@@ -652,7 +653,7 @@
 </div>
 <div class="panel" id="panel-data">
   <div class="dash-title">&#128252; Data & Backup</div>
- 
+
   <div class="data-section">
     <div class="data-section-title">Auto Backup</div>
     <div class="data-section-desc">A snapshot of all records is automatically saved every 30 minutes.</div>
@@ -666,7 +667,7 @@
     </div>
     <button class="btn btn-secondary" onclick="runBackup(true)">&#128190; Back Up Now</button>
   </div>
- 
+
   <div class="data-section">
     <div class="data-section-title">Export & Import</div>
     <div class="data-section-desc">Export all records as a JSON file to save or transfer to another device. Import a previously exported file to restore records.</div>
@@ -675,18 +676,18 @@
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
     <div id="importStatus" class="data-import-status"></div>
   </div>
- 
+
   <div class="data-section data-section-danger">
     <div class="data-section-title" style="color:var(--danger)">Restore from Backup</div>
     <div class="data-section-desc">If something goes wrong, restore from the last auto backup. This will overwrite current records.</div>
     <button class="btn btn-danger" style="width:100%;margin-top:10px" onclick="restoreBackup()">&#9888; Restore from Last Backup</button>
   </div>
 </div>
- 
+
 <!-- ==================== PROFILE PANEL ==================== -->
 <div class="panel" id="panel-profile">
   <div class="dash-title">&#128100; Profile</div>
- 
+
   <div class="data-section">
     <div class="data-section-title">Driver Name</div>
     <div class="data-section-desc">Your name will appear in the dashboard and in exported file names.</div>
@@ -694,7 +695,7 @@
       style="text-transform:none; margin-bottom:0"
       oninput="previewProfileName()">
   </div>
- 
+
   <div class="data-section">
     <div class="data-section-title">Home Branch / Location</div>
     <div class="data-section-desc">Your primary branch or lot location.</div>
@@ -709,25 +710,25 @@
       <option>Other</option>
     </select>
   </div>
- 
+
   <button class="btn btn-primary" onclick="saveProfile()">&#128190; Save Profile</button>
 </div>
- 
+
 <div class="panel active" id="panel-entry">
- 
+
   <button class="btn-scan-primary" onclick="openScanner()">
     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="4" height="4"/><rect x="17" y="3" width="4" height="4"/><rect x="3" y="17" width="4" height="4"/><line x1="7" y1="5" x2="17" y2="5"/><line x1="19" y1="7" x2="19" y2="17"/><line x1="7" y1="19" x2="17" y2="19"/><line x1="5" y1="7" x2="5" y2="17"/><line x1="10" y1="12" x2="14" y2="12"/><line x1="12" y1="10" x2="12" y2="14"/></svg>
     SCAN BARCODE
   </button>
- 
+
   <button class="btn-manual-toggle" onclick="toggleManualEntry()">✏️ Enter Manually</button>
- 
+
   <div id="manualEntrySection" style="display:none">
     <div class="field-label">Serial ID</div>
     <input type="text" id="serial" placeholder="Type Serial ID" autocomplete="off"
       oninput="this.value = this.value.toUpperCase()">
   </div>
- 
+
   <div class="field-label">Status</div>
   <select id="status" onchange="handleStatusChange()">
     <option value="">-- SELECT STATUS --</option>
@@ -742,7 +743,7 @@
     <option>TI</option>
     <option>OTHER</option>
   </select>
- 
+
   <!-- TIRE SELECTOR - shown when TI is selected -->
   <div id="tireSelectorSection" style="display:none">
     <div class="field-label">Select Affected Tire(s)</div>
@@ -769,7 +770,7 @@
     </div>
     <div class="tire-selected-label" id="tireSelectedLabel">No tires selected</div>
   </div>
- 
+
   <div class="field-label">Destination</div>
   <select id="destination">
     <option value="">-- SELECT DESTINATION --</option>
@@ -780,7 +781,7 @@
     <option>BRANCH</option>
     <option>OTHER</option>
   </select>
- 
+
   <div class="checkbox-row" style="display:flex;gap:10px;margin-top:12px">
     <div class="notag-row" id="noTagRow" style="flex:1;margin-top:0" onclick="document.getElementById('noTag').click()">
       <input type="checkbox" id="noTag" onclick="event.stopPropagation(); toggleNoTagStyle()">
@@ -791,13 +792,13 @@
       <label for="shuttle">Shuttle</label>
     </div>
   </div>
- 
+
   <div class="field-label">Notes</div>
   <textarea id="notes" placeholder="Optional notes..."></textarea>
- 
+
   <button id="saveBtn" class="btn btn-primary" onclick="saveRecord()">&#128190; SAVE RECORD</button>
   <div id="gpsStatus" class="gps-status"></div>
- 
+
   <!-- TODAY'S ENTRIES -->
   <div class="today-header">
     <span class="today-title">Today's Entries</span>
@@ -805,10 +806,10 @@
   </div>
   <div id="todayRecords"></div>
 </div>
- 
+
 <!-- ==================== RECORDS PANEL ==================== -->
 <div class="panel" id="panel-records">
- 
+
   <div class="filter-bar">
     <div class="filter-label" id="recordsHeading">Filter Records</div>
     <div class="filter-row">
@@ -840,44 +841,44 @@
     <button class="btn btn-secondary" style="margin-top:6px" onclick="clearFilters()">Clear Filters</button>
     <button class="btn btn-primary" style="margin-top:4px" onclick="exportCSV()">&#128229; EXPORT CSV</button>
   </div>
- 
+
   <div class="results-count" id="resultsCount"></div>
   <div id="records"></div>
 </div>
- 
+
 <!-- ==================== DASHBOARD PANEL ==================== -->
 <div class="panel" id="panel-dashboard">
- 
+
   <div id="dashDriverName" style="display:none;margin-bottom:20px">
     <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700">Driver</div>
     <div id="dashDriverNameText" style="font-size:22px;font-weight:900;color:var(--text);letter-spacing:1px"></div>
     <div id="dashDriverLocation" style="font-size:13px;color:var(--muted);margin-top:3px"></div>
   </div>
- 
+
   <div class="dash-section">
     <div class="dash-title">&#128202; Overview</div>
     <div class="stat-grid" id="dashOverview"></div>
   </div>
- 
+
   <div class="dash-section">
     <div class="dash-title">&#128203; By Status</div>
     <div class="bar-chart" id="dashStatus"></div>
   </div>
- 
+
   <div class="dash-section">
     <div class="dash-title">&#128197; Last 7 Days <span style="font-size:11px;font-weight:normal">(tap a day to view entries)</span></div>
     <div id="dashDays"></div>
   </div>
- 
+
   <div class="dash-section">
     <div class="dash-title">&#128467; This Week vs Last Week</div>
     <div class="stat-grid" id="dashWeeks"></div>
   </div>
- 
+
 </div>
- 
+
 <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
- 
+
 <!-- RECORD DETAIL OVERLAY -->
 <div id="detailOverlay" class="detail-overlay" onclick="if(event.target===this)closeDetail()">
   <div class="detail-sheet" id="detailSheet">
@@ -916,7 +917,7 @@
     </div>
   </div>
 </div>
- 
+
 <!-- BARCODE SCANNER OVERLAY -->
 <div id="scannerOverlay" class="scanner-overlay">
   <div class="scanner-header">
@@ -945,12 +946,12 @@
   </div>
 </div>
 <script>
- 
+
 const DB_KEY = "drivertraxxx_records";
 function getRecords() { return JSON.parse(localStorage.getItem(DB_KEY) || "[]"); }
 function setRecords(r) { localStorage.setItem(DB_KEY, JSON.stringify(r)); }
 function statusClass(s) { return "status-" + s.replace(/[^A-Z]/g,""); }
- 
+
 // ============================
 // SLIDE MENU
 // ============================
@@ -962,7 +963,7 @@ function closeMenu() {
   document.getElementById("slideMenu").classList.remove("open");
   document.getElementById("menuOverlay").classList.remove("open");
 }
- 
+
 // ============================
 // TABS
 // ============================
@@ -977,12 +978,12 @@ function showTab(name) {
   if (name === "dashboard") { applyProfile(); renderDashboard(); }
   if (name === "profile") applyProfile();
 }
- 
+
 // ============================
 // TIRE SELECTOR
 // ============================
 let selectedTires = [];
- 
+
 function handleStatusChange() {
   const val = document.getElementById("status").value;
   const section = document.getElementById("tireSelectorSection");
@@ -993,7 +994,7 @@ function handleStatusChange() {
     resetTires();
   }
 }
- 
+
 function toggleTire(tire) {
   const btn = document.getElementById("tire-" + tire);
   const idx = selectedTires.indexOf(tire);
@@ -1006,7 +1007,7 @@ function toggleTire(tire) {
   }
   updateTireLabel();
 }
- 
+
 function updateTireLabel() {
   const label = document.getElementById("tireSelectedLabel");
   if (selectedTires.length === 0) {
@@ -1019,7 +1020,7 @@ function updateTireLabel() {
     label.className = "tire-selected-label has-selection";
   }
 }
- 
+
 function resetTires() {
   selectedTires = [];
   ["FL","FR","RL","RR"].forEach(t => {
@@ -1040,7 +1041,7 @@ function toggleManualEntry() {
   btn.textContent = visible ? "✏️ Enter Manually" : "✕ Hide Manual Entry";
   if (!visible) document.getElementById("serial").focus();
 }
- 
+
 function showManualEntry() {
   const section = document.getElementById("manualEntrySection");
   const btn = document.querySelector(".btn-manual-toggle");
@@ -1051,19 +1052,22 @@ function toggleNoTagStyle() {
   const checked = document.getElementById("noTag").checked;
   document.getElementById("noTagRow").classList.toggle("checked", checked);
 }
- 
+
 const SHUTTLE_KEY = "drivertraxxx_shuttle";
- 
+
 function toggleShuttleStyle() {
   const checked = document.getElementById("shuttle").checked;
   document.getElementById("shuttleRow").classList.toggle("shuttle-checked", checked);
   localStorage.setItem(SHUTTLE_KEY, checked ? "1" : "0");
 }
- 
+
 // ============================
 // RECORD CARD HTML (shared)
 // ============================
 function recordCard(r, onDelete) {
+  const vinInfo = r.vinData
+    ? `<div class="record-vin">&#128663; <b>${[r.vinData.year, r.vinData.make, r.vinData.model].filter(Boolean).join(" ")}</b>${r.vinData.trim ? ` <span style="color:var(--muted)">${r.vinData.trim}</span>` : ""}</div>`
+    : "";
   return `
     <div class="record" onclick="openDetail('${r.id}', '${onDelete}')">
       <div class="record-header">
@@ -1075,22 +1079,23 @@ function recordCard(r, onDelete) {
           ${r.noTag ? '<span class="badge-notag">NO TAG</span>' : ""}
         </div>
       </div>
+      ${vinInfo}
       <div class="record-meta">&#128336; ${new Date(r.timestamp).toLocaleTimeString("en-US", {hour:'2-digit',minute:'2-digit', timeZone:"America/New_York"})}</div>
       ${r.tires && r.tires.length > 0 ? `<div class="record-meta" style="margin-top:4px">&#128308; Tires: <b style="color:var(--danger)">${r.tires.join(", ")}</b></div>` : ""}
       ${r.notes ? `<div class="record-notes">${r.notes}</div>` : ""}
     </div>`;
 }
- 
+
 // ============================
 // RECORD DETAIL OVERLAY
 // ============================
 let _detailDeleteFn = null;
- 
+
 function openDetail(id, onDelete) {
   const records = getRecords();
   const r = records.find(rec => rec.id === id);
   if (!r) return;
- 
+
   // Populate header
   document.getElementById("detailSerial").textContent = r.serialId;
   document.getElementById("detailTime").textContent =
@@ -1098,7 +1103,7 @@ function openDetail(id, onDelete) {
       weekday:"short", month:"short", day:"numeric",
       hour:"numeric", minute:"2-digit", timeZone:"America/New_York"
     });
- 
+
   // Badges
   document.getElementById("detailBadges").innerHTML = `
     <span class="record-status ${statusClass(r.status)}">${r.status}</span>
@@ -1106,24 +1111,24 @@ function openDetail(id, onDelete) {
     ${r.shuttle ? '<span class="badge-shuttle">🚌 SHUTTLE</span>' : ""}
     ${r.noTag ? '<span class="badge-notag">NO TAG</span>' : ""}
   `;
- 
+
   // Destination row
   const destRow = document.getElementById("detailDestRow");
   if (r.destination) {
     document.getElementById("detailDest").textContent = r.destination;
     destRow.style.display = "flex";
   } else { destRow.style.display = "none"; }
- 
+
   // Notes row
   const notesRow = document.getElementById("detailNotesRow");
   if (r.notes) {
     document.getElementById("detailNotes").textContent = r.notes;
     notesRow.style.display = "flex";
   } else { notesRow.style.display = "none"; }
- 
+
   // Shift
   document.getElementById("detailShift").textContent = r.shiftNum ? `Shift ${r.shiftNum}` : "-";
- 
+
   // Map
   const mapFrame = document.getElementById("detailMapFrame");
   const noGps = document.getElementById("detailNoGps");
@@ -1136,7 +1141,7 @@ function openDetail(id, onDelete) {
     mapFrame.src = "";
     noGps.style.display = "block";
   }
- 
+
   // Delete button
   _detailDeleteFn = () => {
     if (!confirm("Delete this record? This cannot be undone.")) return;
@@ -1146,16 +1151,16 @@ function openDetail(id, onDelete) {
     else renderRecords();
   };
   document.getElementById("detailDeleteBtn").onclick = _detailDeleteFn;
- 
+
   // Show overlay
   document.getElementById("detailOverlay").classList.add("open");
 }
- 
+
 function closeDetail() {
   document.getElementById("detailOverlay").classList.remove("open");
   document.getElementById("detailMapFrame").src = "";
 }
- 
+
 // ============================
 // WEATHER ALERT (SDF / Louisville 40213)
 // ============================
@@ -1166,29 +1171,29 @@ const EXTREME_CODES = {
   82:"Violent Rain Showers", 85:"Heavy Snow Showers", 86:"Heavy Snow Showers",
   95:"Thunderstorm", 96:"Thunderstorm + Hail", 99:"Thunderstorm + Heavy Hail"
 };
- 
+
 const ALERT_DISMISSED_KEY = "drivertraxxx_alert_dismissed";
- 
+
 function dismissWeatherAlert() {
   const alert = document.getElementById("weatherAlert");
   alert.style.display = "none";
   // Remember dismissed for 30 min so it doesn't keep reappearing
   localStorage.setItem(ALERT_DISMISSED_KEY, Date.now().toString());
 }
- 
+
 // For testing: call testWeatherAlert() in browser console to force show alert
 function testWeatherAlert() {
   localStorage.removeItem(ALERT_DISMISSED_KEY);
   checkWeatherAlert();
 }
- 
+
 async function checkWeatherAlert() {
   // Don't show if dismissed in last 30 min
   const dismissed = parseInt(localStorage.getItem(ALERT_DISMISSED_KEY) || "0");
   if (Date.now() - dismissed < 30 * 60 * 1000) return;
- 
+
   const alerts = [];
- 
+
   // 1. NWS official alerts for Jefferson County KY (SDF area)
   try {
     const nwsRes = await fetch("https://api.weather.gov/alerts/active?point=38.1741,-85.7368", {
@@ -1212,7 +1217,7 @@ async function checkWeatherAlert() {
   } catch(e) {
     console.warn("NWS fetch failed:", e.message);
   }
- 
+
   // 2. Open-Meteo as backup for extreme conditions not covered by NWS alerts
   try {
     const url = "https://api.open-meteo.com/v1/forecast?latitude=38.1741&longitude=-85.7368&current=temperature_2m,weather_code,windspeed_10m&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FNew_York";
@@ -1233,11 +1238,11 @@ async function checkWeatherAlert() {
   } catch(e) {
     console.warn("Open-Meteo fetch failed:", e.message);
   }
- 
+
   // Deduplicate and display
   const unique = [...new Set(alerts)];
   const alertEl = document.getElementById("weatherAlert");
- 
+
   if (unique.length > 0) {
     document.getElementById("weatherAlertMsg").textContent =
       "SDF WEATHER ALERT: " + unique.join(" - ");
@@ -1247,17 +1252,17 @@ async function checkWeatherAlert() {
     console.log("No extreme weather - alert hidden");
   }
 }
- 
+
 // ============================
 // SHIFT DETECTION
 // ============================
 const SHIFT_GAP_MS = 6 * 60 * 60 * 1000; // 6 hours
- 
+
 function estDateStr(ts) {
   const d = new Date(new Date(ts).toLocaleString("en-US", {timeZone:"America/New_York"}));
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
- 
+
 // Split ALL records into shifts by 6hr gap, oldest first
 function getAllShifts() {
   const all = getRecords().slice().sort((a,b) => a.timestamp - b.timestamp);
@@ -1275,18 +1280,18 @@ function getAllShifts() {
     records
   }));
 }
- 
+
 // Get shifts for a specific EST date string
 function getShiftsForDate(dateStr) {
   return getAllShifts().filter(s => s.date === dateStr);
 }
- 
+
 // Get current shift (last shift overall)
 function getCurrentShift() {
   const all = getAllShifts();
   return all.length > 0 ? all[all.length-1] : { records: [], shiftIndex: 0, date: "" };
 }
- 
+
 // Get shifts grouped by date for the last N days
 function getShiftsByDay(days) {
   const all = getAllShifts();
@@ -1297,12 +1302,12 @@ function getShiftsByDay(days) {
   });
   return byDay;
 }
- 
+
 // Get current shift records
 function getCurrentShiftRecords() {
   return getCurrentShift().records;
 }
- 
+
 // Kept for compatibility
 function getShiftGroups(sortedRecords) {
   if (sortedRecords.length === 0) return [];
@@ -1314,21 +1319,21 @@ function getShiftGroups(sortedRecords) {
   }
   return shifts;
 }
- 
+
 // ============================
 // AVG BANNER
 // ============================
 function updateAvgBanner() {
   const shiftRecords = getCurrentShiftRecords();
   const banner = document.getElementById("avgBanner");
- 
+
   if (shiftRecords.length < 2) {
     banner.style.display = "none";
     return;
   }
- 
+
   const timestamps = shiftRecords.map(r => r.timestamp);
- 
+
   // Avg trip time - gaps between consecutive entries
   const gaps = [];
   for (let i = 1; i < timestamps.length; i++) {
@@ -1339,17 +1344,17 @@ function updateAvgBanner() {
   const h = Math.floor(mins / 60);
   const m = mins % 60;
   const timeStr = h > 0 ? (m > 0 ? `${h}h ${m}m` : `${h}h`) : `${m}m`;
- 
+
   // Cars per hour over shift elapsed time
   const elapsedMs = timestamps[timestamps.length-1] - timestamps[0];
   const elapsedHrs = elapsedMs / 3600000;
   const cph = elapsedHrs > 0 ? (timestamps.length / elapsedHrs).toFixed(1) : "-";
- 
+
   document.getElementById("avgBannerTime").textContent = timeStr;
   document.getElementById("avgBannerCph").textContent = cph;
   banner.style.display = "block";
 }
- 
+
 // ============================
 // TOAST NOTIFICATION
 // ============================
@@ -1365,7 +1370,51 @@ function showToast(msg, type = "success") {
   clearTimeout(toast._timer);
   toast._timer = setTimeout(() => { toast.className = "toast"; }, 2800);
 }
- 
+
+// ============================
+// VIN DECODER (NHTSA vPIC API - free, no key)
+// ============================
+const VIN_REGEX = /^[A-HJ-NPR-Z0-9]{17}$/; // VIN excludes I, O, Q
+
+function isValidVIN(s) {
+  return VIN_REGEX.test(s);
+}
+
+async function decodeVIN(vin) {
+  try {
+    const url = `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/${vin}?format=json`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data.Results || !data.Results.length) return null;
+
+    // Build a flat lookup of value by Variable name
+    const map = {};
+    data.Results.forEach(r => {
+      if (r.Value && r.Value !== "Not Applicable" && r.Value !== "0") {
+        map[r.Variable] = r.Value;
+      }
+    });
+
+    // Only return if we got at least make/model/year
+    if (!map["Make"] && !map["Model"] && !map["Model Year"]) return null;
+
+    return {
+      year: map["Model Year"] || "",
+      make: map["Make"] || "",
+      model: map["Model"] || "",
+      trim: map["Trim"] || "",
+      bodyClass: map["Body Class"] || "",
+      fuelType: map["Fuel Type - Primary"] || "",
+      engine: map["Displacement (L)"] ? `${map["Displacement (L)"]}L` : "",
+      manufacturer: map["Manufacturer Name"] || ""
+    };
+  } catch (e) {
+    console.warn("VIN decode failed:", e);
+    return null;
+  }
+}
+
 // ============================
 // SAVE RECORD
 // ============================
@@ -1374,23 +1423,23 @@ function saveRecord() {
   if (!serial) { showToast("Please enter or scan a Serial ID.", "error"); return; }
   const statusVal = document.getElementById("status").value;
   if (!statusVal) { showToast("Please select a status.", "error"); return; }
- 
+
   const saveBtn = document.getElementById("saveBtn");
   const gpsEl = document.getElementById("gpsStatus");
- 
+
   // Lock button while acquiring
   saveBtn.disabled = true;
   saveBtn.innerHTML = "📡 Getting location...";
   gpsEl.className = "gps-status acquiring";
   gpsEl.textContent = "Acquiring GPS coordinates...";
- 
+
   // Determine shift number for this record
   const allShifts = getAllShifts();
   const lastShift = allShifts.length > 0 ? allShifts[allShifts.length-1] : null;
   const lastTs = lastShift ? lastShift.records[lastShift.records.length-1].timestamp : null;
   const isNewShift = !lastTs || (Date.now() - lastTs >= SHIFT_GAP_MS);
   const currentShiftNum = isNewShift ? allShifts.length + 1 : allShifts.length || 1;
- 
+
   const recordData = {
     id: Date.now().toString(),
     serialId: serial,
@@ -1403,15 +1452,32 @@ function saveRecord() {
     notes: document.getElementById("notes").value,
     timestamp: Date.now()
   };
- 
+
+  // Kick off VIN decode in parallel (non-blocking)
+  if (isValidVIN(serial)) {
+    gpsEl.textContent = "Acquiring GPS + decoding VIN...";
+    decodeVIN(serial).then(vinData => {
+      if (vinData) {
+        // Update the saved record with VIN data
+        const records = getRecords();
+        const rec = records.find(r => r.id === recordData.id);
+        if (rec) {
+          rec.vinData = vinData;
+          setRecords(records);
+          renderTodayEntries();
+        }
+      }
+    });
+  }
+
   function doSave(lat, lng, gpsError) {
     if (lat !== null) { recordData.lat = lat; recordData.lng = lng; }
     if (gpsError) { recordData.gpsError = true; }
- 
+
     const records = getRecords();
     records.unshift(recordData);
     setRecords(records);
- 
+
     // Reset form
     document.getElementById("serial").value = "";
     document.getElementById("notes").value = "";
@@ -1423,22 +1489,22 @@ function saveRecord() {
     toggleNoTagStyle();
     document.getElementById("manualEntrySection").style.display = "none";
     document.querySelector(".btn-manual-toggle").textContent = "✏️ Enter Manually";
- 
+
     // Restore button
     saveBtn.disabled = false;
     saveBtn.innerHTML = "&#128190; SAVE RECORD";
     gpsEl.className = "gps-status";
     gpsEl.textContent = "";
- 
+
     renderTodayEntries();
- 
+
     if (gpsError) {
       showToast("✅ Saved - no GPS location", "warn");
     } else {
       showToast("✅ Record saved with GPS", "success");
     }
   }
- 
+
   if ("geolocation" in navigator) {
     navigator.geolocation.getCurrentPosition(
       pos => {
@@ -1458,7 +1524,7 @@ function saveRecord() {
     doSave(null, null, true);
   }
 }
- 
+
 // ============================
 // TODAY'S ENTRIES (entry tab)
 // ============================
@@ -1470,28 +1536,28 @@ function renderTodayEntries() {
   const isCurrentShiftToday = currentShift.date === todayEST;
   const shiftRecords = isCurrentShiftToday ? currentShift.records : [];
   const shiftNum = isCurrentShiftToday ? todayShifts.length : 0;
- 
+
   document.getElementById("todayCount").textContent = shiftRecords.length;
   updateAvgBanner();
- 
+
   document.querySelector(".today-title").textContent =
     shiftNum > 1 ? `Shift ${shiftNum} Entries` : "Today's Entries";
- 
+
   if (shiftRecords.length === 0) {
     document.getElementById("todayRecords").innerHTML = '<div class="today-empty">No entries yet this shift.</div>';
     return;
   }
- 
+
   const sorted = [...shiftRecords].reverse();
   document.getElementById("todayRecords").innerHTML = sorted.map(r => recordCard(r, "deleteTodayRecord")).join("");
 }
- 
+
 function deleteTodayRecord(id) {
   if (!confirm("Delete this record? This cannot be undone.")) return;
   setRecords(getRecords().filter(r => r.id !== id));
   renderTodayEntries();
 }
- 
+
 // ============================
 // DELETE (records tab)
 // ============================
@@ -1500,7 +1566,7 @@ function deleteRecord(id) {
   setRecords(getRecords().filter(r => r.id !== id));
   renderRecords();
 }
- 
+
 // ============================
 // FILTER
 // ============================
@@ -1511,7 +1577,7 @@ function getFiltered() {
   const dest = document.getElementById("fDest").value;
   const from = document.getElementById("fDateFrom").value;
   const to = document.getElementById("fDateTo").value;
- 
+
   return getRecords().filter(r => {
     if (search && !r.serialId.includes(search)) return false;
     if (status && r.status !== status) return false;
@@ -1524,14 +1590,14 @@ function getFiltered() {
     return true;
   });
 }
- 
+
 function clearFilters() {
   ["fSearch","fDateFrom","fDateTo"].forEach(id => document.getElementById(id).value = "");
   ["fStatus","fNoTag","fDest"].forEach(id => document.getElementById(id).selectedIndex = 0);
   document.getElementById("recordsHeading").textContent = "Filter Records";
   renderRecords();
 }
- 
+
 // ============================
 // DRILL INTO DATE / WEEK
 // ============================
@@ -1545,7 +1611,7 @@ function viewByDate(dateStr) {
   document.getElementById("recordsHeading").textContent = "Entries for " + dateStr;
   showTab("records");
 }
- 
+
 function viewByWeek(fromStr, toStr, label) {
   document.getElementById("fDateFrom").value = fromStr;
   document.getElementById("fDateTo").value = toStr;
@@ -1556,7 +1622,7 @@ function viewByWeek(fromStr, toStr, label) {
   document.getElementById("recordsHeading").textContent = label;
   showTab("records");
 }
- 
+
 // ============================
 // RENDER RECORDS TAB
 // ============================
@@ -1564,7 +1630,7 @@ function renderRecords() {
   const records = getFiltered();
   document.getElementById("resultsCount").textContent =
     records.length + " record" + (records.length !== 1 ? "s" : "") + " found";
- 
+
   if (records.length === 0) {
     document.getElementById("records").innerHTML =
       '<p style="color:var(--muted);text-align:center;padding:24px">No records match your filters.</p>';
@@ -1572,16 +1638,20 @@ function renderRecords() {
   }
   document.getElementById("records").innerHTML = records.map(r => recordCard(r, "deleteRecord")).join("");
 }
- 
+
 // ============================
 // EXPORT CSV
 // ============================
 function exportCSV() {
   const records = getFiltered();
   if (records.length === 0) { showToast("No records to export.", "error"); return; }
-  const rows = [["ID","Serial ID","Status","Tires","Destination","Shuttle","No Tag","Notes","Latitude","Longitude","Timestamp"]];
+  const rows = [["ID","Serial ID","Year","Make","Model","Status","Tires","Destination","Shuttle","No Tag","Notes","Latitude","Longitude","Timestamp"]];
   records.forEach(r => rows.push([
-    r.id, r.serialId, r.status,
+    r.id, r.serialId,
+    r.vinData ? r.vinData.year : "",
+    r.vinData ? r.vinData.make : "",
+    r.vinData ? r.vinData.model : "",
+    r.status,
     r.tires && r.tires.length > 0 ? r.tires.join("|") : "",
     r.destination || "",
     r.shuttle ? "YES" : "NO",
@@ -1598,7 +1668,7 @@ function exportCSV() {
   a.download = getDriverFileName("drivertraxxx", "csv");
   a.click();
 }
- 
+
 // ============================
 // DASHBOARD
 // ============================
@@ -1608,9 +1678,9 @@ function startOfWeek(d) {
   dt.setHours(0,0,0,0);
   return dt;
 }
- 
+
 function isoDate(d) { return d.toISOString().slice(0,10); }
- 
+
 function renderDashboard() {
   const all = getRecords();
   const now = new Date();
@@ -1618,7 +1688,7 @@ function renderDashboard() {
   const thisWeekStart = startOfWeek(now);
   const lastWeekStart = new Date(thisWeekStart); lastWeekStart.setDate(lastWeekStart.getDate() - 7);
   const lastWeekEnd = new Date(thisWeekStart);
- 
+
   let todayCount=0, thisWeekCount=0, lastWeekCount=0, noTagCount=0;
   all.forEach(r => {
     const d = new Date(r.timestamp);
@@ -1627,12 +1697,12 @@ function renderDashboard() {
     if (d >= lastWeekStart && d < lastWeekEnd) lastWeekCount++;
     if (r.noTag) noTagCount++;
   });
- 
+
   const thisWeekEnd = isoDate(now);
   const thisWeekFromStr = isoDate(thisWeekStart);
   const lastWeekFromStr = isoDate(lastWeekStart);
   const lastWeekToStr = isoDate(new Date(lastWeekEnd.getTime() - 86400000));
- 
+
   document.getElementById("dashOverview").innerHTML = `
     <div class="stat-card clickable" onclick="viewByDate('${today}')">
       <div class="stat-num">${todayCount}</div><div class="stat-label">Today &#8594;</div>
@@ -1643,7 +1713,7 @@ function renderDashboard() {
     <div class="stat-card"><div class="stat-num">${all.length}</div><div class="stat-label">Total</div></div>
     <div class="stat-card"><div class="stat-num" style="color:var(--danger)">${noTagCount}</div><div class="stat-label">No Tag</div></div>
   `;
- 
+
   const statuses = ["CLEAN","DIRTY","PM","MK","MR","AUDIT","WI/DELETE","GLASS","OTHER"];
   const sc = {};
   statuses.forEach(s => sc[s] = 0);
@@ -1658,17 +1728,17 @@ function renderDashboard() {
         <div class="bar-val">${sc[s]}</div>
       </div>
     `).join("") || '<p style="color:var(--muted);padding:8px">No data yet.</p>';
- 
+
   // Last 7 days - clickable rows with avg trip time
   const days = [];
   for (let i=6; i>=0; i--) {
     const d = new Date(now); d.setDate(d.getDate()-i);
     days.push(isoDate(d));
   }
- 
+
   // Group shifts by their start date (EST) for last 7 days
   const byDay = getShiftsByDay(days);
- 
+
   function avgTripTime(timestamps) {
     if (timestamps.length < 2) return null;
     const gaps = [];
@@ -1680,13 +1750,13 @@ function renderDashboard() {
     const m = mins % 60;
     return m > 0 ? `${h}h ${m}m` : `${h}h`;
   }
- 
+
   function fmtTime(ts) {
     return new Date(ts).toLocaleTimeString("en-US", {hour:"numeric", minute:"2-digit", timeZone:"America/New_York"});
   }
- 
+
   const dn = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
- 
+
   document.getElementById("dashDays").innerHTML = `
     <table class="day-table" style="width:100%">
       <thead><tr><th>Date</th><th>Shift</th><th>Cars</th><th>Avg</th><th></th></tr></thead>
@@ -1696,7 +1766,7 @@ function renderDashboard() {
           const dayName = dn[dt.getDay()];
           const isToday = d === today;
           const shifts = byDay[d];
- 
+
           if (!shifts || shifts.length === 0) {
             return `<tr>
               <td>${d}${isToday ? ' <b style="color:var(--accent)">(today)</b>' : ''}<br><span style="color:var(--muted);font-size:11px">${dayName}</span></td>
@@ -1706,7 +1776,7 @@ function renderDashboard() {
               <td></td>
             </tr>`;
           }
- 
+
           return shifts.map((shift, si) => {
             const shiftLabel = shifts.length > 1 ? `Shift ${si+1}` : "Shift 1";
             const timestamps = shift.records.map(r => r.timestamp);
@@ -1727,7 +1797,7 @@ function renderDashboard() {
         }).join("")}
       </tbody>
     </table>`;
- 
+
   // Week comparison - clickable
   const delta = thisWeekCount - lastWeekCount;
   const dStr = delta>0 ? "&#9650; +"+delta+" vs last week" : delta<0 ? "&#9660; "+delta+" vs last week" : "Same as last week";
@@ -1744,7 +1814,7 @@ function renderDashboard() {
       <div class="stat-label">Week-over-Week</div>
     </div>`;
 }
- 
+
 // ============================
 // BARCODE SCANNER (ZXing)
 // ============================
@@ -1752,7 +1822,7 @@ let codeReader = null;
 let scannerActive = false;
 let torchOn = false;
 let activeStream = null;
- 
+
 function openScanner() {
   const overlay = document.getElementById("scannerOverlay");
   const hint = document.getElementById("scannerHint");
@@ -1761,13 +1831,13 @@ function openScanner() {
   hint.innerHTML = '<span class="scanner-dot">●</span> Starting camera...';
   torchOn = false;
   document.getElementById("torchBtn").classList.remove("on");
- 
+
   if (!window.ZXing) {
     hint.className = "scanner-status error";
     hint.textContent = "Scanner not loaded. Use manual entry.";
     return;
   }
- 
+
   try {
     // Restrict to Code 39 and Code 128 only - Enterprise uses these formats
     const hints = new Map();
@@ -1776,14 +1846,14 @@ function openScanner() {
     hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
     codeReader = new ZXing.BrowserMultiFormatReader(hints);
     scannerActive = true;
- 
+
     codeReader.listVideoInputDevices().then(devices => {
       const rearCam = devices.find(d =>
         /back|rear|environment/i.test(d.label)
       ) || devices[devices.length - 1];
- 
+
       const deviceId = rearCam ? rearCam.deviceId : undefined;
- 
+
       // Get stream for torch control
       const constraints = {
         video: {
@@ -1793,48 +1863,48 @@ function openScanner() {
           height: { ideal: 720 }
         }
       };
- 
+
       navigator.mediaDevices.getUserMedia(constraints).then(stream => {
         activeStream = stream;
         document.getElementById("scannerVideo").srcObject = stream;
         hint.innerHTML = '<span class="scanner-dot">●</span> Scanning...';
       }).catch(() => {});
- 
+
       codeReader.decodeFromVideoDevice(deviceId, "scannerVideo", (result, err) => {
         if (!scannerActive) return;
         if (result) {
           const code = result.getText().trim().toUpperCase();
- 
+
           // Green flash + vibrate
           const flash = document.getElementById("scannerFlash");
           flash.classList.remove("flash");
           void flash.offsetWidth; // force reflow to restart animation
           flash.classList.add("flash");
           navigator.vibrate && navigator.vibrate([80, 40, 80]);
- 
+
           hint.className = "scanner-status success";
           hint.textContent = "✓ " + code;
- 
+
           document.getElementById("serial").value = code;
           showManualEntry();
- 
+
           setTimeout(() => closeScanner(), 600);
         }
       });
- 
+
       hint.innerHTML = '<span class="scanner-dot">●</span> Scanning...';
- 
+
     }).catch(() => {
       hint.className = "scanner-status error";
       hint.textContent = "Camera access denied. Check permissions.";
     });
- 
+
   } catch(e) {
     hint.className = "scanner-status error";
     hint.textContent = "Scanner unavailable. Use manual entry.";
   }
 }
- 
+
 function closeScanner() {
   scannerActive = false;
   if (codeReader) {
@@ -1848,7 +1918,7 @@ function closeScanner() {
   torchOn = false;
   document.getElementById("scannerOverlay").classList.remove("open");
 }
- 
+
 function toggleTorch() {
   if (!activeStream) return;
   const track = activeStream.getVideoTracks()[0];
@@ -1862,16 +1932,16 @@ function toggleTorch() {
   track.applyConstraints({ advanced: [{ torch: torchOn }] });
   document.getElementById("torchBtn").classList.toggle("on", torchOn);
 }
- 
+
 // ============================
 // PROFILE
 // ============================
 const PROFILE_KEY = "drivertraxxx_profile";
- 
+
 function getProfile() {
   try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || "{}"); } catch(e) { return {}; }
 }
- 
+
 function saveProfile() {
   const name = document.getElementById("profileName").value.trim();
   if (!name) { showToast("Please enter your name.", "error"); return; }
@@ -1881,7 +1951,7 @@ function saveProfile() {
   applyProfile();
   showToast("✅ Profile saved", "success");
 }
- 
+
 function previewProfileName() {
   const name = document.getElementById("profileName").value.trim();
   const el = document.getElementById("dashDriverNameText");
@@ -1890,7 +1960,7 @@ function previewProfileName() {
     document.getElementById("dashDriverName").style.display = "block";
   }
 }
- 
+
 function applyProfile() {
   const profile = getProfile();
   const name = profile.name || "";
@@ -1898,17 +1968,17 @@ function applyProfile() {
   const nameEl = document.getElementById("dashDriverNameText");
   const nameSection = document.getElementById("dashDriverName");
   const locationEl = document.getElementById("dashDriverLocation");
- 
+
   if (nameEl) nameEl.textContent = name;
   if (nameSection) nameSection.style.display = name ? "block" : "none";
   if (locationEl) locationEl.textContent = location ? "📍 " + location : "";
- 
+
   const nameInput = document.getElementById("profileName");
   const locSelect = document.getElementById("profileLocation");
   if (nameInput && name) nameInput.value = name;
   if (locSelect && location) locSelect.value = location;
 }
- 
+
 function getDriverFileName(base, ext) {
   const profile = getProfile();
   const name = profile.name ? "_" + profile.name.replace(/\s+/g,"_") : "";
@@ -1918,7 +1988,7 @@ function getDriverFileName(base, ext) {
 const BACKUP_KEY = "drivertraxxx_backup";
 const BACKUP_TIME_KEY = "drivertraxxx_backup_time";
 const BACKUP_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
- 
+
 function runBackup(manual = false) {
   const records = getRecords();
   const backupData = { records, timestamp: Date.now(), version: 1 };
@@ -1931,32 +2001,32 @@ function runBackup(manual = false) {
     if (manual) showToast("Backup failed - storage may be full", "error");
   }
 }
- 
+
 function updateBackupStatus() {
   const ts = localStorage.getItem(BACKUP_TIME_KEY);
   const backup = localStorage.getItem(BACKUP_KEY);
   const timeEl = document.getElementById("lastBackupTime");
   const countEl = document.getElementById("backupRecordCount");
   const menuStatus = document.getElementById("menuSyncStatus");
- 
+
   if (!ts || !timeEl) return;
- 
+
   const d = new Date(parseInt(ts));
   const timeStr = d.toLocaleTimeString("en-US", {hour:"numeric", minute:"2-digit", timeZone:"America/New_York"});
   const dateStr = d.toLocaleDateString("en-US", {month:"short", day:"numeric", timeZone:"America/New_York"});
- 
+
   if (timeEl) timeEl.textContent = `${dateStr} at ${timeStr}`;
- 
+
   if (backup && countEl) {
     try {
       const parsed = JSON.parse(backup);
       countEl.textContent = parsed.records ? parsed.records.length + " records" : "-";
     } catch(e) { countEl.textContent = "-"; }
   }
- 
+
   if (menuStatus) menuStatus.textContent = `Backed up ${timeStr}`;
 }
- 
+
 function restoreBackup() {
   const backup = localStorage.getItem(BACKUP_KEY);
   if (!backup) { showToast("No backup found", "error"); return; }
@@ -1972,7 +2042,7 @@ function restoreBackup() {
     showToast("Restore failed - backup may be corrupt", "error");
   }
 }
- 
+
 function exportJSON() {
   const records = getRecords();
   if (records.length === 0) { showToast("No records to export", "error"); return; }
@@ -1984,31 +2054,31 @@ function exportJSON() {
   a.click();
   showToast(`✅ Exported ${records.length} records`, "success");
 }
- 
+
 function importJSON(event) {
   const file = event.target.files[0];
   if (!file) return;
   const statusEl = document.getElementById("importStatus");
   statusEl.textContent = "Reading file...";
- 
+
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
       const parsed = JSON.parse(e.target.result);
       if (!parsed.records || !Array.isArray(parsed.records)) throw new Error("Invalid format");
- 
+
       const existing = getRecords();
       // Merge - avoid duplicates by id
       const existingIds = new Set(existing.map(r => r.id));
       const newRecords = parsed.records.filter(r => !existingIds.has(r.id));
       const merged = [...existing, ...newRecords].sort((a,b) => b.timestamp - a.timestamp);
- 
+
       if (!confirm(`Import ${newRecords.length} new records? (${parsed.records.length - newRecords.length} duplicates skipped)`)) {
         statusEl.textContent = "";
         event.target.value = "";
         return;
       }
- 
+
       setRecords(merged);
       if (parsed.profile) localStorage.setItem(PROFILE_KEY, JSON.stringify(parsed.profile));
       applyProfile();
@@ -2024,7 +2094,7 @@ function importJSON(event) {
   };
   reader.readAsText(file);
 }
- 
+
 // ============================
 // INIT
 // ============================
@@ -2039,8 +2109,7 @@ setInterval(runBackup, BACKUP_INTERVAL_MS);
 updateBackupStatus();
 applyProfile();
 renderTodayEntries();
- 
+
 </script>
 </body>
 </html>
- 
