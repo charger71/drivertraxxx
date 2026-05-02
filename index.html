@@ -68,14 +68,15 @@
     background: var(--card); border: 1.5px solid var(--border);
     border-radius: var(--radius); padding: 14px 16px; margin-top: 12px;
     cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    user-select: none;
   }
   .notag-row input[type=checkbox] {
-    width: 11px; height: 20px; margin: 0; cursor: pointer;
-    accent-color: var(--danger); flex-shrink: 0;
+    display: none;
   }
   .notag-row label {
     font-size: 14px; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.5px; cursor: pointer; color: var(--text2);
+    letter-spacing: 0.5px; cursor: pointer; color: var(--text2); flex: 1;
+    pointer-events: none; text-align: center;
   }
   .notag-row.checked { border-color: var(--danger); background: #2d1515; }
   .notag-row.checked label { color: var(--danger); }
@@ -952,16 +953,16 @@
 
   <div class="field-label">Options</div>
   <div class="checkbox-row" style="display:flex;gap:10px;margin-top:0">
-    <div class="notag-row" id="noTagRow" style="flex:1;margin-top:0" onclick="document.getElementById('noTag').click()">
-      <input type="checkbox" id="noTag" onclick="event.stopPropagation(); toggleNoTagStyle()">
+    <div class="notag-row" id="noTagRow" style="flex:1;margin-top:0" onclick="document.getElementById('noTag').checked=!document.getElementById('noTag').checked; toggleNoTagStyle()">
+      <input type="checkbox" id="noTag" style="pointer-events:none">
       <label for="noTag">No Tag</label>
     </div>
-    <div class="notag-row shuttle-row" id="shuttleRow" style="flex:1;margin-top:0" onclick="document.getElementById('shuttle').click()">
-      <input type="checkbox" id="shuttle" onclick="event.stopPropagation(); toggleShuttleStyle()">
+    <div class="notag-row shuttle-row" id="shuttleRow" style="flex:1;margin-top:0" onclick="document.getElementById('shuttle').checked=!document.getElementById('shuttle').checked; toggleShuttleStyle()">
+      <input type="checkbox" id="shuttle" style="pointer-events:none">
       <label for="shuttle">Shuttle</label>
     </div>
-    <div class="notag-row transport-row" id="transportRow" style="flex:1;margin-top:0" onclick="document.getElementById('transport').click()">
-      <input type="checkbox" id="transport" onclick="event.stopPropagation(); toggleTransportStyle()">
+    <div class="notag-row transport-row" id="transportRow" style="flex:1;margin-top:0" onclick="document.getElementById('transport').checked=!document.getElementById('transport').checked; toggleTransportStyle()">
+      <input type="checkbox" id="transport" style="pointer-events:none">
       <label for="transport">Transport</label>
     </div>
   </div>
