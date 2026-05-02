@@ -12,7 +12,6 @@
 <title>DriverTraxxx</title>
 <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
-<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiRHJpdmVyVHJheHh4Iiwic2hvcnRfbmFtZSI6IkRyaXZlclRyYXh4eCIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMTMxNjFhIiwidGhlbWVfY29sb3IiOiIjMDBhNjUxIiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCxpVkJPUncwS0dnb0FBQUFOU1VoRVVnQUFBTUFBQUFDMENBWUFBQUJqZVlNekFBQUhPa2xFUVZSNE5PMmR6WEhiU2hBR2g2NlhBYXQ4Y0NKS1M2RW9MU1dpZzZvWWczMVE0Wm1HQkJHN083dnoxMzEwV1FCMnB2RnhTSURFUlJ4dy9mbnJ0OVV3d0RpMjk3ZUw5VEdZSEFBQzE4QkM4R1U3Uk9MYXJKSjc2azZRR0w1aXBseFFOb3pJY0lZWll2L1EzaUF5dzFsbXVLSjJoaUF5aktDVjFpb0pqY3d3aXBaRFEyY0ZJc01NUnRLNk82R1JHV1l4NHRhWDBNZ01zK2wxckZsb1pJWlY5TGpXSkRRenczQnFuVHN0TkRLREZTM3VuUklhbWNHYXN3NCtGQnFad3d0blhGUy85QTFneWJkQ2s4N2dqVWRPSGw2UlFlWTJiaTlQdzl1NJByOHFIRWtOanE0bUluUWpHdUsyZ3VpZmFSSWFtZjlpSWZBakVQeURyNlQrOUEvVlpmWW84Q01xQzc2WEdrRWxwc1JIVTBQN1c2R3J5WnhKNUQyVnhMNlh1cVRRbVVYZVUwSHNzc0pYRW5sUFpyRy9GRHFuekpWRjNwTlY3RTNxMUVJajhqSFp4RTR0TkNLZkp3dlkvd2lkUldaRTdpZUQyTGYzdDBtYXUyMDh5SHg5ZnUwU3c0Tk1IdXFud1gvV0I2REI2bWJNRVBCb215dlhkbnQ1Y25GeWpSQmE2RlhOdG16eWZ0K3oxN3h0UDZyWWw2ano4K3pHanpTMDlkaDY5K1c1QmxhRW5LRm5OckozRHJaZzlyRkdqUHFDalJ5ekNoN" }>
 
 <style>
   :root {
@@ -44,16 +43,8 @@
   }
   .tab.active { color: #000; background: var(--accent); }
 
-  .panel {
-    display: block; padding: 20px var(--space);
-    visibility: hidden; position: absolute;
-    top: 0; left: -9999px; pointer-events: none;
-    width: 100%;
-  }
-  .panel.active {
-    visibility: visible; position: relative;
-    left: 0; pointer-events: all;
-  }
+  .panel { display: none; padding: 20px var(--space); }
+  .panel.active { display: block; }
 
   .field-label {
     font-size: 10px; font-weight: 700; color: var(--muted);
