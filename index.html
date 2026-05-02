@@ -122,6 +122,10 @@
   .badge-dest { background: var(--accent-muted); color: var(--accent); border: 1px solid var(--accent); font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
   .badge-notag { background: #2d1515; color: #e85550; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
   .badge-shuttle { background: #0d1e36; color: #4d9bff; border: 1px solid #4d9bff; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .transport-row.transport-checked { border-color: #f0b04a; background: #2a1f08; }
+  .transport-row.transport-checked label { color: #f0b04a; }
+  .transport-row input[type=checkbox] { accent-color: #f0b04a; }
+  .badge-transport { background: #2a1f08; color: #f0b04a; border: 1px solid #f0b04a; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
   .status-CLEAN { background: #0d2e1a; color: #34c76a; }
   .status-DIRTY { background: #2d1515; color: #e87070; }
   .status-PM { background: #0d1e36; color: #6aadff; }
@@ -546,6 +550,23 @@
     color: var(--text2); font-size: 15px; line-height: 1.7;
   }
 
+  /* DASHBOARD QUOTE */
+  .dash-quote {
+    background: var(--accent-muted);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 20px;
+  }
+  .dash-quote-text {
+    font-size: 15px; color: var(--text); line-height: 1.7;
+    font-style: italic; font-weight: 400;
+  }
+  .dash-quote-attr {
+    font-size: 12px; color: var(--accent); font-weight: 700;
+    margin-top: 10px; letter-spacing: 0.3px; text-align: right;
+  }
+
   /* AVG BANNER */
   #avgBanner { background: var(--accent); color: #000; max-width: 600px; margin: 0 auto; }
   .avg-banner-stats { display: flex; align-items: stretch; }
@@ -659,6 +680,121 @@
       </li>
     </ul>
   </div>
+
+  <div class="training-placeholder" style="margin-top:16px">
+    <h3 style="color:var(--accent);font-size:16px;margin-bottom:4px">Car SIPP Codes</h3>
+    <p style="color:var(--muted);font-size:12px;margin-bottom:14px;font-style:italic">* Certain car categories are not available at all locations.</p>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr style="border-bottom:2px solid var(--accent)">
+            <th style="text-align:left;padding:8px 10px;color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:1px;white-space:nowrap">Code</th>
+            <th style="text-align:left;padding:8px 10px;color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:1px">Category</th>
+            <th style="text-align:left;padding:8px 10px;color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:1px">Example</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:1px;white-space:nowrap">Seats</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 10px;font-weight:800;color:var(--text);white-space:nowrap">CCAR</td>
+            <td style="padding:9px 10px;color:var(--text2)">Compact</td>
+            <td style="padding:9px 10px;color:var(--muted);font-size:12px">Nissan Versa or similar</td>
+            <td style="padding:9px 10px;color:var(--text2);text-align:center">5</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);background:var(--card2)">
+            <td style="padding:9px 10px;font-weight:800;color:var(--text);white-space:nowrap">ECAR</td>
+            <td style="padding:9px 10px;color:var(--text2)">Economy</td>
+            <td style="padding:9px 10px;color:var(--muted);font-size:12px">Mitsubishi Mirage or similar</td>
+            <td style="padding:9px 10px;color:var(--text2);text-align:center">4</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 10px;font-weight:800;color:var(--text);white-space:nowrap">FCAR</td>
+            <td style="padding:9px 10px;color:var(--text2)">Full Size</td>
+            <td style="padding:9px 10px;color:var(--muted);font-size:12px">Chevrolet Malibu or similar</td>
+            <td style="padding:9px 10px;color:var(--text2);text-align:center">5</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);background:var(--card2)">
+            <td style="padding:9px 10px;font-weight:800;color:var(--text);white-space:nowrap">FJAR</td>
+            <td style="padding:9px 10px;color:var(--text2)">Full Size All-Terrain 4 Door</td>
+            <td style="padding:9px 10px;color:var(--muted);font-size:12px">Jeep Wrangler Unlimited or similar</td>
+            <td style="padding:9px 10px;color:var(--text2);text-align:center">5</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 10px;font-weight:800;color:var(--text);white-space:nowrap">GCAR</td>
+            <td style="padding:9px 10px;color:var(--text2)">Minivan (Grand Caravan)</td>
+            <td style="padding:9px 10px;color:var(--muted);font-size:12px">Dodge Grand Caravan</td>
+            <td style="padding:9px 10px;color:var(--text2);text-align:center">7</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);background:var(--card2)">
+            <td style="padding:9px 10px;font-weight:800;color:var(--text);white-space:nowrap">ICAR</td>
+            <td style="padding:9px 10px;color:var(--text2)">Intermediate / Midsize</td>
+            <td style="padding:9px 10px;color:var(--muted);font-size:12px">Toyota Corolla or similar</td>
+            <td style="padding:9px 10px;color:var(--text2);text-align:center">5</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 10px;font-weight:800;color:var(--text);white-space:nowrap">IFAR</td>
+            <td style="padding:9px 10px;color:var(--text2)">Midsize SUV</td>
+            <td style="padding:9px 10px;color:var(--muted);font-size:12px">Nissan Rogue or similar</td>
+            <td style="padding:9px 10px;color:var(--text2);text-align:center">5</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);background:var(--card2)">
+            <td style="padding:9px 10px;font-weight:800;color:var(--text);white-space:nowrap">IJAR</td>
+            <td style="padding:9px 10px;color:var(--text2)">Intermediate All-Terrain 2 Door</td>
+            <td style="padding:9px 10px;color:var(--muted);font-size:12px">Jeep Wrangler or similar</td>
+            <td style="padding:9px 10px;color:var(--text2);text-align:center">5</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 10px;font-weight:800;color:var(--text);white-space:nowrap">LCAR / LDAR</td>
+            <td style="padding:9px 10px;color:var(--text2)">Luxury</td>
+            <td style="padding:9px 10px;color:var(--muted);font-size:12px">Audi A4, BMW 3 Series or similar</td>
+            <td style="padding:9px 10px;color:var(--text2);text-align:center">5</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);background:var(--card2)">
+            <td style="padding:9px 10px;font-weight:800;color:var(--text);white-space:nowrap">MVAR</td>
+            <td style="padding:9px 10px;color:var(--text2)">Minivan</td>
+            <td style="padding:9px 10px;color:var(--muted);font-size:12px">Chrysler Pacifica or similar</td>
+            <td style="padding:9px 10px;color:var(--text2);text-align:center">7</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 10px;font-weight:800;color:var(--text);white-space:nowrap">PCAR</td>
+            <td style="padding:9px 10px;color:var(--text2)">Premium</td>
+            <td style="padding:9px 10px;color:var(--muted);font-size:12px">Nissan Altima or similar</td>
+            <td style="padding:9px 10px;color:var(--text2);text-align:center">5</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);background:var(--card2)">
+            <td style="padding:9px 10px;font-weight:800;color:var(--text);white-space:nowrap">SCAR</td>
+            <td style="padding:9px 10px;color:var(--text2)">Standard</td>
+            <td style="padding:9px 10px;color:var(--muted);font-size:12px">&mdash;</td>
+            <td style="padding:9px 10px;color:var(--text2);text-align:center">5</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 10px;font-weight:800;color:var(--text);white-space:nowrap">SFAR</td>
+            <td style="padding:9px 10px;color:var(--text2)">SUV</td>
+            <td style="padding:9px 10px;color:var(--muted);font-size:12px">Ford Edge or similar</td>
+            <td style="padding:9px 10px;color:var(--text2);text-align:center">5</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);background:var(--card2)">
+            <td style="padding:9px 10px;font-weight:800;color:var(--text);white-space:nowrap">STAR</td>
+            <td style="padding:9px 10px;color:var(--text2)">Convertible</td>
+            <td style="padding:9px 10px;color:var(--muted);font-size:12px">Ford Mustang or similar</td>
+            <td style="padding:9px 10px;color:var(--text2);text-align:center">4</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:9px 10px;font-weight:800;color:var(--text);white-space:nowrap">XPAR</td>
+            <td style="padding:9px 10px;color:var(--text2)">Sport Utility</td>
+            <td style="padding:9px 10px;color:var(--muted);font-size:12px">&mdash;</td>
+            <td style="padding:9px 10px;color:var(--text2);text-align:center">5</td>
+          </tr>
+          <tr style="background:var(--card2)">
+            <td style="padding:9px 10px;font-weight:800;color:var(--text);white-space:nowrap">XVARP</td>
+            <td style="padding:9px 10px;color:var(--text2)">15 Person Van</td>
+            <td style="padding:9px 10px;color:var(--muted);font-size:12px">&mdash;</td>
+            <td style="padding:9px 10px;color:var(--text2);text-align:center">15</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 <div class="panel" id="panel-data">
   <div class="dash-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg> Data & Backup</div>
@@ -706,17 +842,35 @@
   </div>
 
   <div class="data-section">
-    <div class="data-section-title">Home Branch / Location</div>
-    <div class="data-section-desc">Your primary branch or lot location.</div>
+    <div class="data-section-title">Home Airport / Branch</div>
+    <div class="data-section-desc">Your primary airport or branch location.</div>
     <select id="profileLocation" style="margin-bottom:0">
       <option value="">-- SELECT LOCATION --</option>
-      <option>SDF Airport</option>
-      <option>Garage</option>
-      <option>QTA</option>
-      <option>Backlot</option>
-      <option>Atlantic</option>
-      <option>Branch</option>
-      <option>Other</option>
+      <option>Austin-Bergstrom (AUS)</option>
+      <option>Boston Logan (BOS)</option>
+      <option>Charlotte Douglas (CLT)</option>
+      <option>Chicago O'Hare (ORD)</option>
+      <option>Dallas/Fort Worth (DFW)</option>
+      <option>Denver (DEN)</option>
+      <option>Fort Lauderdale-Hollywood (FLL)</option>
+      <option>Hartsfield-Jackson Atlanta (ATL)</option>
+      <option>Harry Reid Las Vegas (LAS)</option>
+      <option>Honolulu (HNL)</option>
+      <option>John F. Kennedy (JFK)</option>
+      <option>Los Angeles (LAX)</option>
+      <option>Louisville Muhammad Ali (SDF)</option>
+      <option>Miami (MIA)</option>
+      <option>Minneapolis-St. Paul (MSP)</option>
+      <option>Nashville (BNA)</option>
+      <option>Newark Liberty (EWR)</option>
+      <option>Orlando (MCO)</option>
+      <option>Phoenix Sky Harbor (PHX)</option>
+      <option>Salt Lake City (SLC)</option>
+      <option>San Diego (SAN)</option>
+      <option>San Francisco (SFO)</option>
+      <option>Seattle-Tacoma (SEA)</option>
+      <option>Tampa (TPA)</option>
+      <option>Washington Reagan (DCA)</option>
     </select>
   </div>
 
@@ -737,21 +891,6 @@
     <input type="text" id="serial" placeholder="Type Serial ID" autocomplete="off"
       oninput="this.value = this.value.toUpperCase()">
   </div>
-
-  <div class="field-label">Status</div>
-  <select id="status" onchange="handleStatusChange()">
-    <option value="">-- SELECT STATUS --</option>
-    <option>CLEAN</option>
-    <option>DIRTY</option>
-    <option>PM</option>
-    <option>MK</option>
-    <option>MR</option>
-    <option>AUDIT</option>
-    <option>WI/DELETE</option>
-    <option>GLASS</option>
-    <option>TI</option>
-    <option>OTHER</option>
-  </select>
 
   <!-- TIRE SELECTOR - shown when TI is selected -->
   <div id="tireSelectorSection" style="display:none">
@@ -780,18 +919,39 @@
     <div class="tire-selected-label" id="tireSelectedLabel">No tires selected</div>
   </div>
 
-  <div class="field-label">Destination</div>
-  <select id="destination">
-    <option value="">-- SELECT DESTINATION --</option>
-    <option>GARAGE</option>
-    <option>QTA</option>
-    <option>BACKLOT</option>
-    <option>ATLANTIC</option>
-    <option>BRANCH</option>
-    <option>OTHER</option>
-  </select>
+  <div style="display:flex;gap:10px;margin-top:20px">
+    <div style="flex:1">
+      <div class="field-label" style="margin-top:0">Status</div>
+      <select id="status" onchange="handleStatusChange()" style="margin-bottom:0">
+        <option value="">-- SELECT STATUS --</option>
+        <option>CLEAN</option>
+        <option>DIRTY</option>
+        <option>PM</option>
+        <option>MK</option>
+        <option>MR</option>
+        <option>AUDIT</option>
+        <option>WI/DELETE</option>
+        <option>GLASS</option>
+        <option>TI</option>
+        <option>OTHER</option>
+      </select>
+    </div>
+    <div style="flex:1">
+      <div class="field-label" style="margin-top:0">Destination</div>
+      <select id="destination" style="margin-bottom:0">
+        <option value="">-- SELECT DESTINATION --</option>
+        <option>GARAGE</option>
+        <option>QTA</option>
+        <option>BACKLOT</option>
+        <option>ATLANTIC</option>
+        <option>BRANCH</option>
+        <option>OTHER</option>
+      </select>
+    </div>
+  </div>
 
-  <div class="checkbox-row" style="display:flex;gap:10px;margin-top:12px">
+  <div class="field-label">Options</div>
+  <div class="checkbox-row" style="display:flex;gap:10px;margin-top:0">
     <div class="notag-row" id="noTagRow" style="flex:1;margin-top:0" onclick="document.getElementById('noTag').click()">
       <input type="checkbox" id="noTag" onclick="event.stopPropagation(); toggleNoTagStyle()">
       <label for="noTag">No Tag</label>
@@ -799,6 +959,10 @@
     <div class="notag-row shuttle-row" id="shuttleRow" style="flex:1;margin-top:0" onclick="document.getElementById('shuttle').click()">
       <input type="checkbox" id="shuttle" onclick="event.stopPropagation(); toggleShuttleStyle()">
       <label for="shuttle">Shuttle</label>
+    </div>
+    <div class="notag-row transport-row" id="transportRow" style="flex:1;margin-top:0" onclick="document.getElementById('transport').click()">
+      <input type="checkbox" id="transport" onclick="event.stopPropagation(); toggleTransportStyle()">
+      <label for="transport">Transport</label>
     </div>
   </div>
 
@@ -857,6 +1021,8 @@
 
 <!-- ==================== DASHBOARD PANEL ==================== -->
 <div class="panel" id="panel-dashboard">
+
+  <div id="dashQuote" class="dash-quote"></div>
 
   <div id="dashDriverName" style="display:none;margin-bottom:20px">
     <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700">Driver</div>
@@ -1213,6 +1379,7 @@ function saveRecord() {
     destination: document.getElementById("destination").value,
     noTag: document.getElementById("noTag").checked,
     shuttle: document.getElementById("shuttle").checked,
+    transport: document.getElementById("transport").checked,
     shiftNum: currentShiftNum,
     notes: sanitizeNotes(document.getElementById("notes").value),
     timestamp: Date.now()
@@ -1243,6 +1410,8 @@ function saveRecord() {
     document.getElementById("destination").selectedIndex = 0;
     document.getElementById("noTag").checked = false;
     toggleNoTagStyle();
+    document.getElementById("transport").checked = false;
+    toggleTransportStyle();
     document.getElementById("manualEntrySection").style.display = "none";
     document.querySelector(".btn-manual-toggle").innerHTML = "Enter Manually";
     saveBtn.disabled = false;
@@ -1365,11 +1534,18 @@ function toggleNoTagStyle() {
 }
 
 const SHUTTLE_KEY = "drivertraxxx_shuttle";
+const TRANSPORT_KEY = "drivertraxxx_transport";
 
 function toggleShuttleStyle() {
   const checked = document.getElementById("shuttle").checked;
   document.getElementById("shuttleRow").classList.toggle("shuttle-checked", checked);
   localStorage.setItem(SHUTTLE_KEY, checked ? "1" : "0");
+}
+
+function toggleTransportStyle() {
+  const checked = document.getElementById("transport").checked;
+  document.getElementById("transportRow").classList.toggle("transport-checked", checked);
+  localStorage.setItem(TRANSPORT_KEY, checked ? "1" : "0");
 }
 
 // ============================
@@ -1441,6 +1617,7 @@ function recordCard(r, onDelete) {
           <span class="record-status ${statusClass(r.status)}">${safeStatus}</span>
           ${safeDest ? `<span class="badge-dest"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${safeDest}</span>` : ""}
           ${r.shuttle ? `<span class="badge-shuttle"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="22" height="12" rx="2"/><path d="M16 6V4a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v2"/><line x1="12" y1="6" x2="12" y2="18"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><line x1="1" y1="12" x2="23" y2="12"/></svg> SHUTTLE</span>` : ""}
+          ${r.transport ? '<span class="badge-transport">TRANSPORT</span>' : ""}
           ${r.noTag ? '<span class="badge-notag">NO TAG</span>' : ""}
         </div>
       </div>
@@ -1524,6 +1701,7 @@ function openDetail(id, onDelete) {
     <span class="record-status ${statusClass(r.status)}">${sanitizeText(r.status)}</span>
     ${r.destination ? `<span class="badge-dest">${sanitizeText(r.destination)}</span>` : ""}
     ${r.shuttle ? '<span class="badge-shuttle">SHUTTLE</span>' : ""}
+    ${r.transport ? '<span class="badge-transport">TRANSPORT</span>' : ""}
     ${r.noTag ? '<span class="badge-notag">NO TAG</span>' : ""}
   `;
 
@@ -1603,7 +1781,7 @@ function closeDetail() {
 function exportCSV() {
   const records = getFiltered();
   if (records.length === 0) { showToast("No records to export.", "error"); return; }
-  const rows = [["ID","Serial ID","Year","Make","Model","Status","Tires","Destination","Shuttle","No Tag","Notes","Latitude","Longitude","Timestamp"]];
+  const rows = [["ID","Serial ID","Year","Make","Model","Status","Tires","Destination","Shuttle","Transport","No Tag","Notes","Latitude","Longitude","Timestamp"]];
   records.forEach(r => rows.push([
     r.id, r.serialId,
     r.vinData ? r.vinData.year : "",
@@ -1613,6 +1791,7 @@ function exportCSV() {
     r.tires && r.tires.length > 0 ? r.tires.join("|") : "",
     r.destination || "",
     r.shuttle ? "YES" : "NO",
+    r.transport ? "YES" : "NO",
     r.noTag ? "YES" : "NO",
     (r.notes || "").replace(/,/g,";"),
     r.lat !== undefined ? r.lat.toFixed(6) : "",
@@ -1639,7 +1818,32 @@ function startOfWeek(d) {
 
 function isoDate(d) { return d.toISOString().slice(0,10); }
 
+// ============================
+// DASHBOARD QUOTE
+// ============================
+const CAR_QUOTES = [
+  { text: "If I had asked people what they wanted, they would have said faster horses.", attr: "Henry Ford" },
+  { text: "I couldn't find the sports car of my dreams, so I built it myself.", attr: "Ferdinand Porsche" },
+  { text: "Everything in life is somewhere else, and you get there in a car.", attr: "E.B. White" },
+  { text: "Racing is life. Anything before or after is just waiting.", attr: "Steve McQueen" },
+  { text: "The cars we drive say a lot about us.", attr: "Alexandra Paul" },
+  { text: "The best car safety device is a rear-view mirror with a cop in it.", attr: "Dudley Moore" },
+  { text: "I spent a lot of money on booze, birds, and fast cars. The rest I just squandered.", attr: "George Best" },
+  { text: "A car is like a mother-in-law — if you let it, it will rule your life.", attr: "Jaime Lerner" },
+  { text: "There's a lot of stress, but once you get in the car, all that goes out the window.", attr: "Danica Patrick" },
+  { text: "Straight roads are for fast cars, turns are for fast drivers.", attr: "Colin McRae" }
+];
+
+function renderQuote() {
+  const q = CAR_QUOTES[Math.floor(Math.random() * CAR_QUOTES.length)];
+  const el = document.getElementById("dashQuote");
+  if (el) {
+    el.innerHTML = `<div class="dash-quote-text">"${sanitizeText(q.text)}"</div><div class="dash-quote-attr">— ${sanitizeText(q.attr)}</div>`;
+  }
+}
+
 function renderDashboard() {
+  renderQuote();
   const all = getRecords();
   const now = new Date();
   const today = isoDate(now);
@@ -2133,6 +2337,10 @@ async function checkWeatherAlert() {
 if (localStorage.getItem(SHUTTLE_KEY) === "1") {
   document.getElementById("shuttle").checked = true;
   document.getElementById("shuttleRow").classList.add("shuttle-checked");
+}
+if (localStorage.getItem(TRANSPORT_KEY) === "1") {
+  document.getElementById("transport").checked = true;
+  document.getElementById("transportRow").classList.add("transport-checked");
 }
 checkWeatherAlert();
 setInterval(checkWeatherAlert, 15 * 60 * 1000);
