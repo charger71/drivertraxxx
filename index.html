@@ -224,7 +224,7 @@
     background: var(--card2); border-radius: var(--radius);
     border-left: 3px solid var(--accent);
   }
-  .detail-vin-icon { flex-shrink: 0; }
+  .detail-vin-icon { flex-shrink: 0; display: flex; align-items: center; gap: 4px; }
   .detail-vin-name { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.3; }
   .detail-vin-specs { font-size: 12px; color: var(--muted); margin-top: 3px; }
   .detail-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 12px; }
@@ -886,6 +886,8 @@
 
 </div>
 
+<div id="toast" class="toast"></div>
+
 <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
 
 <!-- RECORD DETAIL OVERLAY -->
@@ -971,6 +973,266 @@ const DB_KEY = "drivertraxxx_records";
 function getRecords() { return JSON.parse(localStorage.getItem(DB_KEY) || "[]"); }
 function setRecords(r) { localStorage.setItem(DB_KEY, JSON.stringify(r)); }
 function statusClass(s) { return "status-" + s.replace(/[^A-Z]/g,""); }
+
+// ============================
+// TOAST
+// ============================
+function showToast(msg, type = "success") {
+  let toast = document.getElementById("toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "toast";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.className = "toast toast-" + type + " toast-show";
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => { toast.className = "toast"; }, 2800);
+}
+
+// ============================
+// SHIFT DETECTION
+// ============================
+const SHIFT_GAP_MS = 6 * 60 * 60 * 1000;
+
+function estDateStr(ts) {
+  const d = new Date(new Date(ts).toLocaleString("en-US", {timeZone:"America/New_York"}));
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
+function getAllShifts() {
+  const all = getRecords().slice().sort((a,b) => a.timestamp - b.timestamp);
+  if (all.length === 0) return [];
+  const shifts = [[all[0]]];
+  for (let i = 1; i < all.length; i++) {
+    if (all[i].timestamp - all[i-1].timestamp >= SHIFT_GAP_MS) shifts.push([]);
+    shifts[shifts.length-1].push(all[i]);
+  }
+  return shifts.map((records, idx) => ({
+    shiftIndex: idx,
+    date: estDateStr(records[0].timestamp),
+    records
+  }));
+}
+
+function getShiftsForDate(dateStr) {
+  return getAllShifts().filter(s => s.date === dateStr);
+}
+
+function getCurrentShift() {
+  const all = getAllShifts();
+  return all.length > 0 ? all[all.length-1] : { records: [], shiftIndex: 0, date: "" };
+}
+
+function getCurrentShiftRecords() {
+  return getCurrentShift().records;
+}
+
+function getShiftsByDay(days) {
+  const all = getAllShifts();
+  const byDay = {};
+  days.forEach(d => byDay[d] = []);
+  all.forEach(shift => {
+    if (byDay[shift.date] !== undefined) byDay[shift.date].push(shift);
+  });
+  return byDay;
+}
+
+function getShiftGroups(sortedRecords) {
+  if (sortedRecords.length === 0) return [];
+  const shifts = [[sortedRecords[0]]];
+  for (let i = 1; i < sortedRecords.length; i++) {
+    if (sortedRecords[i].timestamp - sortedRecords[i-1].timestamp >= SHIFT_GAP_MS) shifts.push([]);
+    shifts[shifts.length-1].push(sortedRecords[i]);
+  }
+  return shifts;
+}
+
+// ============================
+// AVG BANNER
+// ============================
+function updateAvgBanner() {
+  const shiftRecords = getCurrentShiftRecords();
+  const banner = document.getElementById("avgBanner");
+  if (shiftRecords.length < 2) { banner.style.display = "none"; return; }
+  const timestamps = shiftRecords.map(r => r.timestamp);
+  const gaps = [];
+  for (let i = 1; i < timestamps.length; i++) gaps.push(timestamps[i] - timestamps[i-1]);
+  const avgMs = gaps.reduce((a,b) => a+b, 0) / gaps.length;
+  const mins = Math.round(avgMs / 60000);
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  const timeStr = h > 0 ? (m > 0 ? `${h}h ${m}m` : `${h}h`) : `${m}m`;
+  const elapsedMs = timestamps[timestamps.length-1] - timestamps[0];
+  const elapsedHrs = elapsedMs / 3600000;
+  const cph = elapsedHrs > 0 ? (timestamps.length / elapsedHrs).toFixed(1) : "-";
+  document.getElementById("avgBannerTime").textContent = timeStr;
+  document.getElementById("avgBannerCph").textContent = cph;
+  banner.style.display = "block";
+}
+
+// ============================
+// FILTER
+// ============================
+function getFiltered() {
+  const search = document.getElementById("fSearch").value.trim().toUpperCase();
+  const status = document.getElementById("fStatus").value;
+  const noTagFilter = document.getElementById("fNoTag").value;
+  const dest = document.getElementById("fDest").value;
+  const from = document.getElementById("fDateFrom").value;
+  const to = document.getElementById("fDateTo").value;
+  return getRecords().filter(r => {
+    if (search && !r.serialId.includes(search)) return false;
+    if (status && r.status !== status) return false;
+    if (noTagFilter === "yes" && !r.noTag) return false;
+    if (noTagFilter === "no" && r.noTag) return false;
+    if (dest && r.destination !== dest) return false;
+    const ds = new Date(r.timestamp).toISOString().slice(0,10);
+    if (from && ds < from) return false;
+    if (to && ds > to) return false;
+    return true;
+  });
+}
+
+function clearFilters() {
+  ["fSearch","fDateFrom","fDateTo"].forEach(id => document.getElementById(id).value = "");
+  ["fStatus","fNoTag","fDest"].forEach(id => document.getElementById(id).selectedIndex = 0);
+  document.getElementById("recordsHeading").textContent = "Filter Records";
+  renderRecords();
+}
+
+function viewByDate(dateStr) {
+  document.getElementById("fDateFrom").value = dateStr;
+  document.getElementById("fDateTo").value = dateStr;
+  document.getElementById("fSearch").value = "";
+  document.getElementById("fStatus").selectedIndex = 0;
+  document.getElementById("fNoTag").selectedIndex = 0;
+  document.getElementById("fDest").selectedIndex = 0;
+  document.getElementById("recordsHeading").textContent = "Entries for " + dateStr;
+  showTab("records");
+}
+
+function viewByWeek(fromStr, toStr, label) {
+  document.getElementById("fDateFrom").value = fromStr;
+  document.getElementById("fDateTo").value = toStr;
+  document.getElementById("fSearch").value = "";
+  document.getElementById("fStatus").selectedIndex = 0;
+  document.getElementById("fNoTag").selectedIndex = 0;
+  document.getElementById("fDest").selectedIndex = 0;
+  document.getElementById("recordsHeading").textContent = label;
+  showTab("records");
+}
+
+// ============================
+// VIN DECODER
+// ============================
+const VIN_REGEX = /^[A-HJ-NPR-Z0-9]{17}$/;
+function isValidVIN(s) { return VIN_REGEX.test(s); }
+
+async function decodeVIN(vin) {
+  try {
+    const url = `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/${vin}?format=json`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data.Results || !data.Results.length) return null;
+    const map = {};
+    data.Results.forEach(r => {
+      if (r.Value && r.Value !== "Not Applicable" && r.Value !== "0") map[r.Variable] = r.Value;
+    });
+    if (!map["Make"] && !map["Model"] && !map["Model Year"]) return null;
+    return {
+      year: map["Model Year"] || "",
+      make: map["Make"] || "",
+      model: map["Model"] || "",
+      trim: map["Trim"] || "",
+      bodyClass: map["Body Class"] || "",
+      fuelType: map["Fuel Type - Primary"] || "",
+      engine: map["Displacement (L)"] ? `${map["Displacement (L)"]}L` : "",
+      manufacturer: map["Manufacturer Name"] || ""
+    };
+  } catch(e) { console.warn("VIN decode failed:", e); return null; }
+}
+
+// ============================
+// SAVE RECORD
+// ============================
+function saveRecord() {
+  const serial = document.getElementById("serial").value.trim().toUpperCase();
+  if (!serial) { showToast("Please enter or scan a Serial ID.", "error"); return; }
+  const statusVal = document.getElementById("status").value;
+  if (!statusVal) { showToast("Please select a status.", "error"); return; }
+
+  const saveBtn = document.getElementById("saveBtn");
+  const gpsEl = document.getElementById("gpsStatus");
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = "Getting location...";
+  gpsEl.className = "gps-status acquiring";
+  gpsEl.textContent = "Acquiring GPS coordinates...";
+
+  const allShifts = getAllShifts();
+  const lastShift = allShifts.length > 0 ? allShifts[allShifts.length-1] : null;
+  const lastTs = lastShift ? lastShift.records[lastShift.records.length-1].timestamp : null;
+  const isNewShift = !lastTs || (Date.now() - lastTs >= SHIFT_GAP_MS);
+  const currentShiftNum = isNewShift ? allShifts.length + 1 : allShifts.length || 1;
+
+  const recordData = {
+    id: Date.now().toString(),
+    serialId: serial,
+    status: statusVal,
+    tires: statusVal === "TI" ? [...selectedTires] : [],
+    destination: document.getElementById("destination").value,
+    noTag: document.getElementById("noTag").checked,
+    shuttle: document.getElementById("shuttle").checked,
+    shiftNum: currentShiftNum,
+    notes: document.getElementById("notes").value,
+    timestamp: Date.now()
+  };
+
+  if (isValidVIN(serial)) {
+    gpsEl.textContent = "Acquiring GPS + decoding VIN...";
+    decodeVIN(serial).then(vinData => {
+      if (vinData) {
+        const records = getRecords();
+        const rec = records.find(r => r.id === recordData.id);
+        if (rec) { rec.vinData = vinData; setRecords(records); renderTodayEntries(); }
+      }
+    });
+  }
+
+  function doSave(lat, lng, gpsError) {
+    if (lat !== null) { recordData.lat = lat; recordData.lng = lng; }
+    if (gpsError) { recordData.gpsError = true; }
+    const records = getRecords();
+    records.unshift(recordData);
+    setRecords(records);
+    document.getElementById("serial").value = "";
+    document.getElementById("notes").value = "";
+    document.getElementById("status").selectedIndex = 0;
+    document.getElementById("tireSelectorSection").style.display = "none";
+    resetTires();
+    document.getElementById("destination").selectedIndex = 0;
+    document.getElementById("noTag").checked = false;
+    toggleNoTagStyle();
+    document.getElementById("manualEntrySection").style.display = "none";
+    document.querySelector(".btn-manual-toggle").innerHTML = "Enter Manually";
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = "SAVE RECORD";
+    gpsEl.className = "gps-status";
+    gpsEl.textContent = "";
+    renderTodayEntries();
+    if (gpsError) { showToast("Saved - no GPS location", "warn"); }
+    else { showToast("Saved with GPS", "success"); }
+  }
+
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      pos => { gpsEl.className = "gps-status got"; gpsEl.textContent = "Location acquired"; doSave(pos.coords.latitude, pos.coords.longitude, false); },
+      err => { gpsEl.className = "gps-status err"; gpsEl.textContent = "Location unavailable - saving anyway"; saveBtn.innerHTML = "Saving..."; setTimeout(() => doSave(null, null, true), 800); },
+      { timeout: 8000, maximumAge: 30000, enableHighAccuracy: true }
+    );
+  } else { doSave(null, null, true); }
+}
 
 // ============================
 // SLIDE MENU
@@ -1084,115 +1346,57 @@ function toggleShuttleStyle() {
 // ============================
 // RECORD CARD HTML (shared)
 // ============================
-// VEHICLE SVG ICONS
+// ============================
+// VEHICLE SVG ICONS - silhouettes with negative space
 // ============================
 function getVehicleSVG(vinData) {
-  if (!vinData) return "";
-
+  if (!vinData) return { vehicle: "", fuel: "" };
   const body = (vinData.bodyClass || "").toLowerCase();
   const fuel = (vinData.fuelType || "").toLowerCase();
   const size = vinData._size || 28;
+  const c = "var(--accent)";
+  const uid = "v" + Math.random().toString(36).slice(2,7);
 
-  // Determine fuel overlay
   const isElectric = fuel.includes("electric") && !fuel.includes("hybrid");
   const isHybrid = fuel.includes("hybrid") || (fuel.includes("electric") && fuel.includes("gasoline"));
-  const overlayColor = isElectric ? "#4d9bff" : isHybrid ? "#00c853" : null;
 
-  // Fuel overlay symbol
-  let overlay = "";
+  // Small fuel icon shown separately next to vehicle
+  let fuelIcon = "";
   if (isElectric) {
-    // Lightning bolt
-    overlay = `<path d="M13 2L4 14h7l-1 8 9-12h-7z" fill="${overlayColor}" stroke="none" opacity="0.95"/>`;
+    fuelIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" style="flex-shrink:0" title="Electric"><path d="M13.5 3L5 14h6.5L10 21l9-12h-6.5z" fill="#4d9bff"/></svg>`;
   } else if (isHybrid) {
-    // Leaf
-    overlay = `<path d="M12 2C8 2 4 6 4 11c0 3 1.5 5.5 4 7 0-3 1-6 4-8-1 3-1 6 0 8 2.5-1.5 4-4 4-7 0-5-1.5-9-4-9z" fill="${overlayColor}" opacity="0.95"/>`;
+    fuelIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" style="flex-shrink:0" title="Hybrid"><path d="M12 3C9 3 6 6.5 6 10.5c0 2.2 1 4.2 3 5.5 0-2.2.8-4.5 3-6-1 2.5-1 4.8 0 6 2-1.2 3-3.2 3-5.5C15 6.5 14 3 12 3z" fill="#00c853"/></svg>`;
   }
 
-  // Determine vehicle type and color
-  const vehicleColor = "var(--accent)";
-  let svgPath = "";
-
+  let svg = "";
   if (body.includes("pickup") || body.includes("truck")) {
-    // Pickup truck profile
-    svgPath = `
-      <rect x="2" y="12" width="20" height="7" rx="1.5" fill="${vehicleColor}"/>
-      <rect x="11" y="7" width="9" height="6" rx="1" fill="${vehicleColor}"/>
-      <rect x="2" y="9" width="10" height="4" rx="1" fill="${vehicleColor}"/>
-      <circle cx="6" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
-      <circle cx="6" cy="20" r="1.2" fill="#444"/>
-      <circle cx="18" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
-      <circle cx="18" cy="20" r="1.2" fill="#444"/>
-      <rect x="11.5" y="7.5" width="8" height="4.5" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
-      <rect x="2.5" y="9.5" width="8" height="2" rx="0.5" fill="#1a2a3a" opacity="0.6"/>`;
+    svg = `<defs><mask id="${uid}"><rect width="24" height="24" fill="white"/><rect x="12" y="7.8" width="7.5" height="4" rx="0.8" fill="black"/><circle cx="6.2" cy="19.2" r="2" fill="black"/><circle cx="18" cy="19.2" r="2" fill="black"/></mask></defs><g mask="url(#${uid})"><rect x="1.5" y="13" width="21" height="6.5" rx="1.5" fill="${c}"/><rect x="10.5" y="7" width="11" height="7" rx="1" fill="${c}"/><rect x="1.5" y="9.5" width="10.5" height="4" rx="1" fill="${c}"/></g>`;
   } else if (body.includes("van") || body.includes("minivan")) {
-    // Van - tall boxy profile
-    svgPath = `
-      <rect x="2" y="7" width="20" height="12" rx="1.5" fill="${vehicleColor}"/>
-      <rect x="3" y="8" width="8" height="5" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
-      <rect x="13" y="8" width="8" height="5" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
-      <circle cx="6" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
-      <circle cx="6" cy="20" r="1.2" fill="#444"/>
-      <circle cx="18" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
-      <circle cx="18" cy="20" r="1.2" fill="#444"/>`;
+    svg = `<defs><mask id="${uid}"><rect width="24" height="24" fill="white"/><rect x="2.5" y="7.5" width="8" height="5" rx="0.8" fill="black"/><rect x="13" y="7.5" width="8.5" height="5" rx="0.8" fill="black"/><circle cx="5.5" cy="19.5" r="2" fill="black"/><circle cx="18.5" cy="19.5" r="2" fill="black"/></mask></defs><g mask="url(#${uid})"><rect x="1.5" y="6" width="21" height="14" rx="1.5" fill="${c}"/></g>`;
   } else if (body.includes("suv") || body.includes("sport utility") || body.includes("crossover")) {
-    // SUV - tall with slight slope
-    svgPath = `
-      <rect x="2" y="13" width="20" height="6" rx="1.5" fill="${vehicleColor}"/>
-      <path d="M4 13 L6 7 L18 7 L20 13 Z" fill="${vehicleColor}"/>
-      <rect x="6.5" y="7.5" width="5" height="4.5" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
-      <rect x="13" y="7.5" width="5" height="4.5" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
-      <circle cx="6.5" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
-      <circle cx="6.5" cy="20" r="1.2" fill="#444"/>
-      <circle cx="17.5" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
-      <circle cx="17.5" cy="20" r="1.2" fill="#444"/>`;
+    svg = `<defs><mask id="${uid}"><rect width="24" height="24" fill="white"/><rect x="6" y="7.5" width="5" height="4.5" rx="0.8" fill="black"/><rect x="13" y="7.5" width="5" height="4.5" rx="0.8" fill="black"/><circle cx="6.5" cy="19.5" r="2" fill="black"/><circle cx="17.5" cy="19.5" r="2" fill="black"/></mask></defs><g mask="url(#${uid})"><rect x="1.5" y="13" width="21" height="7" rx="1.5" fill="${c}"/><path d="M3 13 L5.5 6.5 L18.5 6.5 L21 13 Z" fill="${c}"/></g>`;
   } else if (body.includes("convertible") || body.includes("roadster")) {
-    // Convertible - low open top
-    svgPath = `
-      <rect x="2" y="15" width="20" height="5" rx="1.5" fill="${vehicleColor}"/>
-      <path d="M5 15 L7 11 L17 11 L19 15 Z" fill="${vehicleColor}"/>
-      <rect x="7.5" y="11.5" width="4" height="3" rx="0.5" fill="#1a2a3a" opacity="0.5"/>
-      <rect x="13" y="11.5" width="4" height="3" rx="0.5" fill="#1a2a3a" opacity="0.5"/>
-      <circle cx="6.5" cy="21" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
-      <circle cx="6.5" cy="21" r="1.2" fill="#444"/>
-      <circle cx="17.5" cy="21" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
-      <circle cx="17.5" cy="21" r="1.2" fill="#444"/>`;
+    svg = `<defs><mask id="${uid}"><rect width="24" height="24" fill="white"/><rect x="7" y="11.5" width="4" height="3" rx="0.5" fill="black"/><rect x="13" y="11.5" width="4" height="3" rx="0.5" fill="black"/><circle cx="6.5" cy="20.5" r="2" fill="black"/><circle cx="17.5" cy="20.5" r="2" fill="black"/></mask></defs><g mask="url(#${uid})"><rect x="1.5" y="15" width="21" height="6" rx="1.5" fill="${c}"/><path d="M4.5 15 L7 11 L17 11 L19.5 15 Z" fill="${c}"/></g>`;
   } else if (body.includes("wagon") || body.includes("hatchback")) {
-    // Wagon/hatch - longer roofline
-    svgPath = `
-      <rect x="2" y="13" width="20" height="6" rx="1.5" fill="${vehicleColor}"/>
-      <path d="M4 13 L5 8 L19 8 L20 13 Z" fill="${vehicleColor}"/>
-      <rect x="5.5" y="8.5" width="5.5" height="4" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
-      <rect x="13" y="8.5" width="5.5" height="4" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
-      <circle cx="6.5" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
-      <circle cx="6.5" cy="20" r="1.2" fill="#444"/>
-      <circle cx="17.5" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
-      <circle cx="17.5" cy="20" r="1.2" fill="#444"/>`;
+    svg = `<defs><mask id="${uid}"><rect width="24" height="24" fill="white"/><rect x="5" y="8.5" width="5.5" height="4" rx="0.8" fill="black"/><rect x="12.5" y="8.5" width="6" height="4" rx="0.8" fill="black"/><circle cx="6.5" cy="19.5" r="2" fill="black"/><circle cx="17.5" cy="19.5" r="2" fill="black"/></mask></defs><g mask="url(#${uid})"><rect x="1.5" y="13" width="21" height="7" rx="1.5" fill="${c}"/><path d="M3 13 L4.5 8 L20 8 L21.5 13 Z" fill="${c}"/></g>`;
   } else {
-    // Default: sedan
-    svgPath = `
-      <rect x="2" y="14" width="20" height="6" rx="1.5" fill="${vehicleColor}"/>
-      <path d="M5 14 L7 9 L17 9 L19 14 Z" fill="${vehicleColor}"/>
-      <rect x="7.5" y="9.5" width="4" height="4" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
-      <rect x="12.5" y="9.5" width="4" height="4" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
-      <circle cx="6.5" cy="21" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
-      <circle cx="6.5" cy="21" r="1.2" fill="#444"/>
-      <circle cx="17.5" cy="21" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
-      <circle cx="17.5" cy="21" r="1.2" fill="#444"/>`;
+    svg = `<defs><mask id="${uid}"><rect width="24" height="24" fill="white"/><rect x="7" y="9.5" width="4" height="4" rx="0.8" fill="black"/><rect x="13" y="9.5" width="4" height="4" rx="0.8" fill="black"/><circle cx="6.5" cy="20" r="2" fill="black"/><circle cx="17.5" cy="20" r="2" fill="black"/></mask></defs><g mask="url(#${uid})"><rect x="1.5" y="14" width="21" height="6.5" rx="1.5" fill="${c}"/><path d="M4.5 14 L7 9 L17 9 L19.5 14 Z" fill="${c}"/></g>`;
   }
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${size}" height="${size}" style="vertical-align:middle;margin-right:6px;flex-shrink:0">
-    ${svgPath}
-    ${overlay}
-  </svg>`;
+  const vehicleIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${size}" height="${size}" style="vertical-align:middle;flex-shrink:0">${svg}</svg>`;
+  return { vehicle: vehicleIcon, fuel: fuelIcon };
 }
 
+// ============================
+// RECORD CARD HTML (shared)
+// ============================
 function recordCard(r, onDelete) {
   let vinInfo = "";
   if (r.vinData) {
-    const icon = getVehicleSVG(r.vinData);
+    const icons = getVehicleSVG(r.vinData);
     const name = [r.vinData.year, r.vinData.make, r.vinData.model].filter(Boolean).join(" ");
     const trim = r.vinData.trim ? `<span style="color:var(--muted);font-size:12px"> ${r.vinData.trim}</span>` : "";
-    vinInfo = `<div class="record-vin">${icon}<span><b>${name}</b>${trim}</span></div>`;
+    vinInfo = `<div class="record-vin" style="display:flex;align-items:center;gap:6px">${icons.vehicle}${icons.fuel}<span><b>${name}</b>${trim}</span></div>`;
   }
   return `
     <div class="record" onclick="openDetail('${r.id}', '${onDelete}')">
@@ -1200,16 +1404,68 @@ function recordCard(r, onDelete) {
         <div class="record-serial">${r.serialId}</div>
         <div class="record-badges">
           <span class="record-status ${statusClass(r.status)}">${r.status}</span>
-          ${r.destination ? `<span class="badge-dest"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${r.destination}</span>` : ""}
-          ${r.shuttle ? '<span class="badge-shuttle"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><rect x="1" y="6" width="22" height="12" rx="2"/><path d="M16 6V4a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v2"/><line x1="12" y1="6" x2="12" y2="18"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><line x1="1" y1="12" x2="23" y2="12"/></svg> SHUTTLE</span>' : ""}
+          ${r.destination ? `<span class="badge-dest"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${r.destination}</span>` : ""}
+          ${r.shuttle ? `<span class="badge-shuttle"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="22" height="12" rx="2"/><path d="M16 6V4a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v2"/><line x1="12" y1="6" x2="12" y2="18"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><line x1="1" y1="12" x2="23" y2="12"/></svg> SHUTTLE</span>` : ""}
           ${r.noTag ? '<span class="badge-notag">NO TAG</span>' : ""}
         </div>
       </div>
       ${vinInfo}
-      <div class="record-meta"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${new Date(r.timestamp).toLocaleTimeString("en-US", {hour:'2-digit',minute:'2-digit', timeZone:"America/New_York"})}</div>
-      ${r.tires && r.tires.length > 0 ? `<div class="record-meta" style="margin-top:4px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><circle cx="12" cy="12" r="6" fill="currentColor" stroke="none"/></svg> Tires: <b style="color:var(--danger)">${r.tires.join(", ")}</b></div>` : ""}
+      <div class="record-meta"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${new Date(r.timestamp).toLocaleTimeString("en-US", {hour:'2-digit',minute:'2-digit', timeZone:"America/New_York"})}</div>
+      ${r.tires && r.tires.length > 0 ? `<div class="record-meta" style="margin-top:4px">Tires: <b style="color:var(--danger)">${r.tires.join(", ")}</b></div>` : ""}
       ${r.notes ? `<div class="record-notes">${r.notes}</div>` : ""}
     </div>`;
+}
+
+// ============================
+// TODAY'S ENTRIES (entry tab)
+// ============================
+function renderTodayEntries() {
+  const now = new Date();
+  const todayEST = estDateStr(now.getTime());
+  const todayShifts = getShiftsForDate(todayEST);
+  const currentShift = getCurrentShift();
+  const isCurrentShiftToday = currentShift.date === todayEST;
+  const shiftRecords = isCurrentShiftToday ? currentShift.records : [];
+  const shiftNum = isCurrentShiftToday ? todayShifts.length : 0;
+
+  document.getElementById("todayCount").textContent = shiftRecords.length;
+  updateAvgBanner();
+  document.querySelector(".today-title").textContent =
+    shiftNum > 1 ? `Shift ${shiftNum} Entries` : "Today's Entries";
+
+  if (shiftRecords.length === 0) {
+    document.getElementById("todayRecords").innerHTML = '<div class="today-empty">No entries yet this shift.</div>';
+    return;
+  }
+  const sorted = [...shiftRecords].reverse();
+  document.getElementById("todayRecords").innerHTML = sorted.map(r => recordCard(r, "deleteTodayRecord")).join("");
+}
+
+function deleteTodayRecord(id) {
+  if (!confirm("Delete this record? This cannot be undone.")) return;
+  setRecords(getRecords().filter(r => r.id !== id));
+  renderTodayEntries();
+}
+
+function deleteRecord(id) {
+  if (!confirm("Delete this record? This cannot be undone.")) return;
+  setRecords(getRecords().filter(r => r.id !== id));
+  renderRecords();
+}
+
+// ============================
+// RENDER RECORDS TAB
+// ============================
+function renderRecords() {
+  const records = getFiltered();
+  document.getElementById("resultsCount").textContent =
+    records.length + " record" + (records.length !== 1 ? "s" : "") + " found";
+  if (records.length === 0) {
+    document.getElementById("records").innerHTML =
+      '<p style="color:var(--muted);text-align:center;padding:24px">No records match your filters.</p>';
+    return;
+  }
+  document.getElementById("records").innerHTML = records.map(r => recordCard(r, "deleteRecord")).join("");
 }
 
 // ============================
@@ -1222,7 +1478,6 @@ function openDetail(id, onDelete) {
   const r = records.find(rec => rec.id === id);
   if (!r) return;
 
-  // Populate header
   document.getElementById("detailSerial").textContent = r.serialId;
   document.getElementById("detailTime").textContent =
     new Date(r.timestamp).toLocaleString("en-US", {
@@ -1230,11 +1485,10 @@ function openDetail(id, onDelete) {
       hour:"numeric", minute:"2-digit", timeZone:"America/New_York"
     });
 
-  // Badges
   document.getElementById("detailBadges").innerHTML = `
     <span class="record-status ${statusClass(r.status)}">${r.status}</span>
-    ${r.destination ? `<span class="badge-dest"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${r.destination}</span>` : ""}
-    ${r.shuttle ? '<span class="badge-shuttle"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><rect x="1" y="6" width="22" height="12" rx="2"/><path d="M16 6V4a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v2"/><line x1="12" y1="6" x2="12" y2="18"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><line x1="1" y1="12" x2="23" y2="12"/></svg> SHUTTLE</span>' : ""}
+    ${r.destination ? `<span class="badge-dest">${r.destination}</span>` : ""}
+    ${r.shuttle ? '<span class="badge-shuttle">SHUTTLE</span>' : ""}
     ${r.noTag ? '<span class="badge-notag">NO TAG</span>' : ""}
   `;
 
@@ -1243,13 +1497,9 @@ function openDetail(id, onDelete) {
   if (r.vinData) {
     const name = [r.vinData.year, r.vinData.make, r.vinData.model].filter(Boolean).join(" ");
     const trim = r.vinData.trim || "";
-    const specs = [
-      r.vinData.bodyClass,
-      r.vinData.engine ? r.vinData.engine : "",
-      r.vinData.fuelType
-    ].filter(Boolean).join("  ·  ");
-
-    document.getElementById("detailVinIcon").innerHTML = getVehicleSVG({...r.vinData, _size: 36});
+    const specs = [r.vinData.bodyClass, r.vinData.engine, r.vinData.fuelType].filter(Boolean).join("  ·  ");
+    const icons = getVehicleSVG({...r.vinData, _size: 36});
+    document.getElementById("detailVinIcon").innerHTML = icons.vehicle + icons.fuel;
     document.getElementById("detailVinName").textContent = name + (trim ? "  " + trim : "");
     document.getElementById("detailVinSpecs").textContent = specs;
     vinSection.style.display = "flex";
@@ -1304,491 +1554,12 @@ function openDetail(id, onDelete) {
   };
   document.getElementById("detailDeleteBtn").onclick = _detailDeleteFn;
 
-  // Show overlay
   document.getElementById("detailOverlay").classList.add("open");
 }
 
 function closeDetail() {
   document.getElementById("detailOverlay").classList.remove("open");
   document.getElementById("detailMapFrame").src = "";
-}
-
-// ============================
-// WEATHER ALERT (SDF / Louisville 40213)
-// ============================
-const EXTREME_CODES = {
-  55:"Heavy Drizzle",
-  65:"Heavy Rain", 67:"Heavy Freezing Rain",
-  75:"Heavy Snow", 77:"Snow Grains",
-  82:"Violent Rain Showers", 85:"Heavy Snow Showers", 86:"Heavy Snow Showers",
-  95:"Thunderstorm", 96:"Thunderstorm + Hail", 99:"Thunderstorm + Heavy Hail"
-};
-
-const ALERT_DISMISSED_KEY = "drivertraxxx_alert_dismissed";
-
-function dismissWeatherAlert() {
-  const alert = document.getElementById("weatherAlert");
-  alert.style.display = "none";
-  // Remember dismissed for 30 min so it doesn't keep reappearing
-  localStorage.setItem(ALERT_DISMISSED_KEY, Date.now().toString());
-}
-
-// For testing: call testWeatherAlert() in browser console to force show alert
-function testWeatherAlert() {
-  localStorage.removeItem(ALERT_DISMISSED_KEY);
-  checkWeatherAlert();
-}
-
-async function checkWeatherAlert() {
-  // Don't show if dismissed in last 30 min
-  const dismissed = parseInt(localStorage.getItem(ALERT_DISMISSED_KEY) || "0");
-  if (Date.now() - dismissed < 30 * 60 * 1000) return;
-
-  const alerts = [];
-
-  // 1. NWS official alerts for Jefferson County KY (SDF area)
-  try {
-    const nwsRes = await fetch("https://api.weather.gov/alerts/active?point=38.1741,-85.7368", {
-      headers: {
-        "Accept": "application/geo+json",
-        "User-Agent": "DriverTraxxx/1.0 (louisville-airport-ops)"
-      }
-    });
-    if (nwsRes.ok) {
-      const nwsData = await nwsRes.json();
-      console.log("NWS alerts:", nwsData);
-      if (nwsData.features && nwsData.features.length > 0) {
-        nwsData.features.forEach(f => {
-          const event = f.properties && f.properties.event;
-          if (event) alerts.push(event);
-        });
-      }
-    } else {
-      console.warn("NWS returned:", nwsRes.status);
-    }
-  } catch(e) {
-    console.warn("NWS fetch failed:", e.message);
-  }
-
-  // 2. Open-Meteo as backup for extreme conditions not covered by NWS alerts
-  try {
-    const url = "https://api.open-meteo.com/v1/forecast?latitude=38.1741&longitude=-85.7368&current=temperature_2m,weather_code,windspeed_10m&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FNew_York";
-    const res = await fetch(url);
-    const raw = await res.text();
-    const data = JSON.parse(raw);
-    const c = data.current;
-    if (c) {
-      const code = c.weather_code !== undefined ? c.weather_code : c.weathercode;
-      const temp = Math.round(c.temperature_2m);
-      const wind = Math.round(c.windspeed_10m);
-      console.log(`Weather code: ${code}, Temp: ${temp}F, Wind: ${wind}mph`);
-      if (EXTREME_CODES[code]) alerts.push(EXTREME_CODES[code]);
-      if (temp <= 20) alerts.push(`Extreme Cold: ${temp}F`);
-      if (temp >= 100) alerts.push(`Extreme Heat: ${temp}F`);
-      if (wind >= 30) alerts.push(`High Winds: ${wind}mph`);
-    }
-  } catch(e) {
-    console.warn("Open-Meteo fetch failed:", e.message);
-  }
-
-  // Deduplicate and display
-  const unique = [...new Set(alerts)];
-  const alertEl = document.getElementById("weatherAlert");
-
-  if (unique.length > 0) {
-    document.getElementById("weatherAlertMsg").textContent =
-      "SDF WEATHER ALERT: " + unique.join(" - ");
-    alertEl.style.display = "block";
-  } else {
-    alertEl.style.display = "none";
-    console.log("No extreme weather - alert hidden");
-  }
-}
-
-// ============================
-// SHIFT DETECTION
-// ============================
-const SHIFT_GAP_MS = 6 * 60 * 60 * 1000; // 6 hours
-
-function estDateStr(ts) {
-  const d = new Date(new Date(ts).toLocaleString("en-US", {timeZone:"America/New_York"}));
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-}
-
-// Split ALL records into shifts by 6hr gap, oldest first
-function getAllShifts() {
-  const all = getRecords().slice().sort((a,b) => a.timestamp - b.timestamp);
-  if (all.length === 0) return [];
-  const shifts = [[all[0]]];
-  for (let i = 1; i < all.length; i++) {
-    const gap = all[i].timestamp - all[i-1].timestamp;
-    if (gap >= SHIFT_GAP_MS) shifts.push([]);
-    shifts[shifts.length-1].push(all[i]);
-  }
-  // Tag each shift with the EST date of its FIRST record
-  return shifts.map((records, idx) => ({
-    shiftIndex: idx,
-    date: estDateStr(records[0].timestamp),
-    records
-  }));
-}
-
-// Get shifts for a specific EST date string
-function getShiftsForDate(dateStr) {
-  return getAllShifts().filter(s => s.date === dateStr);
-}
-
-// Get current shift (last shift overall)
-function getCurrentShift() {
-  const all = getAllShifts();
-  return all.length > 0 ? all[all.length-1] : { records: [], shiftIndex: 0, date: "" };
-}
-
-// Get shifts grouped by date for the last N days
-function getShiftsByDay(days) {
-  const all = getAllShifts();
-  const byDay = {};
-  days.forEach(d => byDay[d] = []);
-  all.forEach(shift => {
-    if (byDay[shift.date] !== undefined) byDay[shift.date].push(shift);
-  });
-  return byDay;
-}
-
-// Get current shift records
-function getCurrentShiftRecords() {
-  return getCurrentShift().records;
-}
-
-// Kept for compatibility
-function getShiftGroups(sortedRecords) {
-  if (sortedRecords.length === 0) return [];
-  const shifts = [[sortedRecords[0]]];
-  for (let i = 1; i < sortedRecords.length; i++) {
-    const gap = sortedRecords[i].timestamp - sortedRecords[i-1].timestamp;
-    if (gap >= SHIFT_GAP_MS) shifts.push([]);
-    shifts[shifts.length-1].push(sortedRecords[i]);
-  }
-  return shifts;
-}
-
-// ============================
-// AVG BANNER
-// ============================
-function updateAvgBanner() {
-  const shiftRecords = getCurrentShiftRecords();
-  const banner = document.getElementById("avgBanner");
-
-  if (shiftRecords.length < 2) {
-    banner.style.display = "none";
-    return;
-  }
-
-  const timestamps = shiftRecords.map(r => r.timestamp);
-
-  // Avg trip time - gaps between consecutive entries
-  const gaps = [];
-  for (let i = 1; i < timestamps.length; i++) {
-    gaps.push(timestamps[i] - timestamps[i-1]);
-  }
-  const avgMs = gaps.reduce((a,b) => a+b, 0) / gaps.length;
-  const mins = Math.round(avgMs / 60000);
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  const timeStr = h > 0 ? (m > 0 ? `${h}h ${m}m` : `${h}h`) : `${m}m`;
-
-  // Cars per hour over shift elapsed time
-  const elapsedMs = timestamps[timestamps.length-1] - timestamps[0];
-  const elapsedHrs = elapsedMs / 3600000;
-  const cph = elapsedHrs > 0 ? (timestamps.length / elapsedHrs).toFixed(1) : "-";
-
-  document.getElementById("avgBannerTime").textContent = timeStr;
-  document.getElementById("avgBannerCph").textContent = cph;
-  banner.style.display = "block";
-}
-
-// ============================
-// TOAST NOTIFICATION
-// ============================
-function showToast(msg, type = "success") {
-  let toast = document.getElementById("toast");
-  if (!toast) {
-    toast = document.createElement("div");
-    toast.id = "toast";
-    document.body.appendChild(toast);
-  }
-  toast.textContent = msg;
-  toast.className = "toast toast-" + type + " toast-show";
-  clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => { toast.className = "toast"; }, 2800);
-}
-
-// ============================
-// VIN DECODER (NHTSA vPIC API - free, no key)
-// ============================
-const VIN_REGEX = /^[A-HJ-NPR-Z0-9]{17}$/; // VIN excludes I, O, Q
-
-function isValidVIN(s) {
-  return VIN_REGEX.test(s);
-}
-
-async function decodeVIN(vin) {
-  try {
-    const url = `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/${vin}?format=json`;
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const data = await res.json();
-    if (!data.Results || !data.Results.length) return null;
-
-    // Build a flat lookup of value by Variable name
-    const map = {};
-    data.Results.forEach(r => {
-      if (r.Value && r.Value !== "Not Applicable" && r.Value !== "0") {
-        map[r.Variable] = r.Value;
-      }
-    });
-
-    // Only return if we got at least make/model/year
-    if (!map["Make"] && !map["Model"] && !map["Model Year"]) return null;
-
-    return {
-      year: map["Model Year"] || "",
-      make: map["Make"] || "",
-      model: map["Model"] || "",
-      trim: map["Trim"] || "",
-      bodyClass: map["Body Class"] || "",
-      fuelType: map["Fuel Type - Primary"] || "",
-      engine: map["Displacement (L)"] ? `${map["Displacement (L)"]}L` : "",
-      manufacturer: map["Manufacturer Name"] || ""
-    };
-  } catch (e) {
-    console.warn("VIN decode failed:", e);
-    return null;
-  }
-}
-
-// ============================
-// SAVE RECORD
-// ============================
-function saveRecord() {
-  const serial = document.getElementById("serial").value.trim().toUpperCase();
-  if (!serial) { showToast("Please enter or scan a Serial ID.", "error"); return; }
-  const statusVal = document.getElementById("status").value;
-  if (!statusVal) { showToast("Please select a status.", "error"); return; }
-
-  const saveBtn = document.getElementById("saveBtn");
-  const gpsEl = document.getElementById("gpsStatus");
-
-  // Lock button while acquiring
-  saveBtn.disabled = true;
-  saveBtn.innerHTML = "Getting location...";
-  gpsEl.className = "gps-status acquiring";
-  gpsEl.textContent = "Acquiring GPS coordinates...";
-
-  // Determine shift number for this record
-  const allShifts = getAllShifts();
-  const lastShift = allShifts.length > 0 ? allShifts[allShifts.length-1] : null;
-  const lastTs = lastShift ? lastShift.records[lastShift.records.length-1].timestamp : null;
-  const isNewShift = !lastTs || (Date.now() - lastTs >= SHIFT_GAP_MS);
-  const currentShiftNum = isNewShift ? allShifts.length + 1 : allShifts.length || 1;
-
-  const recordData = {
-    id: Date.now().toString(),
-    serialId: serial,
-    status: statusVal,
-    tires: statusVal === "TI" ? [...selectedTires] : [],
-    destination: document.getElementById("destination").value,
-    noTag: document.getElementById("noTag").checked,
-    shuttle: document.getElementById("shuttle").checked,
-    shiftNum: currentShiftNum,
-    notes: document.getElementById("notes").value,
-    timestamp: Date.now()
-  };
-
-  // Kick off VIN decode in parallel (non-blocking)
-  if (isValidVIN(serial)) {
-    gpsEl.textContent = "Acquiring GPS + decoding VIN...";
-    decodeVIN(serial).then(vinData => {
-      if (vinData) {
-        // Update the saved record with VIN data
-        const records = getRecords();
-        const rec = records.find(r => r.id === recordData.id);
-        if (rec) {
-          rec.vinData = vinData;
-          setRecords(records);
-          renderTodayEntries();
-        }
-      }
-    });
-  }
-
-  function doSave(lat, lng, gpsError) {
-    if (lat !== null) { recordData.lat = lat; recordData.lng = lng; }
-    if (gpsError) { recordData.gpsError = true; }
-
-    const records = getRecords();
-    records.unshift(recordData);
-    setRecords(records);
-
-    // Reset form
-    document.getElementById("serial").value = "";
-    document.getElementById("notes").value = "";
-    document.getElementById("status").selectedIndex = 0;
-    document.getElementById("tireSelectorSection").style.display = "none";
-    resetTires();
-    document.getElementById("destination").selectedIndex = 0;
-    document.getElementById("noTag").checked = false;
-    toggleNoTagStyle();
-    document.getElementById("manualEntrySection").style.display = "none";
-    document.querySelector(".btn-manual-toggle").innerHTML = "Enter Manually";
-
-    // Restore button
-    saveBtn.disabled = false;
-    saveBtn.innerHTML = "SAVE RECORD";
-    gpsEl.className = "gps-status";
-    gpsEl.textContent = "";
-
-    renderTodayEntries();
-
-    if (gpsError) {
-      showToast("Saved - no GPS", "warn");
-    } else {
-      showToast("Saved with GPS", "success");
-    }
-  }
-
-  if ("geolocation" in navigator) {
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        gpsEl.className = "gps-status got";
-        gpsEl.textContent = "Location acquired";
-        doSave(pos.coords.latitude, pos.coords.longitude, false);
-      },
-      err => {
-        gpsEl.className = "gps-status err";
-        gpsEl.textContent = "Location unavailable - saving anyway";
-        saveBtn.innerHTML = "Saving...";
-        setTimeout(() => doSave(null, null, true), 800);
-      },
-      { timeout: 8000, maximumAge: 30000, enableHighAccuracy: true }
-    );
-  } else {
-    doSave(null, null, true);
-  }
-}
-
-// ============================
-// TODAY'S ENTRIES (entry tab)
-// ============================
-function renderTodayEntries() {
-  const now = new Date();
-  const todayEST = estDateStr(now.getTime());
-  const todayShifts = getShiftsForDate(todayEST);
-  const currentShift = getCurrentShift();
-  const isCurrentShiftToday = currentShift.date === todayEST;
-  const shiftRecords = isCurrentShiftToday ? currentShift.records : [];
-  const shiftNum = isCurrentShiftToday ? todayShifts.length : 0;
-
-  document.getElementById("todayCount").textContent = shiftRecords.length;
-  updateAvgBanner();
-
-  document.querySelector(".today-title").textContent =
-    shiftNum > 1 ? `Shift ${shiftNum} Entries` : "Today's Entries";
-
-  if (shiftRecords.length === 0) {
-    document.getElementById("todayRecords").innerHTML = '<div class="today-empty">No entries yet this shift.</div>';
-    return;
-  }
-
-  const sorted = [...shiftRecords].reverse();
-  document.getElementById("todayRecords").innerHTML = sorted.map(r => recordCard(r, "deleteTodayRecord")).join("");
-}
-
-function deleteTodayRecord(id) {
-  if (!confirm("Delete this record? This cannot be undone.")) return;
-  setRecords(getRecords().filter(r => r.id !== id));
-  renderTodayEntries();
-}
-
-// ============================
-// DELETE (records tab)
-// ============================
-function deleteRecord(id) {
-  if (!confirm("Delete this record? This cannot be undone.")) return;
-  setRecords(getRecords().filter(r => r.id !== id));
-  renderRecords();
-}
-
-// ============================
-// FILTER
-// ============================
-function getFiltered() {
-  const search = document.getElementById("fSearch").value.trim().toUpperCase();
-  const status = document.getElementById("fStatus").value;
-  const noTagFilter = document.getElementById("fNoTag").value;
-  const dest = document.getElementById("fDest").value;
-  const from = document.getElementById("fDateFrom").value;
-  const to = document.getElementById("fDateTo").value;
-
-  return getRecords().filter(r => {
-    if (search && !r.serialId.includes(search)) return false;
-    if (status && r.status !== status) return false;
-    if (noTagFilter === "yes" && !r.noTag) return false;
-    if (noTagFilter === "no" && r.noTag) return false;
-    if (dest && r.destination !== dest) return false;
-    const ds = new Date(r.timestamp).toISOString().slice(0,10);
-    if (from && ds < from) return false;
-    if (to && ds > to) return false;
-    return true;
-  });
-}
-
-function clearFilters() {
-  ["fSearch","fDateFrom","fDateTo"].forEach(id => document.getElementById(id).value = "");
-  ["fStatus","fNoTag","fDest"].forEach(id => document.getElementById(id).selectedIndex = 0);
-  document.getElementById("recordsHeading").textContent = "Filter Records";
-  renderRecords();
-}
-
-// ============================
-// DRILL INTO DATE / WEEK
-// ============================
-function viewByDate(dateStr) {
-  document.getElementById("fDateFrom").value = dateStr;
-  document.getElementById("fDateTo").value = dateStr;
-  document.getElementById("fSearch").value = "";
-  document.getElementById("fStatus").selectedIndex = 0;
-  document.getElementById("fNoTag").selectedIndex = 0;
-  document.getElementById("fDest").selectedIndex = 0;
-  document.getElementById("recordsHeading").textContent = "Entries for " + dateStr;
-  showTab("records");
-}
-
-function viewByWeek(fromStr, toStr, label) {
-  document.getElementById("fDateFrom").value = fromStr;
-  document.getElementById("fDateTo").value = toStr;
-  document.getElementById("fSearch").value = "";
-  document.getElementById("fStatus").selectedIndex = 0;
-  document.getElementById("fNoTag").selectedIndex = 0;
-  document.getElementById("fDest").selectedIndex = 0;
-  document.getElementById("recordsHeading").textContent = label;
-  showTab("records");
-}
-
-// ============================
-// RENDER RECORDS TAB
-// ============================
-function renderRecords() {
-  const records = getFiltered();
-  document.getElementById("resultsCount").textContent =
-    records.length + " record" + (records.length !== 1 ? "s" : "") + " found";
-
-  if (records.length === 0) {
-    document.getElementById("records").innerHTML =
-      '<p style="color:var(--muted);text-align:center;padding:24px">No records match your filters.</p>';
-    return;
-  }
-  document.getElementById("records").innerHTML = records.map(r => recordCard(r, "deleteRecord")).join("");
 }
 
 // ============================
@@ -2245,6 +2016,80 @@ function importJSON(event) {
     event.target.value = "";
   };
   reader.readAsText(file);
+}
+
+// ============================
+// WEATHER ALERT (SDF / Louisville 40213)
+// ============================
+const EXTREME_CODES = {
+  55:"Heavy Drizzle",
+  65:"Heavy Rain", 67:"Heavy Freezing Rain",
+  75:"Heavy Snow", 77:"Snow Grains",
+  82:"Violent Rain Showers", 85:"Heavy Snow Showers", 86:"Heavy Snow Showers",
+  95:"Thunderstorm", 96:"Thunderstorm + Hail", 99:"Thunderstorm + Heavy Hail"
+};
+
+const ALERT_DISMISSED_KEY = "drivertraxxx_alert_dismissed";
+
+function dismissWeatherAlert() {
+  document.getElementById("weatherAlert").style.display = "none";
+  localStorage.setItem(ALERT_DISMISSED_KEY, Date.now().toString());
+}
+
+function testWeatherAlert() {
+  localStorage.removeItem(ALERT_DISMISSED_KEY);
+  checkWeatherAlert();
+}
+
+async function checkWeatherAlert() {
+  const dismissed = parseInt(localStorage.getItem(ALERT_DISMISSED_KEY) || "0");
+  if (Date.now() - dismissed < 30 * 60 * 1000) return;
+
+  const alerts = [];
+
+  // NWS official alerts for SDF area
+  try {
+    const nwsRes = await fetch("https://api.weather.gov/alerts/active?point=38.1741,-85.7368", {
+      headers: { "Accept": "application/geo+json", "User-Agent": "DriverTraxxx/1.0 (louisville-airport-ops)" }
+    });
+    if (nwsRes.ok) {
+      const nwsData = await nwsRes.json();
+      if (nwsData.features && nwsData.features.length > 0) {
+        nwsData.features.forEach(f => {
+          const event = f.properties && f.properties.event;
+          if (event) alerts.push(event);
+        });
+      }
+    }
+  } catch(e) { console.warn("NWS fetch failed:", e.message); }
+
+  // Open-Meteo backup for extreme conditions
+  try {
+    const url = "https://api.open-meteo.com/v1/forecast?latitude=38.1741&longitude=-85.7368&current=temperature_2m,weather_code,windspeed_10m&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=America%2FNew_York";
+    const res = await fetch(url);
+    const raw = await res.text();
+    const data = JSON.parse(raw);
+    const c = data.current;
+    if (c) {
+      const code = c.weather_code !== undefined ? c.weather_code : c.weathercode;
+      const temp = Math.round(c.temperature_2m);
+      const wind = Math.round(c.windspeed_10m);
+      console.log(`Weather code: ${code}, Temp: ${temp}F, Wind: ${wind}mph`);
+      if (EXTREME_CODES[code]) alerts.push(EXTREME_CODES[code]);
+      if (temp <= 20) alerts.push(`Extreme Cold: ${temp}F`);
+      if (temp >= 100) alerts.push(`Extreme Heat: ${temp}F`);
+      if (wind >= 30) alerts.push(`High Winds: ${wind}mph`);
+    }
+  } catch(e) { console.warn("Open-Meteo fetch failed:", e.message); }
+
+  const unique = [...new Set(alerts)];
+  const alertEl = document.getElementById("weatherAlert");
+  if (unique.length > 0) {
+    document.getElementById("weatherAlertMsg").textContent = "SDF WEATHER ALERT: " + unique.join(" - ");
+    alertEl.style.display = "block";
+  } else {
+    alertEl.style.display = "none";
+  }
 }
 
 // ============================
