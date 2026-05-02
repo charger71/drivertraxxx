@@ -1830,7 +1830,7 @@ const CAR_QUOTES = [
   { text: "The cars we drive say a lot about us.", attr: "Alexandra Paul" },
   { text: "The best car safety device is a rear-view mirror with a cop in it.", attr: "Dudley Moore" },
   { text: "I spent a lot of money on booze, birds, and fast cars. The rest I just squandered.", attr: "George Best" },
-  { text: "A car is like a mother-in-law — if you let it, it will rule your life.", attr: "Jaime Lerner" },
+  { text: "A car is like a mother-in-law - if you let it, it will rule your life.", attr: "Jaime Lerner" },
   { text: "There's a lot of stress, but once you get in the car, all that goes out the window.", attr: "Danica Patrick" },
   { text: "Straight roads are for fast cars, turns are for fast drivers.", attr: "Colin McRae" }
 ];
@@ -1898,7 +1898,6 @@ function renderDashboard() {
     const d = new Date(now); d.setDate(d.getDate()-i);
     days.push(estDateStr(d.getTime()));
   }
-  const today = estDateStr(now.getTime());
 
   // Group shifts by their start date (EST) for last 7 days
   const byDay = getShiftsByDay(days);
