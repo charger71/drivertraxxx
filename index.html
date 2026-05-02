@@ -133,7 +133,7 @@
   .status-TI { background: #2d1515; color: #e85550; border: 1px solid #e85550; }
   .status-WIDELETE { background: #2d1515; color: #e87070; }
   .record-meta { font-size: 12px; color: var(--muted); margin-top: 6px; }
-  .record-vin { font-size: 13px; color: var(--accent); margin-top: 6px; font-weight: 600; letter-spacing: 0.3px; }
+  .record-vin { display:flex; align-items:center; font-size:13px; color:var(--accent); margin-top:6px; font-weight:600; letter-spacing:0.3px; }
   .record-notes { font-size: 13px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); color: var(--text2); line-height: 1.5; }
   .record-footer { display: flex; justify-content: flex-end; margin-top: 10px; }
 
@@ -1064,10 +1064,121 @@ function toggleShuttleStyle() {
 // ============================
 // RECORD CARD HTML (shared)
 // ============================
+// VEHICLE SVG ICONS
+// ============================
+function getVehicleSVG(vinData) {
+  if (!vinData) return "";
+
+  const body = (vinData.bodyClass || "").toLowerCase();
+  const fuel = (vinData.fuelType || "").toLowerCase();
+
+  // Determine fuel overlay
+  const isElectric = fuel.includes("electric") && !fuel.includes("hybrid");
+  const isHybrid = fuel.includes("hybrid") || (fuel.includes("electric") && fuel.includes("gasoline"));
+  const overlayColor = isElectric ? "#4d9bff" : isHybrid ? "#00c853" : null;
+
+  // Fuel overlay symbol
+  let overlay = "";
+  if (isElectric) {
+    // Lightning bolt
+    overlay = `<path d="M13 2L4 14h7l-1 8 9-12h-7z" fill="${overlayColor}" stroke="none" opacity="0.95"/>`;
+  } else if (isHybrid) {
+    // Leaf
+    overlay = `<path d="M12 2C8 2 4 6 4 11c0 3 1.5 5.5 4 7 0-3 1-6 4-8-1 3-1 6 0 8 2.5-1.5 4-4 4-7 0-5-1.5-9-4-9z" fill="${overlayColor}" opacity="0.95"/>`;
+  }
+
+  // Determine vehicle type and color
+  let vehicleColor = "#4a9eff"; // default blue
+  let svgPath = "";
+
+  if (body.includes("pickup") || body.includes("truck")) {
+    vehicleColor = "#e8a030";
+    // Pickup truck profile
+    svgPath = `
+      <rect x="2" y="12" width="20" height="7" rx="1.5" fill="${vehicleColor}"/>
+      <rect x="11" y="7" width="9" height="6" rx="1" fill="${vehicleColor}"/>
+      <rect x="2" y="9" width="10" height="4" rx="1" fill="${vehicleColor}"/>
+      <circle cx="6" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
+      <circle cx="6" cy="20" r="1.2" fill="#444"/>
+      <circle cx="18" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
+      <circle cx="18" cy="20" r="1.2" fill="#444"/>
+      <rect x="11.5" y="7.5" width="8" height="4.5" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
+      <rect x="2.5" y="9.5" width="8" height="2" rx="0.5" fill="#1a2a3a" opacity="0.6"/>`;
+  } else if (body.includes("van") || body.includes("minivan")) {
+    vehicleColor = "#9b6aff";
+    // Van - tall boxy profile
+    svgPath = `
+      <rect x="2" y="7" width="20" height="12" rx="1.5" fill="${vehicleColor}"/>
+      <rect x="3" y="8" width="8" height="5" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
+      <rect x="13" y="8" width="8" height="5" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
+      <circle cx="6" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
+      <circle cx="6" cy="20" r="1.2" fill="#444"/>
+      <circle cx="18" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
+      <circle cx="18" cy="20" r="1.2" fill="#444"/>`;
+  } else if (body.includes("suv") || body.includes("sport utility") || body.includes("crossover")) {
+    vehicleColor = "#00c896";
+    // SUV - tall with slight slope
+    svgPath = `
+      <rect x="2" y="13" width="20" height="6" rx="1.5" fill="${vehicleColor}"/>
+      <path d="M4 13 L6 7 L18 7 L20 13 Z" fill="${vehicleColor}"/>
+      <rect x="6.5" y="7.5" width="5" height="4.5" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
+      <rect x="13" y="7.5" width="5" height="4.5" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
+      <circle cx="6.5" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
+      <circle cx="6.5" cy="20" r="1.2" fill="#444"/>
+      <circle cx="17.5" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
+      <circle cx="17.5" cy="20" r="1.2" fill="#444"/>`;
+  } else if (body.includes("convertible") || body.includes("roadster")) {
+    vehicleColor = "#ff6b6b";
+    // Convertible - low open top
+    svgPath = `
+      <rect x="2" y="15" width="20" height="5" rx="1.5" fill="${vehicleColor}"/>
+      <path d="M5 15 L7 11 L17 11 L19 15 Z" fill="${vehicleColor}"/>
+      <rect x="7.5" y="11.5" width="4" height="3" rx="0.5" fill="#1a2a3a" opacity="0.5"/>
+      <rect x="13" y="11.5" width="4" height="3" rx="0.5" fill="#1a2a3a" opacity="0.5"/>
+      <circle cx="6.5" cy="21" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
+      <circle cx="6.5" cy="21" r="1.2" fill="#444"/>
+      <circle cx="17.5" cy="21" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
+      <circle cx="17.5" cy="21" r="1.2" fill="#444"/>`;
+  } else if (body.includes("wagon") || body.includes("hatchback")) {
+    vehicleColor = "#4d9bff";
+    // Wagon/hatch - longer roofline
+    svgPath = `
+      <rect x="2" y="13" width="20" height="6" rx="1.5" fill="${vehicleColor}"/>
+      <path d="M4 13 L5 8 L19 8 L20 13 Z" fill="${vehicleColor}"/>
+      <rect x="5.5" y="8.5" width="5.5" height="4" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
+      <rect x="13" y="8.5" width="5.5" height="4" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
+      <circle cx="6.5" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
+      <circle cx="6.5" cy="20" r="1.2" fill="#444"/>
+      <circle cx="17.5" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
+      <circle cx="17.5" cy="20" r="1.2" fill="#444"/>`;
+  } else {
+    // Default: sedan
+    vehicleColor = "#4d9bff";
+    svgPath = `
+      <rect x="2" y="14" width="20" height="6" rx="1.5" fill="${vehicleColor}"/>
+      <path d="M5 14 L7 9 L17 9 L19 14 Z" fill="${vehicleColor}"/>
+      <rect x="7.5" y="9.5" width="4" height="4" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
+      <rect x="12.5" y="9.5" width="4" height="4" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
+      <circle cx="6.5" cy="21" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
+      <circle cx="6.5" cy="21" r="1.2" fill="#444"/>
+      <circle cx="17.5" cy="21" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
+      <circle cx="17.5" cy="21" r="1.2" fill="#444"/>`;
+  }
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" style="vertical-align:middle;margin-right:6px;flex-shrink:0">
+    ${svgPath}
+    ${overlay}
+  </svg>`;
+}
+
 function recordCard(r, onDelete) {
-  const vinInfo = r.vinData
-    ? `<div class="record-vin">&#128663; <b>${[r.vinData.year, r.vinData.make, r.vinData.model].filter(Boolean).join(" ")}</b>${r.vinData.trim ? ` <span style="color:var(--muted)">${r.vinData.trim}</span>` : ""}</div>`
-    : "";
+  let vinInfo = "";
+  if (r.vinData) {
+    const icon = getVehicleSVG(r.vinData);
+    const name = [r.vinData.year, r.vinData.make, r.vinData.model].filter(Boolean).join(" ");
+    const trim = r.vinData.trim ? `<span style="color:var(--muted);font-size:12px"> ${r.vinData.trim}</span>` : "";
+    vinInfo = `<div class="record-vin">${icon}<span><b>${name}</b>${trim}</span></div>`;
+  }
   return `
     <div class="record" onclick="openDetail('${r.id}', '${onDelete}')">
       <div class="record-header">
