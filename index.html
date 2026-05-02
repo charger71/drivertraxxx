@@ -44,8 +44,16 @@
   }
   .tab.active { color: #000; background: var(--accent); }
 
-  .panel { display: none; padding: 20px var(--space); overflow: hidden; pointer-events: none; }
-  .panel.active { display: block; overflow: visible; pointer-events: all; }
+  .panel {
+    display: block; padding: 20px var(--space);
+    visibility: hidden; position: absolute;
+    top: 0; left: -9999px; pointer-events: none;
+    width: 100%;
+  }
+  .panel.active {
+    visibility: visible; position: relative;
+    left: 0; pointer-events: all;
+  }
 
   .field-label {
     font-size: 10px; font-weight: 700; color: var(--muted);
