@@ -1283,7 +1283,7 @@ function getFiltered() {
     if (noTagFilter === "yes" && !r.noTag) return false;
     if (noTagFilter === "no" && r.noTag) return false;
     if (dest && r.destination !== dest) return false;
-    const ds = new Date(r.timestamp).toISOString().slice(0,10);
+    const ds = estDateStr(r.timestamp);
     if (from && ds < from) return false;
     if (to && ds > to) return false;
     return true;
@@ -1847,7 +1847,7 @@ function renderDashboard() {
   renderQuote();
   const all = getRecords();
   const now = new Date();
-  const today = isoDate(now);
+  const today = estDateStr(now.getTime());
   const thisWeekStart = startOfWeek(now);
   const lastWeekStart = new Date(thisWeekStart); lastWeekStart.setDate(lastWeekStart.getDate() - 7);
   const lastWeekEnd = new Date(thisWeekStart);
@@ -1892,12 +1892,13 @@ function renderDashboard() {
       </div>
     `).join("") || '<p style="color:var(--muted);padding:8px">No data yet.</p>';
 
-  // Last 7 days - clickable rows with avg trip time
+  // Last 7 days - use EST dates to match shift grouping
   const days = [];
   for (let i=6; i>=0; i--) {
     const d = new Date(now); d.setDate(d.getDate()-i);
-    days.push(isoDate(d));
+    days.push(estDateStr(d.getTime()));
   }
+  const today = estDateStr(now.getTime());
 
   // Group shifts by their start date (EST) for last 7 days
   const byDay = getShiftsByDay(days);
