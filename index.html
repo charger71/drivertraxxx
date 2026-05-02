@@ -565,10 +565,10 @@
 <div id="weatherAlert">
   <div class="weather-alert-inner">
     <div class="weather-alert-text">
-      <div class="weather-alert-icon">⚠️</div>
+      <div class="weather-alert-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
       <div class="weather-alert-msg" id="weatherAlertMsg"></div>
     </div>
-    <button class="weather-alert-close" onclick="dismissWeatherAlert()">✕</button>
+    <button class="weather-alert-close" onclick="dismissWeatherAlert()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
 </div>
 
@@ -591,26 +591,26 @@
 <div id="slideMenu" class="slide-menu">
   <div class="menu-header">
     <span class="menu-title">MENU</span>
-    <button class="menu-close" onclick="closeMenu()">&#10005;</button>
+    <button class="menu-close" onclick="closeMenu()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
   <nav class="menu-nav">
     <a class="menu-item" onclick="showTab('entry'); closeMenu()">
-      <span class="menu-icon">&#128190;</span> New Entry
+      <span class="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="2"/><rect x="7" y="2" width="10" height="7"/><rect x="8" y="14" width="8" height="8"/></svg></span> New Entry
     </a>
     <a class="menu-item" onclick="showTab('records'); closeMenu()">
-      <span class="menu-icon">&#128203;</span> Records
+      <span class="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg></span> Records
     </a>
     <a class="menu-item" onclick="showTab('dashboard'); closeMenu()">
-      <span class="menu-icon">&#128202;</span> Dashboard
+      <span class="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Dashboard
     </a>
     <a class="menu-item" onclick="showTab('training'); closeMenu()">
-      <span class="menu-icon">&#127891;</span> Training
+      <span class="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span> Training
     </a>
     <a class="menu-item" onclick="showTab('data'); closeMenu()">
-      <span class="menu-icon">&#128252;</span> Data & Backup
+      <span class="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></span> Data & Backup
     </a>
     <a class="menu-item" onclick="showTab('profile'); closeMenu()">
-      <span class="menu-icon">&#128100;</span> Profile
+      <span class="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Profile
     </a>
   </nav>
   <div class="menu-footer">
@@ -622,7 +622,7 @@
 <!-- ==================== TRAINING PANEL ==================== -->
 <div class="panel" id="panel-training">
   <div class="training-header">
-    <div class="dash-title">&#127891; Training</div>
+    <div class="dash-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> Training</div>
   </div>
   <div class="training-placeholder">
     <h3 style="color:var(--accent);font-size:16px;margin-bottom:12px">Clean Car Notes</h3>
@@ -652,7 +652,7 @@
   </div>
 </div>
 <div class="panel" id="panel-data">
-  <div class="dash-title">&#128252; Data & Backup</div>
+  <div class="dash-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg> Data & Backup</div>
 
   <div class="data-section">
     <div class="data-section-title">Auto Backup</div>
@@ -665,14 +665,14 @@
       <span class="data-label">Records in backup:</span>
       <span id="backupRecordCount" class="data-value">—</span>
     </div>
-    <button class="btn btn-secondary" onclick="runBackup(true)">&#128190; Back Up Now</button>
+    <button class="btn btn-secondary" onclick="runBackup(true)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="2"/><rect x="7" y="2" width="10" height="7"/><rect x="8" y="14" width="8" height="8"/></svg> Back Up Now</button>
   </div>
 
   <div class="data-section">
     <div class="data-section-title">Export & Import</div>
     <div class="data-section-desc">Export all records as a JSON file to save or transfer to another device. Import a previously exported file to restore records.</div>
-    <button class="btn btn-primary" onclick="exportJSON()">&#8659; Export All Data</button>
-    <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">&#8657; Import Data</button>
+    <button class="btn btn-primary" onclick="exportJSON()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M12 5v14"/><path d="M5 12l7 7 7-7"/></svg> Export All Data</button>
+    <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg> Import Data</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
     <div id="importStatus" class="data-import-status"></div>
   </div>
@@ -680,13 +680,13 @@
   <div class="data-section data-section-danger">
     <div class="data-section-title" style="color:var(--danger)">Restore from Backup</div>
     <div class="data-section-desc">If something goes wrong, restore from the last auto backup. This will overwrite current records.</div>
-    <button class="btn btn-danger" style="width:100%;margin-top:10px" onclick="restoreBackup()">&#9888; Restore from Last Backup</button>
+    <button class="btn btn-danger" style="width:100%;margin-top:10px" onclick="restoreBackup()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Restore from Last Backup</button>
   </div>
 </div>
 
 <!-- ==================== PROFILE PANEL ==================== -->
 <div class="panel" id="panel-profile">
-  <div class="dash-title">&#128100; Profile</div>
+  <div class="dash-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</div>
 
   <div class="data-section">
     <div class="data-section-title">Driver Name</div>
@@ -711,7 +711,7 @@
     </select>
   </div>
 
-  <button class="btn btn-primary" onclick="saveProfile()">&#128190; Save Profile</button>
+  <button class="btn btn-primary" onclick="saveProfile()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="2"/><rect x="7" y="2" width="10" height="7"/><rect x="8" y="14" width="8" height="8"/></svg> Save Profile</button>
 </div>
 
 <div class="panel active" id="panel-entry">
@@ -721,7 +721,7 @@
     SCAN BARCODE
   </button>
 
-  <button class="btn-manual-toggle" onclick="toggleManualEntry()">✏️ Enter Manually</button>
+  <button class="btn-manual-toggle" onclick="toggleManualEntry()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Enter Manually</button>
 
   <div id="manualEntrySection" style="display:none">
     <div class="field-label">Serial ID</div>
@@ -796,7 +796,7 @@
   <div class="field-label">Notes</div>
   <textarea id="notes" placeholder="Optional notes..."></textarea>
 
-  <button id="saveBtn" class="btn btn-primary" onclick="saveRecord()">&#128190; SAVE RECORD</button>
+  <button id="saveBtn" class="btn btn-primary" onclick="saveRecord()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><rect x="2" y="2" width="20" height="20" rx="2"/><rect x="7" y="2" width="10" height="7"/><rect x="8" y="14" width="8" height="8"/></svg> SAVE RECORD</button>
   <div id="gpsStatus" class="gps-status"></div>
 
   <!-- TODAY'S ENTRIES -->
@@ -839,7 +839,7 @@
       <input type="date" id="fDateTo" onchange="renderRecords()">
     </div>
     <button class="btn btn-secondary" style="margin-top:6px" onclick="clearFilters()">Clear Filters</button>
-    <button class="btn btn-primary" style="margin-top:4px" onclick="exportCSV()">&#128229; EXPORT CSV</button>
+    <button class="btn btn-primary" style="margin-top:4px" onclick="exportCSV()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> EXPORT CSV</button>
   </div>
 
   <div class="results-count" id="resultsCount"></div>
@@ -856,22 +856,22 @@
   </div>
 
   <div class="dash-section">
-    <div class="dash-title">&#128202; Overview</div>
+    <div class="dash-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Overview</div>
     <div class="stat-grid" id="dashOverview"></div>
   </div>
 
   <div class="dash-section">
-    <div class="dash-title">&#128203; By Status</div>
+    <div class="dash-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg> By Status</div>
     <div class="bar-chart" id="dashStatus"></div>
   </div>
 
   <div class="dash-section">
-    <div class="dash-title">&#128197; Last 7 Days <span style="font-size:11px;font-weight:normal">(tap a day to view entries)</span></div>
+    <div class="dash-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Last 7 Days <span style="font-size:11px;font-weight:normal">(tap a day to view entries)</span></div>
     <div id="dashDays"></div>
   </div>
 
   <div class="dash-section">
-    <div class="dash-title">&#128467; This Week vs Last Week</div>
+    <div class="dash-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/></svg> This Week vs Last Week</div>
     <div class="stat-grid" id="dashWeeks"></div>
   </div>
 
@@ -888,7 +888,7 @@
         <div class="detail-serial" id="detailSerial"></div>
         <div class="detail-time" id="detailTime"></div>
       </div>
-      <button class="detail-close" onclick="closeDetail()">&#10005;</button>
+      <button class="detail-close" onclick="closeDetail()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="detail-badges" id="detailBadges"></div>
     <div class="detail-body">
@@ -906,14 +906,14 @@
       </div>
     </div>
     <div class="detail-map-section">
-      <div class="detail-map-title">&#128205; Location</div>
+      <div class="detail-map-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Location</div>
       <div id="detailMapContainer">
         <iframe id="detailMapFrame" class="detail-map" frameborder="0" style="display:none" allowfullscreen></iframe>
         <div id="detailNoGps" class="detail-no-gps" style="display:none">No GPS data available</div>
       </div>
     </div>
     <div class="detail-actions">
-      <button class="btn btn-danger" id="detailDeleteBtn">&#128465; Delete Record</button>
+      <button class="btn btn-danger" id="detailDeleteBtn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg> Delete Record</button>
     </div>
   </div>
 </div>
@@ -921,8 +921,8 @@
 <!-- BARCODE SCANNER OVERLAY -->
 <div id="scannerOverlay" class="scanner-overlay">
   <div class="scanner-header">
-    <span class="scanner-title">&#128247; SCAN BARCODE</span>
-    <button class="scanner-close" onclick="closeScanner()">&#10005;</button>
+    <span class="scanner-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> SCAN BARCODE</span>
+    <button class="scanner-close" onclick="closeScanner()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
   <div class="scanner-viewport">
     <video id="scannerVideo" autoplay playsinline muted></video>
@@ -937,10 +937,10 @@
   </div>
   <div class="scanner-bottom">
     <div class="scanner-status scanning" id="scannerHint">
-      <span class="scanner-dot">●</span> Scanning...
+      <span class="scanner-dot"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" style="vertical-align:middle;display:inline-block"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg></span> Scanning...
     </div>
     <div class="scanner-actions">
-      <button class="btn-torch" id="torchBtn" onclick="toggleTorch()" title="Flashlight">&#128294;</button>
+      <button class="btn-torch" id="torchBtn" onclick="toggleTorch()" title="Flashlight"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M8 16l-1.5 4.5h7L12 16"/><rect x="8" y="8" width="8" height="9" rx="1"/><path d="M9 8V5a3 3 0 0 1 6 0v3"/><line x1="10" y1="12" x2="14" y2="12"/></svg></button>
       <button class="btn-cancel" onclick="closeScanner()">Cancel</button>
     </div>
   </div>
@@ -1038,7 +1038,7 @@ function toggleManualEntry() {
   const btn = document.querySelector(".btn-manual-toggle");
   const visible = section.style.display !== "none";
   section.style.display = visible ? "none" : "block";
-  btn.textContent = visible ? "✏️ Enter Manually" : "✕ Hide Manual Entry";
+  btn.innerHTML = visible ? "Enter Manually" : "Hide Manual Entry";
   if (!visible) document.getElementById("serial").focus();
 }
 
@@ -1046,7 +1046,7 @@ function showManualEntry() {
   const section = document.getElementById("manualEntrySection");
   const btn = document.querySelector(".btn-manual-toggle");
   section.style.display = "block";
-  btn.textContent = "✕ Hide Manual Entry";
+  btn.innerHTML = "Hide Manual Entry";
 }
 function toggleNoTagStyle() {
   const checked = document.getElementById("noTag").checked;
@@ -1088,11 +1088,10 @@ function getVehicleSVG(vinData) {
   }
 
   // Determine vehicle type and color
-  let vehicleColor = "#4a9eff"; // default blue
+  const vehicleColor = "var(--accent)";
   let svgPath = "";
 
   if (body.includes("pickup") || body.includes("truck")) {
-    vehicleColor = "#e8a030";
     // Pickup truck profile
     svgPath = `
       <rect x="2" y="12" width="20" height="7" rx="1.5" fill="${vehicleColor}"/>
@@ -1105,7 +1104,6 @@ function getVehicleSVG(vinData) {
       <rect x="11.5" y="7.5" width="8" height="4.5" rx="0.8" fill="#1a2a3a" opacity="0.6"/>
       <rect x="2.5" y="9.5" width="8" height="2" rx="0.5" fill="#1a2a3a" opacity="0.6"/>`;
   } else if (body.includes("van") || body.includes("minivan")) {
-    vehicleColor = "#9b6aff";
     // Van - tall boxy profile
     svgPath = `
       <rect x="2" y="7" width="20" height="12" rx="1.5" fill="${vehicleColor}"/>
@@ -1116,7 +1114,6 @@ function getVehicleSVG(vinData) {
       <circle cx="18" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
       <circle cx="18" cy="20" r="1.2" fill="#444"/>`;
   } else if (body.includes("suv") || body.includes("sport utility") || body.includes("crossover")) {
-    vehicleColor = "#00c896";
     // SUV - tall with slight slope
     svgPath = `
       <rect x="2" y="13" width="20" height="6" rx="1.5" fill="${vehicleColor}"/>
@@ -1128,7 +1125,6 @@ function getVehicleSVG(vinData) {
       <circle cx="17.5" cy="20" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
       <circle cx="17.5" cy="20" r="1.2" fill="#444"/>`;
   } else if (body.includes("convertible") || body.includes("roadster")) {
-    vehicleColor = "#ff6b6b";
     // Convertible - low open top
     svgPath = `
       <rect x="2" y="15" width="20" height="5" rx="1.5" fill="${vehicleColor}"/>
@@ -1140,7 +1136,6 @@ function getVehicleSVG(vinData) {
       <circle cx="17.5" cy="21" r="2.5" fill="#222" stroke="#555" stroke-width="0.5"/>
       <circle cx="17.5" cy="21" r="1.2" fill="#444"/>`;
   } else if (body.includes("wagon") || body.includes("hatchback")) {
-    vehicleColor = "#4d9bff";
     // Wagon/hatch - longer roofline
     svgPath = `
       <rect x="2" y="13" width="20" height="6" rx="1.5" fill="${vehicleColor}"/>
@@ -1153,7 +1148,6 @@ function getVehicleSVG(vinData) {
       <circle cx="17.5" cy="20" r="1.2" fill="#444"/>`;
   } else {
     // Default: sedan
-    vehicleColor = "#4d9bff";
     svgPath = `
       <rect x="2" y="14" width="20" height="6" rx="1.5" fill="${vehicleColor}"/>
       <path d="M5 14 L7 9 L17 9 L19 14 Z" fill="${vehicleColor}"/>
@@ -1185,14 +1179,14 @@ function recordCard(r, onDelete) {
         <div class="record-serial">${r.serialId}</div>
         <div class="record-badges">
           <span class="record-status ${statusClass(r.status)}">${r.status}</span>
-          ${r.destination ? `<span class="badge-dest">&#128205; ${r.destination}</span>` : ""}
-          ${r.shuttle ? '<span class="badge-shuttle">🚌 SHUTTLE</span>' : ""}
+          ${r.destination ? `<span class="badge-dest"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${r.destination}</span>` : ""}
+          ${r.shuttle ? '<span class="badge-shuttle"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><rect x="1" y="6" width="22" height="12" rx="2"/><path d="M16 6V4a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v2"/><line x1="12" y1="6" x2="12" y2="18"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><line x1="1" y1="12" x2="23" y2="12"/></svg> SHUTTLE</span>' : ""}
           ${r.noTag ? '<span class="badge-notag">NO TAG</span>' : ""}
         </div>
       </div>
       ${vinInfo}
-      <div class="record-meta">&#128336; ${new Date(r.timestamp).toLocaleTimeString("en-US", {hour:'2-digit',minute:'2-digit', timeZone:"America/New_York"})}</div>
-      ${r.tires && r.tires.length > 0 ? `<div class="record-meta" style="margin-top:4px">&#128308; Tires: <b style="color:var(--danger)">${r.tires.join(", ")}</b></div>` : ""}
+      <div class="record-meta"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${new Date(r.timestamp).toLocaleTimeString("en-US", {hour:'2-digit',minute:'2-digit', timeZone:"America/New_York"})}</div>
+      ${r.tires && r.tires.length > 0 ? `<div class="record-meta" style="margin-top:4px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><circle cx="12" cy="12" r="6" fill="currentColor" stroke="none"/></svg> Tires: <b style="color:var(--danger)">${r.tires.join(", ")}</b></div>` : ""}
       ${r.notes ? `<div class="record-notes">${r.notes}</div>` : ""}
     </div>`;
 }
@@ -1218,8 +1212,8 @@ function openDetail(id, onDelete) {
   // Badges
   document.getElementById("detailBadges").innerHTML = `
     <span class="record-status ${statusClass(r.status)}">${r.status}</span>
-    ${r.destination ? `<span class="badge-dest">📍 ${r.destination}</span>` : ""}
-    ${r.shuttle ? '<span class="badge-shuttle">🚌 SHUTTLE</span>' : ""}
+    ${r.destination ? `<span class="badge-dest"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${r.destination}</span>` : ""}
+    ${r.shuttle ? '<span class="badge-shuttle"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><rect x="1" y="6" width="22" height="12" rx="2"/><path d="M16 6V4a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v2"/><line x1="12" y1="6" x2="12" y2="18"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><line x1="1" y1="12" x2="23" y2="12"/></svg> SHUTTLE</span>' : ""}
     ${r.noTag ? '<span class="badge-notag">NO TAG</span>' : ""}
   `;
 
@@ -1540,7 +1534,7 @@ function saveRecord() {
 
   // Lock button while acquiring
   saveBtn.disabled = true;
-  saveBtn.innerHTML = "📡 Getting location...";
+  saveBtn.innerHTML = "Getting location...";
   gpsEl.className = "gps-status acquiring";
   gpsEl.textContent = "Acquiring GPS coordinates...";
 
@@ -1599,20 +1593,20 @@ function saveRecord() {
     document.getElementById("noTag").checked = false;
     toggleNoTagStyle();
     document.getElementById("manualEntrySection").style.display = "none";
-    document.querySelector(".btn-manual-toggle").textContent = "✏️ Enter Manually";
+    document.querySelector(".btn-manual-toggle").innerHTML = "Enter Manually";
 
     // Restore button
     saveBtn.disabled = false;
-    saveBtn.innerHTML = "&#128190; SAVE RECORD";
+    saveBtn.innerHTML = "SAVE RECORD";
     gpsEl.className = "gps-status";
     gpsEl.textContent = "";
 
     renderTodayEntries();
 
     if (gpsError) {
-      showToast("✅ Saved - no GPS location", "warn");
+      showToast("Saved - no GPS", "warn");
     } else {
-      showToast("✅ Record saved with GPS", "success");
+      showToast("Saved with GPS", "success");
     }
   }
 
@@ -1620,13 +1614,13 @@ function saveRecord() {
     navigator.geolocation.getCurrentPosition(
       pos => {
         gpsEl.className = "gps-status got";
-        gpsEl.textContent = "✓ Location acquired";
+        gpsEl.textContent = "Location acquired";
         doSave(pos.coords.latitude, pos.coords.longitude, false);
       },
       err => {
         gpsEl.className = "gps-status err";
-        gpsEl.textContent = "⚠️ Location unavailable - saving anyway";
-        saveBtn.innerHTML = "&#128190; Saving...";
+        gpsEl.textContent = "Location unavailable - saving anyway";
+        saveBtn.innerHTML = "Saving...";
         setTimeout(() => doSave(null, null, true), 800);
       },
       { timeout: 8000, maximumAge: 30000, enableHighAccuracy: true }
@@ -1939,7 +1933,7 @@ function openScanner() {
   const hint = document.getElementById("scannerHint");
   overlay.classList.add("open");
   hint.className = "scanner-status scanning";
-  hint.innerHTML = '<span class="scanner-dot">●</span> Starting camera...';
+  hint.innerHTML = '<span class="scanner-dot"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" style="vertical-align:middle;display:inline-block"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg></span> Starting camera...';
   torchOn = false;
   document.getElementById("torchBtn").classList.remove("on");
 
@@ -1978,7 +1972,7 @@ function openScanner() {
       navigator.mediaDevices.getUserMedia(constraints).then(stream => {
         activeStream = stream;
         document.getElementById("scannerVideo").srcObject = stream;
-        hint.innerHTML = '<span class="scanner-dot">●</span> Scanning...';
+        hint.innerHTML = '<span class="scanner-dot"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" style="vertical-align:middle;display:inline-block"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg></span> Scanning...';
       }).catch(() => {});
 
       codeReader.decodeFromVideoDevice(deviceId, "scannerVideo", (result, err) => {
@@ -1994,7 +1988,7 @@ function openScanner() {
           navigator.vibrate && navigator.vibrate([80, 40, 80]);
 
           hint.className = "scanner-status success";
-          hint.textContent = "✓ " + code;
+          hint.textContent = "" + code;
 
           document.getElementById("serial").value = code;
           showManualEntry();
@@ -2003,7 +1997,7 @@ function openScanner() {
         }
       });
 
-      hint.innerHTML = '<span class="scanner-dot">●</span> Scanning...';
+      hint.innerHTML = '<span class="scanner-dot"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" style="vertical-align:middle;display:inline-block"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg></span> Scanning...';
 
     }).catch(() => {
       hint.className = "scanner-status error";
@@ -2060,7 +2054,7 @@ function saveProfile() {
   const profile = { name, location };
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
   applyProfile();
-  showToast("✅ Profile saved", "success");
+  showToast("Profile saved", "success");
 }
 
 function previewProfileName() {
@@ -2082,7 +2076,7 @@ function applyProfile() {
 
   if (nameEl) nameEl.textContent = name;
   if (nameSection) nameSection.style.display = name ? "block" : "none";
-  if (locationEl) locationEl.textContent = location ? "📍 " + location : "";
+  if (locationEl) locationEl.textContent = location ? location : "";
 
   const nameInput = document.getElementById("profileName");
   const locSelect = document.getElementById("profileLocation");
@@ -2107,7 +2101,7 @@ function runBackup(manual = false) {
     localStorage.setItem(BACKUP_KEY, JSON.stringify(backupData));
     localStorage.setItem(BACKUP_TIME_KEY, Date.now().toString());
     updateBackupStatus();
-    if (manual) showToast("✅ Backup saved", "success");
+    if (manual) showToast("Backup saved", "success");
   } catch(e) {
     if (manual) showToast("Backup failed - storage may be full", "error");
   }
@@ -2148,7 +2142,7 @@ function restoreBackup() {
     setRecords(parsed.records);
     renderTodayEntries();
     updateBackupStatus();
-    showToast(`✅ Restored ${parsed.records.length} records`, "success");
+    showToast(`Restored ${parsed.records.length} records`, "success");
   } catch(e) {
     showToast("Restore failed - backup may be corrupt", "error");
   }
@@ -2163,7 +2157,7 @@ function exportJSON() {
   a.href = URL.createObjectURL(blob);
   a.download = getDriverFileName("drivertraxxx_backup", "json");
   a.click();
-  showToast(`✅ Exported ${records.length} records`, "success");
+  showToast(`Exported ${records.length} records`, "success");
 }
 
 function importJSON(event) {
@@ -2195,10 +2189,10 @@ function importJSON(event) {
       applyProfile();
       renderTodayEntries();
       runBackup();
-      statusEl.textContent = `✅ Imported ${newRecords.length} new records`;
-      showToast(`✅ Imported ${newRecords.length} records`, "success");
+      statusEl.textContent = `Imported ${newRecords.length} new records`;
+      showToast(`Imported ${newRecords.length} records`, "success");
     } catch(err) {
-      statusEl.textContent = "❌ Invalid file - could not import";
+      statusEl.textContent = "Invalid file - could not import";
       showToast("Import failed - invalid file", "error");
     }
     event.target.value = "";
