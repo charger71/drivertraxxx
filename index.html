@@ -565,8 +565,8 @@
   }
   .shift-map {
     width: 100%; height: 320px; display: none;
+    background: var(--card);
   }
-  .shift-map.loaded { display: block; }
   .shift-map-empty {
     height: 120px; display: flex; align-items: center; justify-content: center;
     color: var(--muted); font-size: 13px; background: var(--card);
@@ -1095,6 +1095,7 @@
     <div id="shiftMapContainer" class="shift-map-container">
       <div id="shiftMap" class="shift-map"></div>
       <div id="shiftMapEmpty" class="shift-map-empty">No GPS entries for this shift</div>
+      <div id="shiftMapLegend" class="map-legend"></div>
     </div>
   </div>
 
@@ -1112,6 +1113,8 @@
 
 <div id="toast" class="toast"></div>
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
 
 <!-- RECORD DETAIL OVERLAY -->
@@ -1154,7 +1157,7 @@
     <div class="detail-map-section">
       <div class="detail-map-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Location</div>
       <div id="detailMapContainer">
-        <iframe id="detailMapFrame" class="detail-map" frameborder="0" style="display:none" allowfullscreen></iframe>
+        <div id="detailMapFrame" class="detail-map" style="display:none"></div>
         <div id="detailNoGps" class="detail-no-gps" style="display:none">No GPS data available</div>
       </div>
     </div>
@@ -1803,15 +1806,47 @@ function openDetail(id, onDelete) {
   document.getElementById("detailShift").textContent = r.shiftNum ? `Shift ${r.shiftNum}` : "-";
 
   // Map
-  const mapFrame = document.getElementById("detailMapFrame");
   const noGps = document.getElementById("detailNoGps");
   if (r.lat && r.lng) {
-    mapFrame.src = `https://maps.google.com/maps?q=${r.lat},${r.lng}&z=16&output=embed`;
-    mapFrame.style.display = "block";
     noGps.style.display = "none";
+    const mapDiv = document.getElementById("detailMapFrame");
+    mapDiv.style.display = "block";
+    // Small delay to ensure element is visible before Leaflet init
+    setTimeout(() => {
+      // Destroy previous map instance if exists
+      if (mapDiv._leaflet_map) {
+        mapDiv._leaflet_map.remove();
+        mapDiv._leaflet_map = null;
+      }
+      mapDiv.innerHTML = "";
+      const m = L.map(mapDiv, { zoomControl: true, attributionControl: false });
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(m);
+      m.setView([r.lat, r.lng], 17);
+      const color = statusMapColor(r.status);
+      const icon = L.divIcon({
+        className: "",
+        html: `<div style="
+          width:32px;height:32px;border-radius:50%;
+          background:#${color};color:#fff;
+          display:flex;align-items:center;justify-content:center;
+          font-size:14px;font-weight:800;font-family:Arial,sans-serif;
+          border:3px solid #fff;
+          box-shadow:0 2px 8px rgba(0,0,0,0.5);
+        ">P</div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      });
+      L.marker([r.lat, r.lng], { icon }).addTo(m);
+      mapDiv._leaflet_map = m;
+    }, 80);
   } else {
-    mapFrame.style.display = "none";
-    mapFrame.src = "";
+    const mapDiv = document.getElementById("detailMapFrame");
+    if (mapDiv._leaflet_map) {
+      mapDiv._leaflet_map.remove();
+      mapDiv._leaflet_map = null;
+    }
+    mapDiv.style.display = "none";
+    mapDiv.innerHTML = "";
     noGps.style.display = "block";
   }
 
@@ -1830,7 +1865,12 @@ function openDetail(id, onDelete) {
 
 function closeDetail() {
   document.getElementById("detailOverlay").classList.remove("open");
-  document.getElementById("detailMapFrame").src = "";
+  const mapDiv = document.getElementById("detailMapFrame");
+  if (mapDiv && mapDiv._leaflet_map) {
+    mapDiv._leaflet_map.remove();
+    mapDiv._leaflet_map = null;
+  }
+  if (mapDiv) mapDiv.innerHTML = "";
 }
 
 // ============================
@@ -1877,29 +1917,48 @@ function startOfWeek(d) {
 function isoDate(d) { return d.toISOString().slice(0,10); }
 
 // ============================
-// SHIFT MAP
+// SHIFT MAP (Leaflet.js + OpenStreetMap)
 // ============================
 let activeShiftMapIndex = null;
+let leafletMap = null;
+let leafletMarkers = [];
+
+function initLeafletMap() {
+  if (leafletMap) return; // already initialized
+  const el = document.getElementById("shiftMap");
+  if (!el) return;
+  el.style.display = "block";
+  leafletMap = L.map("shiftMap", { zoomControl: true, attributionControl: false });
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19
+  }).addTo(leafletMap);
+  L.control.attribution({ prefix: false }).addTo(leafletMap);
+}
+
+function clearLeafletMarkers() {
+  leafletMarkers.forEach(m => leafletMap.removeLayer(m));
+  leafletMarkers = [];
+}
 
 function renderShiftMap(shiftIndex) {
   const allShifts = getAllShifts();
-  const mapContainer = document.getElementById("shiftMap");
+  const mapEl = document.getElementById("shiftMap");
   const emptyMsg = document.getElementById("shiftMapEmpty");
+  const legend = document.getElementById("shiftMapLegend");
 
   if (!allShifts.length) {
-    mapContainer.classList.remove("loaded");
+    mapEl.style.display = "none";
     emptyMsg.classList.remove("hidden");
+    if (legend) legend.innerHTML = "";
     return;
   }
 
-  // Default to current shift
   if (shiftIndex === undefined || shiftIndex === null) {
     shiftIndex = allShifts.length - 1;
   }
   activeShiftMapIndex = shiftIndex;
 
-  // Highlight active button
-  document.querySelectorAll(".shift-map-btn").forEach((btn, i) => {
+  document.querySelectorAll(".shift-map-btn").forEach(btn => {
     btn.classList.toggle("active", parseInt(btn.dataset.shift) === shiftIndex);
   });
 
@@ -1907,55 +1966,104 @@ function renderShiftMap(shiftIndex) {
   const records = shift.records.filter(r => r.lat && r.lng);
 
   if (records.length === 0) {
-    mapContainer.classList.remove("loaded");
+    mapEl.style.display = "none";
     emptyMsg.classList.remove("hidden");
     emptyMsg.textContent = "No GPS entries for this shift";
+    if (legend) legend.innerHTML = "";
     return;
   }
 
   emptyMsg.classList.add("hidden");
-  mapContainer.classList.add("loaded");
+  mapEl.style.display = "block";
 
-  // Build Google Maps embed URL with markers
-  // Use the first record with GPS as center
-  const center = records[0];
-  const markers = records.map((r, i) => {
-    const label = encodeURIComponent((i + 1).toString());
+  // Init map if needed
+  initLeafletMap();
+  clearLeafletMarkers();
+
+  // Force Leaflet to recalculate size after display change
+  setTimeout(() => leafletMap.invalidateSize(), 50);
+
+  const bounds = [];
+
+  records.forEach((r, i) => {
     const color = statusMapColor(r.status);
-    return `markers=color:${color}%7Clabel:${label}%7C${r.lat},${r.lng}`;
-  }).join("&");
+    const num = i + 1;
 
-  const embedUrl = `https://maps.google.com/maps?q=${center.lat},${center.lng}&z=17&output=embed&${markers}`;
-  mapContainer.innerHTML = `<iframe
-    src="${embedUrl}"
-    width="100%" height="320"
-    style="border:0;display:block"
-    allowfullscreen loading="lazy"
-    referrerpolicy="no-referrer-when-downgrade">
-  </iframe>`;
+    // Custom numbered SVG marker
+    const icon = L.divIcon({
+      className: "",
+      html: `<div style="
+        width:28px;height:28px;border-radius:50%;
+        background:#${color};color:#fff;
+        display:flex;align-items:center;justify-content:center;
+        font-size:12px;font-weight:800;font-family:Arial,sans-serif;
+        border:2px solid #fff;
+        box-shadow:0 2px 6px rgba(0,0,0,0.4);
+        cursor:pointer;
+      ">${num}</div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
+      popupAnchor: [0, -16]
+    });
 
-  // Build tap legend below map — tap to open detail
-  const legend = records.map((r, i) => {
-    const color = statusMapColor(r.status);
-    const time = new Date(r.timestamp).toLocaleTimeString("en-US", {hour:"2-digit", minute:"2-digit", timeZone:"America/New_York"});
-    return `<div class="map-legend-row" onclick="openDetail('${r.id}', 'deleteRecord')">
-      <span class="map-legend-num" style="background:#${color}">${i+1}</span>
-      <span class="map-legend-serial">${sanitizeText(r.serialId)}</span>
-      <span class="map-legend-status ${statusClass(r.status)}">${sanitizeText(r.status)}</span>
-      <span class="map-legend-time">${time}</span>
-      <span class="map-legend-arrow">&#8594;</span>
-    </div>`;
-  }).join("");
+    const time = new Date(r.timestamp).toLocaleTimeString("en-US", {
+      hour:"2-digit", minute:"2-digit", timeZone:"America/New_York"
+    });
 
-  mapContainer.innerHTML += `<div class="map-legend">${legend}</div>`;
+    const marker = L.marker([r.lat, r.lng], { icon })
+      .addTo(leafletMap)
+      .bindPopup(`
+        <div style="font-family:Arial,sans-serif;min-width:140px">
+          <div style="font-weight:800;font-size:14px;margin-bottom:4px">${sanitizeText(r.serialId)}</div>
+          <div style="font-size:12px;color:#555;margin-bottom:6px">${sanitizeText(r.status)}${r.destination ? " · " + sanitizeText(r.destination) : ""}</div>
+          <div style="font-size:11px;color:#888;margin-bottom:8px">${time}</div>
+          <button onclick="document.getElementById('shiftMap')._openDetail('${r.id}')"
+            style="background:#00a651;color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;width:100%">
+            View Record
+          </button>
+        </div>
+      `, { maxWidth: 200 });
+
+    marker.on("click", () => {});
+    leafletMarkers.push(marker);
+    bounds.push([r.lat, r.lng]);
+  });
+
+  // Store openDetail reference on the map element for popup button
+  document.getElementById("shiftMap")._openDetail = (id) => {
+    openDetail(id, "deleteRecord");
+  };
+
+  // Fit map to all markers
+  if (bounds.length === 1) {
+    leafletMap.setView(bounds[0], 17);
+  } else {
+    leafletMap.fitBounds(bounds, { padding: [32, 32] });
+  }
+
+  // Build tap legend
+  if (legend) {
+    legend.innerHTML = records.map((r, i) => {
+      const color = statusMapColor(r.status);
+      const time = new Date(r.timestamp).toLocaleTimeString("en-US", {
+        hour:"2-digit", minute:"2-digit", timeZone:"America/New_York"
+      });
+      return `<div class="map-legend-row" onclick="openDetail('${r.id}', 'deleteRecord')">
+        <span class="map-legend-num" style="background:#${color}">${i+1}</span>
+        <span class="map-legend-serial">${sanitizeText(r.serialId)}</span>
+        <span class="record-status ${statusClass(r.status)}" style="font-size:10px">${sanitizeText(r.status)}</span>
+        <span class="map-legend-time">${time}</span>
+        <span class="map-legend-arrow">&#8594;</span>
+      </div>`;
+    }).join("");
+  }
 }
 
 function statusMapColor(status) {
   const map = {
-    "CLEAN": "00a651", "DIRTY": "e85550", "PM": "4d9bff",
-    "MK": "f0b04a", "MR": "e85550", "AUDIT": "9b6aff",
-    "TI": "e85550", "GLASS": "4d9bff", "OTHER": "888888",
-    "WI/DELETE": "e85550"
+    "CLEAN":"00a651","DIRTY":"e85550","PM":"4d9bff","MK":"f0b04a",
+    "MR":"e85550","AUDIT":"9b6aff","TI":"e85550","GLASS":"4d9bff",
+    "OTHER":"888888","WI/DELETE":"e85550"
   };
   return map[status] || "888888";
 }
@@ -1964,24 +2072,18 @@ function renderShiftMapControls() {
   const allShifts = getAllShifts();
   const controls = document.getElementById("shiftMapControls");
   if (!controls) return;
+  if (allShifts.length === 0) { controls.innerHTML = ""; return; }
 
-  if (allShifts.length === 0) {
-    controls.innerHTML = "";
-    return;
-  }
-
-  // Show last 5 shifts max
   const recent = allShifts.slice(-5);
   controls.innerHTML = recent.map((shift, idx) => {
     const realIndex = allShifts.length - recent.length + idx;
     const label = shift.date === estDateStr(Date.now()) ? "Today" : shift.date.slice(5);
-    const shiftNum = realIndex + 1;
-    return `<button class="shift-map-btn" data-shift="${realIndex}" onclick="renderShiftMap(${realIndex})">
-      Shift ${shiftNum} &nbsp;·&nbsp; ${label}
+    return `<button class="shift-map-btn" data-shift="${realIndex}"
+      onclick="renderShiftMap(${realIndex})">
+      Shift ${realIndex + 1} &nbsp;·&nbsp; ${label}
     </button>`;
   }).join("");
 
-  // Auto-select current shift
   renderShiftMap(allShifts.length - 1);
 }
 
