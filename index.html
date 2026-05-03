@@ -2832,7 +2832,7 @@ function openScanner() {
 
   if (!window.ZXing) {
     hint.className = "scanner-status error";
-    hint.textContent = "Scanner library not loaded. Check internet connection and reload.";
+    hint.textContent = "Scanner library not loaded. Check internet and reload.";
     return;
   }
 
@@ -2846,63 +2846,47 @@ function openScanner() {
     codeReader = new ZXing.BrowserMultiFormatReader(hints);
     scannerActive = true;
 
-    const constraints = {
-      video: {
-        facingMode: { exact: "environment" },
-        width: { ideal: 1920 },
-        height: { ideal: 1080 }
-      }
-    };
+    // Let ZXing enumerate and pick rear camera - it manages the video element
+    codeReader.listVideoInputDevices().then(devices => {
+      const rear = devices.find(d => /back|rear|environment/i.test(d.label))
+                || devices[devices.length - 1];
+      const deviceId = rear ? rear.deviceId : undefined;
 
-    navigator.mediaDevices.getUserMedia(constraints)
-      .catch(() => {
-        return navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: "environment",
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          }
-        });
-      })
-      .then(stream => {
-        activeStream = stream;
+      hint.innerHTML = dotSvg + " Scanning...";
+
+      codeReader.decodeFromVideoDevice(deviceId, "scannerVideo", (result, err) => {
+        if (!scannerActive) return;
+
+        // Grab stream reference for torch after ZXing sets it up
         const video = document.getElementById("scannerVideo");
-        video.srcObject = stream;
-        hint.innerHTML = dotSvg + " Scanning...";
+        if (video.srcObject && !activeStream) {
+          activeStream = video.srcObject;
+        }
 
-        video.addEventListener("click", () => {
-          const track = stream.getVideoTracks()[0];
-          if (!track) return;
-          try {
-            track.applyConstraints({ advanced: [{ focusMode: "single-shot" }] }).catch(() => {});
-          } catch(e) {}
-        });
+        const now = Date.now();
+        if (now - lastDecodeTime < DECODE_THROTTLE_MS) return;
+        lastDecodeTime = now;
 
-        codeReader.decodeFromVideoDevice(undefined, "scannerVideo", (result, err) => {
-          if (!scannerActive) return;
-          const now = Date.now();
-          if (now - lastDecodeTime < DECODE_THROTTLE_MS) return;
-          lastDecodeTime = now;
-          if (result) {
-            const code = result.getText().trim().toUpperCase();
-            const flash = document.getElementById("scannerFlash");
-            flash.classList.remove("flash");
-            void flash.offsetWidth;
-            flash.classList.add("flash");
-            navigator.vibrate && navigator.vibrate([80, 40, 80]);
-            playScanBeep();
-            hint.className = "scanner-status success";
-            hint.textContent = code;
-            document.getElementById("serial").value = code;
-            showManualEntry();
-            setTimeout(() => closeScanner(), 600);
-          }
-        });
-      })
-      .catch(() => {
-        hint.className = "scanner-status error";
-        hint.textContent = "Camera access denied. Check permissions.";
+        if (result) {
+          const code = result.getText().trim().toUpperCase();
+          const flash = document.getElementById("scannerFlash");
+          flash.classList.remove("flash");
+          void flash.offsetWidth;
+          flash.classList.add("flash");
+          navigator.vibrate && navigator.vibrate([80, 40, 80]);
+          playScanBeep();
+          hint.className = "scanner-status success";
+          hint.textContent = code;
+          document.getElementById("serial").value = code;
+          showManualEntry();
+          setTimeout(() => closeScanner(), 600);
+        }
       });
+
+    }).catch(() => {
+      hint.className = "scanner-status error";
+      hint.textContent = "Camera access denied. Check permissions.";
+    });
 
   } catch(e) {
     hint.className = "scanner-status error";
