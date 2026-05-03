@@ -547,6 +547,28 @@
   .map-legend-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
   .map-legend-arrow { color: var(--accent); font-size: 14px; }
 
+  /* PERSONAL RECORDS */
+  .pr-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px;
+  }
+  .pr-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 12px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .pr-card.highlight { border-color: var(--accent); background: var(--accent-muted); }
+  .pr-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--muted);
+  }
+  .pr-value {
+    font-size: 26px; font-weight: 900; color: var(--accent); line-height: 1;
+  }
+  .pr-sub {
+    font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.4;
+  }
+  .pr-streak-fire { font-size: 18px; }
+
   /* COLLAPSIBLE RANGE TABS */
   .dash-range-tab {
     display: flex; justify-content: space-between; align-items: center;
@@ -1185,6 +1207,14 @@
     <div class="dash-range-body" id="body-alltime" style="display:none">
       <div id="dashAlltime"></div>
     </div>
+  </div>
+
+  <div class="dash-section">
+    <div class="dash-title">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Personal Records
+    </div>
+    <div id="dashPersonalRecords"></div>
   </div>
 
   <div class="dash-section">
@@ -2001,6 +2031,134 @@ function startOfWeek(d) {
 function isoDate(d) { return d.toISOString().slice(0,10); }
 
 // ============================
+// PERSONAL RECORDS
+// ============================
+function renderPersonalRecords() {
+  const el = document.getElementById("dashPersonalRecords");
+  if (!el) return;
+
+  const all = getRecords();
+  if (all.length === 0) {
+    el.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:16px">No records yet — start scanning to build your stats.</p>';
+    return;
+  }
+
+  const allShifts = getAllShifts();
+
+  // --- Best shift (most records in a single shift) ---
+  let bestShift = null, bestShiftCount = 0;
+  allShifts.forEach(shift => {
+    if (shift.records.length > bestShiftCount) {
+      bestShiftCount = shift.records.length;
+      bestShift = shift;
+    }
+  });
+  const bestShiftDate = bestShift ? bestShift.date : "-";
+
+  // --- Best day (most records in a single EST calendar day) ---
+  const byDay = {};
+  all.forEach(r => {
+    const d = estDateStr(r.timestamp);
+    byDay[d] = (byDay[d] || 0) + 1;
+  });
+  const bestDayEntry = Object.entries(byDay).sort((a,b) => b[1]-a[1])[0];
+  const bestDayCount = bestDayEntry ? bestDayEntry[1] : 0;
+  const bestDayDate  = bestDayEntry ? bestDayEntry[0] : "-";
+
+  // --- Best avg trip time in a shift (lowest avg gap = fastest) ---
+  let bestAvgShift = null, bestAvgMs = Infinity;
+  allShifts.forEach(shift => {
+    if (shift.records.length < 2) return;
+    const ts = shift.records.map(r => r.timestamp).sort((a,b) => a-b);
+    let totalGap = 0;
+    for (let i = 1; i < ts.length; i++) totalGap += ts[i] - ts[i-1];
+    const avg = totalGap / (ts.length - 1);
+    if (avg < bestAvgMs) { bestAvgMs = avg; bestAvgShift = shift; }
+  });
+  const bestAvgMins = bestAvgShift ? Math.round(bestAvgMs / 60000) : null;
+  const bestAvgDate = bestAvgShift ? bestAvgShift.date : "-";
+
+  // --- Current active streak (consecutive calendar days with at least 1 entry) ---
+  const today = estDateStr(Date.now());
+  const daysWithEntries = new Set(Object.keys(byDay));
+  let streak = 0;
+  let checkDate = new Date();
+  // If no entry today, check if yesterday breaks the streak
+  if (!daysWithEntries.has(today)) {
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+    if (!daysWithEntries.has(estDateStr(yesterday.getTime()))) {
+      streak = 0;
+    } else {
+      checkDate = yesterday;
+    }
+  }
+  if (daysWithEntries.has(estDateStr(checkDate.getTime()))) {
+    let d = new Date(checkDate);
+    while (daysWithEntries.has(estDateStr(d.getTime()))) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    }
+  }
+
+  // --- Longest streak ever ---
+  const allDays = [...daysWithEntries].sort();
+  let longestStreak = 0, currentRun = 0, prevDate = null;
+  allDays.forEach(d => {
+    if (!prevDate) { currentRun = 1; }
+    else {
+      const prev = new Date(prevDate + "T12:00:00");
+      const curr = new Date(d + "T12:00:00");
+      const diffDays = Math.round((curr - prev) / 86400000);
+      currentRun = diffDays === 1 ? currentRun + 1 : 1;
+    }
+    if (currentRun > longestStreak) longestStreak = currentRun;
+    prevDate = d;
+  });
+
+  // --- Total days worked ---
+  const totalDays = Object.keys(byDay).length;
+
+  // --- All time avg per day ---
+  const allTimeAvg = totalDays > 0 ? Math.round(all.length / totalDays) : 0;
+
+  const streakEmoji = streak >= 7 ? "&#128293;&#128293;" : streak >= 3 ? "&#128293;" : "&#9733;";
+
+  el.innerHTML = `
+    <div class="pr-grid">
+      <div class="pr-card highlight" onclick="viewByDate('${bestDayDate}')" style="cursor:pointer">
+        <div class="pr-label">Best Day</div>
+        <div class="pr-value">${bestDayCount}</div>
+        <div class="pr-sub">${bestDayDate}</div>
+      </div>
+      <div class="pr-card highlight">
+        <div class="pr-label">Best Shift</div>
+        <div class="pr-value">${bestShiftCount}</div>
+        <div class="pr-sub">${bestShiftDate}</div>
+      </div>
+      <div class="pr-card">
+        <div class="pr-label">Fastest Avg</div>
+        <div class="pr-value">${bestAvgMins !== null ? bestAvgMins + "m" : "--"}</div>
+        <div class="pr-sub">avg trip time${bestAvgDate !== "-" ? "<br>" + bestAvgDate : ""}</div>
+      </div>
+      <div class="pr-card">
+        <div class="pr-label">Avg Per Day</div>
+        <div class="pr-value">${allTimeAvg}</div>
+        <div class="pr-sub">over ${totalDays} day${totalDays !== 1 ? "s" : ""}</div>
+      </div>
+      <div class="pr-card ${streak >= 3 ? "highlight" : ""}">
+        <div class="pr-label">Current Streak ${streakEmoji}</div>
+        <div class="pr-value">${streak}</div>
+        <div class="pr-sub">day${streak !== 1 ? "s" : ""} in a row</div>
+      </div>
+      <div class="pr-card">
+        <div class="pr-label">Longest Streak</div>
+        <div class="pr-value">${longestStreak}</div>
+        <div class="pr-sub">day${longestStreak !== 1 ? "s" : ""} record</div>
+      </div>
+    </div>`;
+}
+
+// ============================
 // COLLAPSIBLE RANGE VIEWS
 // ============================
 const RANGES = ['7days','30days','3months','6months','1year','alltime'];
@@ -2490,6 +2648,7 @@ function renderDashboard() {
   renderQuote();
   renderShiftMapControls();
   renderRange('7days');
+  renderPersonalRecords();
   const all = getRecords();
   const now = new Date();
   const today = estDateStr(now.getTime());
