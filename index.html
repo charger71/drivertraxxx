@@ -547,6 +547,19 @@
   .map-legend-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
   .map-legend-arrow { color: var(--accent); font-size: 14px; }
 
+  /* COLLAPSIBLE RANGE TABS */
+  .dash-range-tab {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 4px; cursor: pointer; user-select: none;
+    font-size: 13px; font-weight: 700; color: var(--text2);
+    border-bottom: 1px solid var(--border);
+    transition: color 0.15s;
+  }
+  .dash-range-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .dash-range-tab:active { opacity: 0.7; }
+  .range-chevron { font-size: 11px; color: var(--muted); }
+  .dash-range-body { padding-top: 12px; }
+
   /* SHIFT MAP */
   .shift-map-controls {
     display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;
@@ -1029,7 +1042,6 @@
 <div class="panel" id="panel-records">
 
   <div class="filter-bar">
-    <div class="filter-label" id="recordsHeading">Filter Records</div>
     <div class="filter-row">
       <input type="text" id="fSearch" placeholder="Search serial..."
         oninput="this.value=this.value.toUpperCase(); renderRecords()">
@@ -1061,6 +1073,21 @@
   </div>
 
   <div class="results-count" id="resultsCount"></div>
+
+  <div class="dash-section" style="margin-bottom:0;padding-bottom:0">
+    <div class="dash-range-tab active" onclick="toggleRecordsMap()" id="tab-recordsMap">
+      <span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Map View</span>
+      <span class="range-chevron" id="chev-recordsMap">&#9660;</span>
+    </div>
+    <div id="body-recordsMap" style="display:block">
+      <div id="recordsMapContainer" class="shift-map-container" style="margin-top:0;border-radius:0 0 var(--radius) var(--radius)">
+        <div id="recordsMap" class="shift-map"></div>
+        <div id="recordsMapEmpty" class="shift-map-empty">No GPS entries in current results</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-title" id="recordsHeading" style="margin-top:20px">Records</div>
   <div id="records"></div>
 </div>
 
@@ -1099,9 +1126,65 @@
     </div>
   </div>
 
+  <!-- TIME RANGE SECTIONS -->
   <div class="dash-section">
-    <div class="dash-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Last 7 Days <span style="font-size:11px;font-weight:normal">(tap a day to view entries)</span></div>
-    <div id="dashDays"></div>
+    <div class="dash-range-tab active" onclick="toggleRange('7days')" id="tab-7days">
+      <span>Last 7 Days</span>
+      <span class="range-chevron" id="chev-7days">&#9660;</span>
+    </div>
+    <div class="dash-range-body" id="body-7days">
+      <div id="dashDays"></div>
+    </div>
+  </div>
+
+  <div class="dash-section">
+    <div class="dash-range-tab" onclick="toggleRange('30days')" id="tab-30days">
+      <span>Last 30 Days</span>
+      <span class="range-chevron" id="chev-30days">&#9654;</span>
+    </div>
+    <div class="dash-range-body" id="body-30days" style="display:none">
+      <div id="dash30days"></div>
+    </div>
+  </div>
+
+  <div class="dash-section">
+    <div class="dash-range-tab" onclick="toggleRange('3months')" id="tab-3months">
+      <span>Last 3 Months</span>
+      <span class="range-chevron" id="chev-3months">&#9654;</span>
+    </div>
+    <div class="dash-range-body" id="body-3months" style="display:none">
+      <div id="dash3months"></div>
+    </div>
+  </div>
+
+  <div class="dash-section">
+    <div class="dash-range-tab" onclick="toggleRange('6months')" id="tab-6months">
+      <span>Last 6 Months</span>
+      <span class="range-chevron" id="chev-6months">&#9654;</span>
+    </div>
+    <div class="dash-range-body" id="body-6months" style="display:none">
+      <div id="dash6months"></div>
+    </div>
+  </div>
+
+  <div class="dash-section">
+    <div class="dash-range-tab" onclick="toggleRange('1year')" id="tab-1year">
+      <span>Last 12 Months</span>
+      <span class="range-chevron" id="chev-1year">&#9654;</span>
+    </div>
+    <div class="dash-range-body" id="body-1year" style="display:none">
+      <div id="dash1year"></div>
+    </div>
+  </div>
+
+  <div class="dash-section">
+    <div class="dash-range-tab" onclick="toggleRange('alltime')" id="tab-alltime">
+      <span>All Time</span>
+      <span class="range-chevron" id="chev-alltime">&#9654;</span>
+    </div>
+    <div class="dash-range-body" id="body-alltime" style="display:none">
+      <div id="dashAlltime"></div>
+    </div>
   </div>
 
   <div class="dash-section">
@@ -1736,9 +1819,10 @@ function renderRecords() {
   if (records.length === 0) {
     document.getElementById("records").innerHTML =
       '<p style="color:var(--muted);text-align:center;padding:24px">No records match your filters.</p>';
-    return;
+  } else {
+    document.getElementById("records").innerHTML = records.map(r => recordCard(r, "deleteRecord")).join("");
   }
-  document.getElementById("records").innerHTML = records.map(r => recordCard(r, "deleteRecord")).join("");
+  renderRecordsMap(); // refresh map if open
 }
 
 // ============================
@@ -1915,6 +1999,297 @@ function startOfWeek(d) {
 }
 
 function isoDate(d) { return d.toISOString().slice(0,10); }
+
+// ============================
+// COLLAPSIBLE RANGE VIEWS
+// ============================
+const RANGES = ['7days','30days','3months','6months','1year','alltime'];
+
+function toggleRange(id) {
+  const body = document.getElementById('body-' + id);
+  const chev = document.getElementById('chev-' + id);
+  const tab  = document.getElementById('tab-' + id);
+  const isOpen = body.style.display !== 'none';
+
+  // Close all
+  RANGES.forEach(r => {
+    document.getElementById('body-' + r).style.display = 'none';
+    document.getElementById('chev-' + r).innerHTML = '&#9654;';
+    document.getElementById('tab-'  + r).classList.remove('active');
+  });
+
+  if (!isOpen) {
+    body.style.display = 'block';
+    chev.innerHTML = '&#9660;';
+    tab.classList.add('active');
+    renderRange(id);
+  }
+}
+
+function renderRange(id) {
+  const now = new Date();
+  const today = estDateStr(now.getTime());
+  const all = getRecords();
+
+  let cutoff, groupFn, labelFn, title;
+
+  if (id === '7days') {
+    // Already rendered by renderDashboard — just ensure visible
+    return;
+  } else if (id === '30days') {
+    cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 30);
+    groupFn = r => estDateStr(r.timestamp);
+    labelFn = d => d.slice(5);
+    title = 'Last 30 Days';
+    const days = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now); d.setDate(d.getDate() - i);
+      days.push(estDateStr(d.getTime()));
+    }
+    renderRangeTable('dash30days', all, days, groupFn, labelFn, today);
+  } else if (id === '3months') {
+    cutoff = new Date(now); cutoff.setMonth(cutoff.getMonth() - 3);
+    const weeks = getWeekBuckets(now, 13);
+    renderRangeWeekTable('dash3months', all, weeks, today);
+  } else if (id === '6months') {
+    cutoff = new Date(now); cutoff.setMonth(cutoff.getMonth() - 6);
+    const weeks = getWeekBuckets(now, 26);
+    renderRangeWeekTable('dash6months', all, weeks, today);
+  } else if (id === '1year') {
+    const months = getMonthBuckets(now, 12);
+    renderRangeMonthTable('dash1year', all, months);
+  } else if (id === 'alltime') {
+    const months = getAllMonthBuckets(all);
+    renderRangeMonthTable('dashAlltime', all, months);
+  }
+}
+
+function getWeekBuckets(now, count) {
+  const weeks = [];
+  for (let i = count - 1; i >= 0; i--) {
+    const end = new Date(now); end.setDate(end.getDate() - (i * 7));
+    const start = new Date(end); start.setDate(start.getDate() - 6);
+    weeks.push({ start: estDateStr(start.getTime()), end: estDateStr(end.getTime()) });
+  }
+  return weeks;
+}
+
+function getMonthBuckets(now, count) {
+  const months = [];
+  for (let i = count - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    months.push(key);
+  }
+  return months;
+}
+
+function getAllMonthBuckets(records) {
+  if (!records.length) return [];
+  const keys = new Set();
+  records.forEach(r => {
+    const d = new Date(r.timestamp);
+    keys.add(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  });
+  return [...keys].sort();
+}
+
+function renderRangeTable(elId, all, days, groupFn, labelFn, today) {
+  const byDay = {};
+  days.forEach(d => byDay[d] = 0);
+  all.forEach(r => {
+    const k = groupFn(r);
+    if (byDay[k] !== undefined) byDay[k]++;
+  });
+  const nonZero = days.filter(d => byDay[d] > 0);
+  if (!nonZero.length) {
+    document.getElementById(elId).innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:16px">No entries in this period</p>';
+    return;
+  }
+  const max = Math.max(...nonZero.map(d => byDay[d]));
+  document.getElementById(elId).innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr>
+        <th style="text-align:left;padding:6px 8px;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase">Date</th>
+        <th style="padding:6px 8px;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase"></th>
+        <th style="text-align:right;padding:6px 8px;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase">Cars</th>
+      </tr></thead>
+      <tbody>
+        ${nonZero.map(d => `
+          <tr style="cursor:pointer" onclick="viewByDate('${d}')">
+            <td style="padding:6px 8px;color:${d===today?'var(--accent)':'var(--text2)'};white-space:nowrap;font-weight:${d===today?'700':'400'}">${labelFn(d)}${d===today?' (today)':''}</td>
+            <td style="padding:6px 8px;width:55%">
+              <div style="background:var(--accent);height:8px;border-radius:4px;width:${Math.round((byDay[d]/max)*100)}%;min-width:4px"></div>
+            </td>
+            <td style="padding:6px 8px;text-align:right;font-weight:700;color:var(--text)">${byDay[d]}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function renderRangeWeekTable(elId, all, weeks, today) {
+  const byWeek = weeks.map(w => {
+    const count = all.filter(r => {
+      const d = estDateStr(r.timestamp);
+      return d >= w.start && d <= w.end;
+    }).length;
+    return { ...w, count };
+  }).filter(w => w.count > 0);
+
+  if (!byWeek.length) {
+    document.getElementById(elId).innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:16px">No entries in this period</p>';
+    return;
+  }
+  const max = Math.max(...byWeek.map(w => w.count));
+  document.getElementById(elId).innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr>
+        <th style="text-align:left;padding:6px 8px;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase">Week</th>
+        <th style="padding:6px 8px;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase"></th>
+        <th style="text-align:right;padding:6px 8px;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase">Cars</th>
+      </tr></thead>
+      <tbody>
+        ${byWeek.map(w => `
+          <tr style="cursor:pointer" onclick="viewByWeek('${w.start}','${w.end}','${w.start} to ${w.end}')">
+            <td style="padding:6px 8px;color:var(--text2);white-space:nowrap">${w.start.slice(5)} – ${w.end.slice(5)}</td>
+            <td style="padding:6px 8px;width:55%">
+              <div style="background:var(--accent);height:8px;border-radius:4px;width:${Math.round((w.count/max)*100)}%;min-width:4px"></div>
+            </td>
+            <td style="padding:6px 8px;text-align:right;font-weight:700;color:var(--text)">${w.count}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function renderRangeMonthTable(elId, all, months) {
+  if (!months.length) {
+    document.getElementById(elId).innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:16px">No entries in this period</p>';
+    return;
+  }
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const byMonth = months.map(m => {
+    const count = all.filter(r => {
+      const d = new Date(r.timestamp);
+      const k = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+      return k === m;
+    }).length;
+    const [yr, mo] = m.split('-');
+    return { key: m, label: `${monthNames[parseInt(mo)-1]} ${yr}`, count };
+  }).filter(m => m.count > 0);
+
+  if (!byMonth.length) {
+    document.getElementById(elId).innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:16px">No entries in this period</p>';
+    return;
+  }
+  const max = Math.max(...byMonth.map(m => m.count));
+  const now = new Date();
+  const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById(elId).innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr>
+        <th style="text-align:left;padding:6px 8px;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase">Month</th>
+        <th style="padding:6px 8px;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase"></th>
+        <th style="text-align:right;padding:6px 8px;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase">Cars</th>
+      </tr></thead>
+      <tbody>
+        ${byMonth.map(m => {
+          const [yr, mo] = m.key.split('-');
+          const fromDate = `${m.key}-01`;
+          const toDate = new Date(parseInt(yr), parseInt(mo), 0);
+          const toStr = `${yr}-${mo}-${String(toDate.getDate()).padStart(2,'0')}`;
+          return `<tr style="cursor:pointer" onclick="viewByWeek('${fromDate}','${toStr}','${m.label}')">
+            <td style="padding:6px 8px;color:${m.key===thisMonth?'var(--accent)':'var(--text2)'};font-weight:${m.key===thisMonth?'700':'400'}">${m.label}${m.key===thisMonth?' ·':''}</td>
+            <td style="padding:6px 8px;width:55%">
+              <div style="background:var(--accent);height:8px;border-radius:4px;width:${Math.round((m.count/max)*100)}%;min-width:4px"></div>
+            </td>
+            <td style="padding:6px 8px;text-align:right;font-weight:700;color:var(--text)">${m.count}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+}
+
+// ============================
+// RECORDS MAP
+// ============================
+let recordsLeafletMap = null;
+let recordsMapMarkers = [];
+let recordsMapOpen = true;
+
+function toggleRecordsMap() {
+  const body = document.getElementById('body-recordsMap');
+  const chev = document.getElementById('chev-recordsMap');
+  const tab  = document.getElementById('tab-recordsMap');
+  recordsMapOpen = body.style.display === 'none';
+  body.style.display = recordsMapOpen ? 'block' : 'none';
+  chev.innerHTML = recordsMapOpen ? '&#9660;' : '&#9654;';
+  tab.classList.toggle('active', recordsMapOpen);
+  if (recordsMapOpen) renderRecordsMap();
+}
+
+function renderRecordsMap() {
+  if (!recordsMapOpen) return;
+  const records = getFiltered().filter(r => r.lat && r.lng);
+  const mapEl = document.getElementById('recordsMap');
+  const emptyEl = document.getElementById('recordsMapEmpty');
+
+  if (!records.length) {
+    mapEl.style.display = 'none';
+    emptyEl.style.display = 'flex';
+    return;
+  }
+
+  emptyEl.style.display = 'none';
+  mapEl.style.display = 'block';
+
+  setTimeout(() => {
+    if (!recordsLeafletMap) {
+      recordsLeafletMap = L.map('recordsMap', { zoomControl: true, attributionControl: false });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(recordsLeafletMap);
+    } else {
+      recordsMapMarkers.forEach(m => recordsLeafletMap.removeLayer(m));
+      recordsMapMarkers = [];
+    }
+
+    recordsLeafletMap.invalidateSize();
+    const bounds = [];
+
+    records.forEach((r, i) => {
+      const color = statusMapColor(r.status);
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="
+          width:26px;height:26px;border-radius:50%;
+          background:#${color};color:#fff;
+          display:flex;align-items:center;justify-content:center;
+          font-size:11px;font-weight:800;font-family:Arial,sans-serif;
+          border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.4);
+          cursor:pointer;">${i+1}</div>`,
+        iconSize: [26, 26], iconAnchor: [13, 13], popupAnchor: [0, -14]
+      });
+      const time = new Date(r.timestamp).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', timeZone:'America/New_York' });
+      const marker = L.marker([r.lat, r.lng], { icon })
+        .addTo(recordsLeafletMap)
+        .bindPopup(`
+          <div style="font-family:Arial,sans-serif;min-width:140px">
+            <div style="font-weight:800;font-size:14px;margin-bottom:4px">${sanitizeText(r.serialId)}</div>
+            <div style="font-size:12px;color:#555;margin-bottom:4px">${sanitizeText(r.status)}${r.destination ? ' · ' + sanitizeText(r.destination) : ''}</div>
+            <div style="font-size:11px;color:#888;margin-bottom:8px">${time}</div>
+            <button onclick="document.getElementById('recordsMap')._openDetail('${r.id}')"
+              style="background:#00a651;color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;width:100%">
+              View Record
+            </button>
+          </div>`, { maxWidth: 200 });
+      recordsMapMarkers.push(marker);
+      bounds.push([r.lat, r.lng]);
+    });
+
+    document.getElementById('recordsMap')._openDetail = (id) => openDetail(id, 'deleteRecord');
+
+    if (bounds.length === 1) recordsLeafletMap.setView(bounds[0], 17);
+    else recordsLeafletMap.fitBounds(bounds, { padding: [32, 32] });
+  }, 80);
+}
 
 // ============================
 // SHIFT MAP (Leaflet.js + OpenStreetMap)
@@ -2114,6 +2489,7 @@ function renderQuote() {
 function renderDashboard() {
   renderQuote();
   renderShiftMapControls();
+  renderRange('7days');
   const all = getRecords();
   const now = new Date();
   const today = estDateStr(now.getTime());
