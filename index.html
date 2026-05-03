@@ -43,8 +43,8 @@
   }
   .tab.active { color: #000; background: var(--accent); }
 
-  .panel { display: none; padding: 20px var(--space); }
-  .panel.active { display: block; }
+  .panel { display: none; padding: 20px var(--space); pointer-events: none; }
+  .panel.active { display: block; pointer-events: auto; }
 
   .field-label {
     font-size: 10px; font-weight: 700; color: var(--muted);
@@ -732,6 +732,10 @@
   </div>
 </div>
 
+<!-- ==================== PANELS ==================== -->
+
+<div id="panelsContainer" style="position:relative;overflow:hidden">
+
 <!-- ==================== TRAINING PANEL ==================== -->
 
 <div class="panel" id="panel-training">
@@ -1234,7 +1238,9 @@
     <div class="stat-grid" id="dashWeeks"></div>
   </div>
 
-</div>
+</div><!-- end panel-dashboard -->
+
+</div><!-- end panelsContainer -->
 
 <div id="toast" class="toast"></div>
 
