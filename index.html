@@ -6,8 +6,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="DriverTraxxx" />
 <meta name="theme-color" content="#13161a" />
-<meta name="referrer" content="no-referrer" />
-<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 <title>DriverTraxxx</title>
 <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
@@ -277,7 +275,7 @@
     background: rgba(0,0,0,0.7);
     clip-path: polygon(
       0% 0%, 100% 0%, 100% 100%, 0% 100%,
-      0% 42%, 4% 42%, 4% 58%, 96% 58%, 96% 42%, 0% 42%
+      0% 38%, 4% 38%, 4% 62%, 96% 62%, 96% 38%, 0% 38%
     );
   }
   /* Left and right end caps on the strip */
@@ -287,8 +285,8 @@
     border-color: var(--accent); border-style: solid;
     animation: cornerPulse 1.5s ease-in-out infinite;
   }
-  .reticle-corner.tl { top: 42%; left: 4%; border-width: 3px 0 3px 3px; border-radius: 3px 0 0 3px; }
-  .reticle-corner.tr { top: 42%; right: 4%; border-width: 3px 3px 3px 0; border-radius: 0 3px 3px 0; }
+  .reticle-corner.tl { top: 38%; left: 4%; border-width: 3px 0 3px 3px; border-radius: 3px 0 0 3px; }
+  .reticle-corner.tr { top: 38%; right: 4%; border-width: 3px 3px 3px 0; border-radius: 0 3px 3px 0; }
   .reticle-corner.bl { display: none; }
   .reticle-corner.br { display: none; }
   @keyframes cornerPulse {
@@ -1222,13 +1220,13 @@
     <div class="stat-grid" id="dashWeeks"></div>
   </div>
 
-</div>
+
 
 <div id="toast" class="toast"></div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
+<script src="https://unpkg.com/@zxing/library@0.18.6/umd/index.min.js"></script>
 
 <!-- RECORD DETAIL OVERLAY -->
 <div id="detailOverlay" class="detail-overlay" onclick="if(event.target===this)closeDetail()">
@@ -1559,17 +1557,6 @@ function saveRecord() {
     timestamp: Date.now()
   };
 
-  if (isValidVIN(serial)) {
-    gpsEl.textContent = "Acquiring GPS + decoding VIN...";
-    decodeVIN(serial).then(vinData => {
-      if (vinData) {
-        const records = getRecords();
-        const rec = records.find(r => r.id === recordData.id);
-        if (rec) { rec.vinData = vinData; setRecords(records); renderTodayEntries(); }
-      }
-    });
-  }
-
   function doSave(lat, lng, gpsError) {
     if (lat !== null) { recordData.lat = lat; recordData.lng = lng; }
     if (gpsError) { recordData.gpsError = true; }
@@ -1595,6 +1582,21 @@ function saveRecord() {
     renderTodayEntries();
     if (gpsError) { showToast("Saved - no GPS location", "warn"); }
     else { showToast("Saved with GPS", "success"); }
+
+    // VIN decode runs AFTER record is saved so the lookup finds it
+    if (isValidVIN(recordData.serialId)) {
+      decodeVIN(recordData.serialId).then(vinData => {
+        if (vinData) {
+          const recs = getRecords();
+          const rec = recs.find(r => r.id === recordData.id);
+          if (rec) {
+            rec.vinData = vinData;
+            setRecords(recs);
+            renderTodayEntries();
+          }
+        }
+      });
+    }
   }
 
   if ("geolocation" in navigator) {
@@ -1924,35 +1926,32 @@ function openDetail(id, onDelete) {
   if (r.lat && r.lng) {
     noGps.style.display = "none";
     const mapDiv = document.getElementById("detailMapFrame");
-    mapDiv.style.display = "block";
-    // Small delay to ensure element is visible before Leaflet init
-    setTimeout(() => {
-      // Destroy previous map instance if exists
-      if (mapDiv._leaflet_map) {
-        mapDiv._leaflet_map.remove();
-        mapDiv._leaflet_map = null;
-      }
-      mapDiv.innerHTML = "";
-      const m = L.map(mapDiv, { zoomControl: true, attributionControl: false });
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(m);
-      m.setView([r.lat, r.lng], 17);
-      const color = statusMapColor(r.status);
-      const icon = L.divIcon({
-        className: "",
-        html: `<div style="
-          width:32px;height:32px;border-radius:50%;
-          background:#${color};color:#fff;
-          display:flex;align-items:center;justify-content:center;
-          font-size:14px;font-weight:800;font-family:Arial,sans-serif;
-          border:3px solid #fff;
-          box-shadow:0 2px 8px rgba(0,0,0,0.5);
-        ">P</div>`,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16]
-      });
-      L.marker([r.lat, r.lng], { icon }).addTo(m);
-      mapDiv._leaflet_map = m;
-    }, 80);
+    if (!window.L) {
+      mapDiv.style.display = "none";
+      noGps.style.display = "block";
+      noGps.textContent = "Map unavailable";
+    } else {
+      mapDiv.style.display = "block";
+      // Small delay to ensure element is visible before Leaflet init
+      setTimeout(() => {
+        if (mapDiv._leaflet_map) {
+          mapDiv._leaflet_map.remove();
+          mapDiv._leaflet_map = null;
+        }
+        mapDiv.innerHTML = "";
+        const m = L.map(mapDiv, { zoomControl: true, attributionControl: false });
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(m);
+        m.setView([r.lat, r.lng], 17);
+        const color = statusMapColor(r.status);
+        const icon = L.divIcon({
+          className: "",
+          html: `<div style="width:32px;height:32px;border-radius:50%;background:#${color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;font-family:Arial,sans-serif;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.5);">P</div>`,
+          iconSize: [32, 32], iconAnchor: [16, 16]
+        });
+        L.marker([r.lat, r.lng], { icon }).addTo(m);
+        mapDiv._leaflet_map = m;
+      }, 80);
+    }
   } else {
     const mapDiv = document.getElementById("detailMapFrame");
     if (mapDiv._leaflet_map) {
@@ -2039,7 +2038,7 @@ function renderPersonalRecords() {
 
   const all = getRecords();
   if (all.length === 0) {
-    el.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:16px">No records yet — start scanning to build your stats.</p>';
+    el.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:16px">No records yet - start scanning to build your stats.</p>';
     return;
   }
 
@@ -2192,7 +2191,7 @@ function renderRange(id) {
   let cutoff, groupFn, labelFn, title;
 
   if (id === '7days') {
-    // Already rendered by renderDashboard — just ensure visible
+    // Already rendered by renderDashboard - just ensure visible
     return;
   } else if (id === '30days') {
     cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 30);
@@ -2309,7 +2308,7 @@ function renderRangeWeekTable(elId, all, weeks, today) {
       <tbody>
         ${byWeek.map(w => `
           <tr style="cursor:pointer" onclick="viewByWeek('${w.start}','${w.end}','${w.start} to ${w.end}')">
-            <td style="padding:6px 8px;color:var(--text2);white-space:nowrap">${w.start.slice(5)} – ${w.end.slice(5)}</td>
+            <td style="padding:6px 8px;color:var(--text2);white-space:nowrap">${w.start.slice(5)} - ${w.end.slice(5)}</td>
             <td style="padding:6px 8px;width:55%">
               <div style="background:var(--accent);height:8px;border-radius:4px;width:${Math.round((w.count/max)*100)}%;min-width:4px"></div>
             </td>
@@ -2397,6 +2396,12 @@ function renderRecordsMap() {
     return;
   }
 
+  if (!window.L) {
+    emptyEl.style.display = 'flex';
+    emptyEl.textContent = 'Map unavailable - library not loaded';
+    return;
+  }
+
   emptyEl.style.display = 'none';
   mapEl.style.display = 'block';
 
@@ -2457,7 +2462,7 @@ let leafletMap = null;
 let leafletMarkers = [];
 
 function initLeafletMap() {
-  if (leafletMap) return; // already initialized
+  if (leafletMap) return;
   const el = document.getElementById("shiftMap");
   if (!el) return;
   el.style.display = "block";
@@ -2503,6 +2508,12 @@ function renderShiftMap(shiftIndex) {
     emptyMsg.classList.remove("hidden");
     emptyMsg.textContent = "No GPS entries for this shift";
     if (legend) legend.innerHTML = "";
+    return;
+  }
+
+  if (!window.L) {
+    emptyMsg.classList.remove("hidden");
+    emptyMsg.textContent = "Map unavailable - library not loaded";
     return;
   }
 
@@ -2640,7 +2651,7 @@ function renderQuote() {
   const q = CAR_QUOTES[Math.floor(Math.random() * CAR_QUOTES.length)];
   const el = document.getElementById("dashQuote");
   if (el) {
-    el.innerHTML = `<div class="dash-quote-text">"${sanitizeText(q.text)}"</div><div class="dash-quote-attr">— ${sanitizeText(q.attr)}</div>`;
+    el.innerHTML = `<div class="dash-quote-text">"${sanitizeText(q.text)}"</div><div class="dash-quote-attr">- ${sanitizeText(q.attr)}</div>`;
   }
 }
 
@@ -2789,82 +2800,109 @@ let codeReader = null;
 let scannerActive = false;
 let torchOn = false;
 let activeStream = null;
+let lastDecodeTime = 0;
+const DECODE_THROTTLE_MS = 200;
+
+function playScanBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(1480, ctx.currentTime);
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.12);
+  } catch(e) {}
+}
 
 function openScanner() {
   const overlay = document.getElementById("scannerOverlay");
   const hint = document.getElementById("scannerHint");
+  const dotSvg = '<span class="scanner-dot"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" style="vertical-align:middle;display:inline-block"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg></span>';
   overlay.classList.add("open");
   hint.className = "scanner-status scanning";
-  hint.innerHTML = '<span class="scanner-dot"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" style="vertical-align:middle;display:inline-block"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg></span> Starting camera...';
+  hint.innerHTML = dotSvg + " Starting camera...";
   torchOn = false;
+  lastDecodeTime = 0;
   document.getElementById("torchBtn").classList.remove("on");
 
   if (!window.ZXing) {
     hint.className = "scanner-status error";
-    hint.textContent = "Scanner not loaded. Use manual entry.";
+    hint.textContent = "Scanner library not loaded. Check internet connection and reload.";
     return;
   }
 
   try {
-    // Restrict to Code 39 and Code 128 only - Enterprise uses these formats
     const hints = new Map();
-    const formats = [ZXing.BarcodeFormat.CODE_39, ZXing.BarcodeFormat.CODE_128];
-    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, formats);
+    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+      ZXing.BarcodeFormat.CODE_39,
+      ZXing.BarcodeFormat.CODE_128
+    ]);
     hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
     codeReader = new ZXing.BrowserMultiFormatReader(hints);
     scannerActive = true;
 
-    codeReader.listVideoInputDevices().then(devices => {
-      const rearCam = devices.find(d =>
-        /back|rear|environment/i.test(d.label)
-      ) || devices[devices.length - 1];
+    const constraints = {
+      video: {
+        facingMode: { exact: "environment" },
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
+      }
+    };
 
-      const deviceId = rearCam ? rearCam.deviceId : undefined;
-
-      // Get stream for torch control
-      const constraints = {
-        video: {
-          deviceId: deviceId ? { exact: deviceId } : undefined,
-          facingMode: deviceId ? undefined : "environment",
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        }
-      };
-
-      navigator.mediaDevices.getUserMedia(constraints).then(stream => {
+    navigator.mediaDevices.getUserMedia(constraints)
+      .catch(() => {
+        return navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: "environment",
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        });
+      })
+      .then(stream => {
         activeStream = stream;
-        document.getElementById("scannerVideo").srcObject = stream;
-        hint.innerHTML = '<span class="scanner-dot"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" style="vertical-align:middle;display:inline-block"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg></span> Scanning...';
-      }).catch(() => {});
+        const video = document.getElementById("scannerVideo");
+        video.srcObject = stream;
+        hint.innerHTML = dotSvg + " Scanning...";
 
-      codeReader.decodeFromVideoDevice(deviceId, "scannerVideo", (result, err) => {
-        if (!scannerActive) return;
-        if (result) {
-          const code = result.getText().trim().toUpperCase();
+        video.addEventListener("click", () => {
+          const track = stream.getVideoTracks()[0];
+          if (!track) return;
+          try {
+            track.applyConstraints({ advanced: [{ focusMode: "single-shot" }] }).catch(() => {});
+          } catch(e) {}
+        });
 
-          // Green flash + vibrate
-          const flash = document.getElementById("scannerFlash");
-          flash.classList.remove("flash");
-          void flash.offsetWidth; // force reflow to restart animation
-          flash.classList.add("flash");
-          navigator.vibrate && navigator.vibrate([80, 40, 80]);
-
-          hint.className = "scanner-status success";
-          hint.textContent = "" + code;
-
-          document.getElementById("serial").value = code;
-          showManualEntry();
-
-          setTimeout(() => closeScanner(), 600);
-        }
+        codeReader.decodeFromVideoDevice(undefined, "scannerVideo", (result, err) => {
+          if (!scannerActive) return;
+          const now = Date.now();
+          if (now - lastDecodeTime < DECODE_THROTTLE_MS) return;
+          lastDecodeTime = now;
+          if (result) {
+            const code = result.getText().trim().toUpperCase();
+            const flash = document.getElementById("scannerFlash");
+            flash.classList.remove("flash");
+            void flash.offsetWidth;
+            flash.classList.add("flash");
+            navigator.vibrate && navigator.vibrate([80, 40, 80]);
+            playScanBeep();
+            hint.className = "scanner-status success";
+            hint.textContent = code;
+            document.getElementById("serial").value = code;
+            showManualEntry();
+            setTimeout(() => closeScanner(), 600);
+          }
+        });
+      })
+      .catch(() => {
+        hint.className = "scanner-status error";
+        hint.textContent = "Camera access denied. Check permissions.";
       });
-
-      hint.innerHTML = '<span class="scanner-dot"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" style="vertical-align:middle;display:inline-block"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg></span> Scanning...';
-
-    }).catch(() => {
-      hint.className = "scanner-status error";
-      hint.textContent = "Camera access denied. Check permissions.";
-    });
 
   } catch(e) {
     hint.className = "scanner-status error";
@@ -2899,6 +2937,7 @@ function toggleTorch() {
   track.applyConstraints({ advanced: [{ torch: torchOn }] });
   document.getElementById("torchBtn").classList.toggle("on", torchOn);
 }
+
 
 // ============================
 // PROFILE
@@ -3118,7 +3157,6 @@ async function checkWeatherAlert() {
       const code = c.weather_code !== undefined ? c.weather_code : c.weathercode;
       const temp = Math.round(c.temperature_2m);
       const wind = Math.round(c.windspeed_10m);
-      console.log(`Weather code: ${code}, Temp: ${temp}F, Wind: ${wind}mph`);
       if (EXTREME_CODES[code]) alerts.push(EXTREME_CODES[code]);
       if (temp <= 20) alerts.push(`Extreme Cold: ${temp}F`);
       if (temp >= 100) alerts.push(`Extreme Heat: ${temp}F`);
