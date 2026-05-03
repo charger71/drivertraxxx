@@ -1243,8 +1243,18 @@
 <div id="toast" class="toast"></div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/@zxing/library@0.18.6/umd/index.min.js"></script>
+<script>
+// Load external libraries with error handling - app works without them
+function loadScript(src, onload) {
+  const s = document.createElement('script');
+  s.src = src;
+  s.onload = onload || function(){};
+  s.onerror = function() { console.warn('Failed to load:', src); };
+  document.head.appendChild(s);
+}
+loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js');
+loadScript('https://unpkg.com/@zxing/library@0.18.6/umd/index.min.js');
+</script>
 
 <!-- RECORD DETAIL OVERLAY -->
 
@@ -1927,10 +1937,14 @@ const noGps = document.getElementById(“detailNoGps”);
 if (r.lat && r.lng) {
 noGps.style.display = “none”;
 const mapDiv = document.getElementById(“detailMapFrame”);
+if (!window.L) {
+mapDiv.style.display = “none”;
+noGps.style.display = “block”;
+noGps.textContent = “Map unavailable”;
+} else {
 mapDiv.style.display = “block”;
 // Small delay to ensure element is visible before Leaflet init
 setTimeout(() => {
-// Destroy previous map instance if exists
 if (mapDiv._leaflet_map) {
 mapDiv._leaflet_map.remove();
 mapDiv._leaflet_map = null;
@@ -1942,13 +1956,13 @@ m.setView([r.lat, r.lng], 17);
 const color = statusMapColor(r.status);
 const icon = L.divIcon({
 className: “”,
-html: `<div style=" width:32px;height:32px;border-radius:50%; background:#${color};color:#fff; display:flex;align-items:center;justify-content:center; font-size:14px;font-weight:800;font-family:Arial,sans-serif; border:3px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,0.5); ">P</div>`,
-iconSize: [32, 32],
-iconAnchor: [16, 16]
+html: `<div style="width:32px;height:32px;border-radius:50%;background:#${color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;font-family:Arial,sans-serif;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.5);">P</div>`,
+iconSize: [32, 32], iconAnchor: [16, 16]
 });
 L.marker([r.lat, r.lng], { icon }).addTo(m);
 mapDiv._leaflet_map = m;
 }, 80);
+}
 } else {
 const mapDiv = document.getElementById(“detailMapFrame”);
 if (mapDiv._leaflet_map) {
@@ -2325,6 +2339,12 @@ emptyEl.style.display = ‘flex’;
 return;
 }
 
+if (!window.L) {
+emptyEl.style.display = ‘flex’;
+emptyEl.textContent = ‘Map unavailable - library not loaded’;
+return;
+}
+
 emptyEl.style.display = ‘none’;
 mapEl.style.display = ‘block’;
 
@@ -2388,7 +2408,8 @@ let leafletMap = null;
 let leafletMarkers = [];
 
 function initLeafletMap() {
-if (leafletMap) return; // already initialized
+if (leafletMap) return;
+if (!window.L) { return; }
 const el = document.getElementById(“shiftMap”);
 if (!el) return;
 el.style.display = “block”;
@@ -2434,6 +2455,12 @@ mapEl.style.display = “none”;
 emptyMsg.classList.remove(“hidden”);
 emptyMsg.textContent = “No GPS entries for this shift”;
 if (legend) legend.innerHTML = “”;
+return;
+}
+
+if (!window.L) {
+emptyMsg.classList.remove(“hidden”);
+emptyMsg.textContent = “Map unavailable - library not loaded”;
 return;
 }
 
@@ -2723,7 +2750,7 @@ document.getElementById(“torchBtn”).classList.remove(“on”);
 
 if (!window.ZXing) {
 hint.className = “scanner-status error”;
-hint.textContent = “Scanner not loaded. Use manual entry.”;
+hint.textContent = “Scanner library not loaded. Check internet connection and reload.”;
 return;
 }
 
