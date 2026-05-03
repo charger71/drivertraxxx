@@ -529,6 +529,50 @@
     color: var(--danger);
   }
 
+  .map-legend { background: var(--card); border-top: 1px solid var(--border); }
+  .map-legend-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: background 0.1s;
+  }
+  .map-legend-row:last-child { border-bottom: none; }
+  .map-legend-row:active { background: var(--card2); }
+  .map-legend-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; color: #fff; flex-shrink: 0;
+  }
+  .map-legend-serial { font-size: 13px; font-weight: 700; color: var(--text); flex: 1; }
+  .map-legend-status { font-size: 10px; }
+  .map-legend-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .map-legend-arrow { color: var(--accent); font-size: 14px; }
+
+  /* SHIFT MAP */
+  .shift-map-controls {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;
+  }
+  .shift-map-btn {
+    padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+    background: var(--card); color: var(--text2); font-size: 12px;
+    font-weight: 600; cursor: pointer; transition: all 0.15s;
+  }
+  .shift-map-btn.active {
+    background: var(--accent); color: #000; border-color: var(--accent);
+  }
+  .shift-map-container {
+    position: relative; border-radius: var(--radius);
+    overflow: hidden; border: 1px solid var(--border);
+  }
+  .shift-map {
+    width: 100%; height: 320px; display: none;
+  }
+  .shift-map.loaded { display: block; }
+  .shift-map-empty {
+    height: 120px; display: flex; align-items: center; justify-content: center;
+    color: var(--muted); font-size: 13px; background: var(--card);
+  }
+  .shift-map-empty.hidden { display: none; }
+
   /* DATA & BACKUP */
   .data-section {
     background: var(--card); border: 1px solid var(--border);
@@ -1039,6 +1083,19 @@
   <div class="dash-section">
     <div class="dash-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg> By Status</div>
     <div class="bar-chart" id="dashStatus"></div>
+  </div>
+
+  <div class="dash-section">
+    <div class="dash-title">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Shift Map
+      <span style="font-size:11px;font-weight:normal"> (tap a dot to view record)</span>
+    </div>
+    <div class="shift-map-controls" id="shiftMapControls"></div>
+    <div id="shiftMapContainer" class="shift-map-container">
+      <div id="shiftMap" class="shift-map"></div>
+      <div id="shiftMapEmpty" class="shift-map-empty">No GPS entries for this shift</div>
+    </div>
   </div>
 
   <div class="dash-section">
@@ -1820,6 +1877,115 @@ function startOfWeek(d) {
 function isoDate(d) { return d.toISOString().slice(0,10); }
 
 // ============================
+// SHIFT MAP
+// ============================
+let activeShiftMapIndex = null;
+
+function renderShiftMap(shiftIndex) {
+  const allShifts = getAllShifts();
+  const mapContainer = document.getElementById("shiftMap");
+  const emptyMsg = document.getElementById("shiftMapEmpty");
+
+  if (!allShifts.length) {
+    mapContainer.classList.remove("loaded");
+    emptyMsg.classList.remove("hidden");
+    return;
+  }
+
+  // Default to current shift
+  if (shiftIndex === undefined || shiftIndex === null) {
+    shiftIndex = allShifts.length - 1;
+  }
+  activeShiftMapIndex = shiftIndex;
+
+  // Highlight active button
+  document.querySelectorAll(".shift-map-btn").forEach((btn, i) => {
+    btn.classList.toggle("active", parseInt(btn.dataset.shift) === shiftIndex);
+  });
+
+  const shift = allShifts[shiftIndex];
+  const records = shift.records.filter(r => r.lat && r.lng);
+
+  if (records.length === 0) {
+    mapContainer.classList.remove("loaded");
+    emptyMsg.classList.remove("hidden");
+    emptyMsg.textContent = "No GPS entries for this shift";
+    return;
+  }
+
+  emptyMsg.classList.add("hidden");
+  mapContainer.classList.add("loaded");
+
+  // Build Google Maps embed URL with markers
+  // Use the first record with GPS as center
+  const center = records[0];
+  const markers = records.map((r, i) => {
+    const label = encodeURIComponent((i + 1).toString());
+    const color = statusMapColor(r.status);
+    return `markers=color:${color}%7Clabel:${label}%7C${r.lat},${r.lng}`;
+  }).join("&");
+
+  const embedUrl = `https://maps.google.com/maps?q=${center.lat},${center.lng}&z=17&output=embed&${markers}`;
+  mapContainer.innerHTML = `<iframe
+    src="${embedUrl}"
+    width="100%" height="320"
+    style="border:0;display:block"
+    allowfullscreen loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade">
+  </iframe>`;
+
+  // Build tap legend below map — tap to open detail
+  const legend = records.map((r, i) => {
+    const color = statusMapColor(r.status);
+    const time = new Date(r.timestamp).toLocaleTimeString("en-US", {hour:"2-digit", minute:"2-digit", timeZone:"America/New_York"});
+    return `<div class="map-legend-row" onclick="openDetail('${r.id}', 'deleteRecord')">
+      <span class="map-legend-num" style="background:#${color}">${i+1}</span>
+      <span class="map-legend-serial">${sanitizeText(r.serialId)}</span>
+      <span class="map-legend-status ${statusClass(r.status)}">${sanitizeText(r.status)}</span>
+      <span class="map-legend-time">${time}</span>
+      <span class="map-legend-arrow">&#8594;</span>
+    </div>`;
+  }).join("");
+
+  mapContainer.innerHTML += `<div class="map-legend">${legend}</div>`;
+}
+
+function statusMapColor(status) {
+  const map = {
+    "CLEAN": "00a651", "DIRTY": "e85550", "PM": "4d9bff",
+    "MK": "f0b04a", "MR": "e85550", "AUDIT": "9b6aff",
+    "TI": "e85550", "GLASS": "4d9bff", "OTHER": "888888",
+    "WI/DELETE": "e85550"
+  };
+  return map[status] || "888888";
+}
+
+function renderShiftMapControls() {
+  const allShifts = getAllShifts();
+  const controls = document.getElementById("shiftMapControls");
+  if (!controls) return;
+
+  if (allShifts.length === 0) {
+    controls.innerHTML = "";
+    return;
+  }
+
+  // Show last 5 shifts max
+  const recent = allShifts.slice(-5);
+  controls.innerHTML = recent.map((shift, idx) => {
+    const realIndex = allShifts.length - recent.length + idx;
+    const label = shift.date === estDateStr(Date.now()) ? "Today" : shift.date.slice(5);
+    const shiftNum = realIndex + 1;
+    return `<button class="shift-map-btn" data-shift="${realIndex}" onclick="renderShiftMap(${realIndex})">
+      Shift ${shiftNum} &nbsp;·&nbsp; ${label}
+    </button>`;
+  }).join("");
+
+  // Auto-select current shift
+  renderShiftMap(allShifts.length - 1);
+}
+
+// ============================
 // DASHBOARD QUOTE
 // ============================
 const CAR_QUOTES = [
@@ -1845,6 +2011,7 @@ function renderQuote() {
 
 function renderDashboard() {
   renderQuote();
+  renderShiftMapControls();
   const all = getRecords();
   const now = new Date();
   const today = estDateStr(now.getTime());
