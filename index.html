@@ -2749,7 +2749,6 @@ const constraints = {
 
 navigator.mediaDevices.getUserMedia(constraints)
   .catch(() => {
-    // Fallback if exact environment fails (desktop or older phone)
     return navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: "environment",
@@ -2770,47 +2769,39 @@ navigator.mediaDevices.getUserMedia(constraints)
       const track = stream.getVideoTracks()[0];
       if (!track) return;
       try {
-        track.applyConstraints({ advanced: [{ focusMode: "single-shot" }] })
-          .catch(() => {});
+        track.applyConstraints({ advanced: [{ focusMode: "single-shot" }] }).catch(() => {});
       } catch(e) {}
     });
 
-    // Use ZXing's decodeFromStream with throttle
-    const decodeLoop = () => {
+    // Use decodeFromVideoDevice — the correct ZXing browser method
+    // Pass undefined as deviceId so ZXing uses the stream we already set
+    codeReader.decodeFromVideoDevice(undefined, "scannerVideo", (result, err) => {
       if (!scannerActive) return;
+
+      // Throttle — skip if too soon since last attempt
       const now = Date.now();
-      if (now - lastDecodeTime < DECODE_THROTTLE_MS) {
-        requestAnimationFrame(decodeLoop);
-        return;
-      }
+      if (now - lastDecodeTime < DECODE_THROTTLE_MS) return;
       lastDecodeTime = now;
 
-      codeReader.decodeFromStream(stream, video, (result, err) => {
-        if (!scannerActive) return;
-        if (result) {
-          const code = result.getText().trim().toUpperCase();
+      if (result) {
+        const code = result.getText().trim().toUpperCase();
 
-          // Flash + vibrate + beep
-          const flash = document.getElementById("scannerFlash");
-          flash.classList.remove("flash");
-          void flash.offsetWidth;
-          flash.classList.add("flash");
-          navigator.vibrate && navigator.vibrate([80, 40, 80]);
-          playScanBeep();
+        // Flash + vibrate + beep
+        const flash = document.getElementById("scannerFlash");
+        flash.classList.remove("flash");
+        void flash.offsetWidth;
+        flash.classList.add("flash");
+        navigator.vibrate && navigator.vibrate([80, 40, 80]);
+        playScanBeep();
 
-          hint.className = "scanner-status success";
-          hint.textContent = code;
+        hint.className = "scanner-status success";
+        hint.textContent = code;
 
-          document.getElementById("serial").value = code;
-          showManualEntry();
-          setTimeout(() => closeScanner(), 600);
-        }
-      });
-    };
-
-    video.onloadedmetadata = () => {
-      video.play().then(() => requestAnimationFrame(decodeLoop)).catch(() => {});
-    };
+        document.getElementById("serial").value = code;
+        showManualEntry();
+        setTimeout(() => closeScanner(), 600);
+      }
+    });
 
   }).catch(() => {
     hint.className = "scanner-status error";
