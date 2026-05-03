@@ -7,8 +7,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="DriverTraxxx" />
 <meta name="theme-color" content="#13161a" />
-<meta name="referrer" content="no-referrer" />
-<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 <title>DriverTraxxx</title>
 <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
@@ -1246,7 +1244,7 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
+<script src="https://unpkg.com/@zxing/library@0.18.6/umd/index.min.js"></script>
 
 <!-- RECORD DETAIL OVERLAY -->
 
@@ -2694,9 +2692,8 @@ let scannerActive = false;
 let torchOn = false;
 let activeStream = null;
 let lastDecodeTime = 0;
-const DECODE_THROTTLE_MS = 200; // only attempt decode every 200ms
+const DECODE_THROTTLE_MS = 200;
 
-// Scan success sound (short beep via Web Audio API)
 function playScanBeep() {
 try {
 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2717,7 +2714,6 @@ function openScanner() {
 const overlay = document.getElementById(“scannerOverlay”);
 const hint = document.getElementById(“scannerHint”);
 const dotSvg = ‘<span class="scanner-dot"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" style="vertical-align:middle;display:inline-block"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg></span>’;
-
 overlay.classList.add(“open”);
 hint.className = “scanner-status scanning”;
 hint.innerHTML = dotSvg + “ Starting camera…”;
@@ -2742,14 +2738,11 @@ codeReader = new ZXing.BrowserMultiFormatReader(hints);
 scannerActive = true;
 
 ```
-// Request rear camera explicitly - facingMode environment, high resolution
-// Do NOT use listVideoInputDevices to avoid camera cycling
 const constraints = {
   video: {
     facingMode: { exact: "environment" },
     width: { ideal: 1920 },
-    height: { ideal: 1080 },
-    focusMode: "continuous"
+    height: { ideal: 1080 }
   }
 };
 
@@ -2767,10 +2760,8 @@ navigator.mediaDevices.getUserMedia(constraints)
     activeStream = stream;
     const video = document.getElementById("scannerVideo");
     video.srcObject = stream;
-
     hint.innerHTML = dotSvg + " Scanning...";
 
-    // Tap to focus
     video.addEventListener("click", () => {
       const track = stream.getVideoTracks()[0];
       if (!track) return;
@@ -2779,37 +2770,28 @@ navigator.mediaDevices.getUserMedia(constraints)
       } catch(e) {}
     });
 
-    // Use decodeFromVideoDevice — the correct ZXing browser method
-    // Pass undefined as deviceId so ZXing uses the stream we already set
     codeReader.decodeFromVideoDevice(undefined, "scannerVideo", (result, err) => {
       if (!scannerActive) return;
-
-      // Throttle — skip if too soon since last attempt
       const now = Date.now();
       if (now - lastDecodeTime < DECODE_THROTTLE_MS) return;
       lastDecodeTime = now;
-
       if (result) {
         const code = result.getText().trim().toUpperCase();
-
-        // Flash + vibrate + beep
         const flash = document.getElementById("scannerFlash");
         flash.classList.remove("flash");
         void flash.offsetWidth;
         flash.classList.add("flash");
         navigator.vibrate && navigator.vibrate([80, 40, 80]);
         playScanBeep();
-
         hint.className = "scanner-status success";
         hint.textContent = code;
-
         document.getElementById("serial").value = code;
         showManualEntry();
         setTimeout(() => closeScanner(), 600);
       }
     });
-
-  }).catch(() => {
+  })
+  .catch(() => {
     hint.className = "scanner-status error";
     hint.textContent = "Camera access denied. Check permissions.";
   });
@@ -3070,7 +3052,6 @@ if (c) {
 const code = c.weather_code !== undefined ? c.weather_code : c.weathercode;
 const temp = Math.round(c.temperature_2m);
 const wind = Math.round(c.windspeed_10m);
-console.log(`Weather code: ${code}, Temp: ${temp}F, Wind: ${wind}mph`);
 if (EXTREME_CODES[code]) alerts.push(EXTREME_CODES[code]);
 if (temp <= 20) alerts.push(`Extreme Cold: ${temp}F`);
 if (temp >= 100) alerts.push(`Extreme Heat: ${temp}F`);
