@@ -275,24 +275,33 @@
     background: rgba(0,0,0,0.7);
     clip-path: polygon(
       0% 0%, 100% 0%, 100% 100%, 0% 100%,
-      0% 38%, 4% 38%, 4% 62%, 96% 62%, 96% 38%, 0% 38%
+      0% 33%, 4% 33%, 4% 67%, 96% 67%, 96% 33%, 0% 33%
     );
   }
   /* Left and right end caps on the strip */
   .reticle-corner {
     position: absolute;
-    width: 20px; height: 36px;
+    width: 24px; height: 44px;
     border-color: var(--accent); border-style: solid;
     animation: cornerPulse 1.5s ease-in-out infinite;
   }
-  .reticle-corner.tl { top: 38%; left: 4%; border-width: 3px 0 3px 3px; border-radius: 3px 0 0 3px; }
-  .reticle-corner.tr { top: 38%; right: 4%; border-width: 3px 3px 3px 0; border-radius: 0 3px 3px 0; }
+  .reticle-corner.tl { top: 33%; left: 4%; border-width: 3px 0 3px 3px; border-radius: 3px 0 0 3px; }
+  .reticle-corner.tr { top: 33%; right: 4%; border-width: 3px 3px 3px 0; border-radius: 0 3px 3px 0; }
   .reticle-corner.bl { display: none; }
   .reticle-corner.br { display: none; }
   @keyframes cornerPulse {
     0%, 100% { opacity: 1; border-color: var(--accent); }
     50%       { opacity: 0.6; border-color: #fff; }
   }
+  /* Tip text below the scan zone */
+  .scanner-tip {
+    position: absolute; left: 0; right: 0; top: 70%;
+    text-align: center; color: rgba(255,255,255,0.85);
+    font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    padding: 0 16px; pointer-events: none;
+  }
+
   /* Animated laser line inside the strip */
   .reticle-line {
     position: absolute; left: 4%; right: 4%;
@@ -1292,6 +1301,7 @@
       <div class="reticle-corner bl"></div>
       <div class="reticle-corner br"></div>
       <div class="reticle-line"></div>
+      <div class="scanner-tip">Hold tag horizontal · 6-8 inches away</div>
     </div>
     <div class="scanner-flash" id="scannerFlash"></div>
   </div>
@@ -2838,10 +2848,6 @@ function openScanner() {
 
   try {
     const hints = new Map();
-    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
-      ZXing.BarcodeFormat.CODE_39,
-      ZXing.BarcodeFormat.CODE_128
-    ]);
     hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
     codeReader = new ZXing.BrowserMultiFormatReader(hints);
     scannerActive = true;
@@ -2862,10 +2868,6 @@ function openScanner() {
         if (video.srcObject && !activeStream) {
           activeStream = video.srcObject;
         }
-
-        const now = Date.now();
-        if (now - lastDecodeTime < DECODE_THROTTLE_MS) return;
-        lastDecodeTime = now;
 
         if (result) {
           const code = result.getText().trim().toUpperCase();
