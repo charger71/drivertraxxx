@@ -281,12 +281,12 @@
   /* Left and right end caps on the strip */
   .reticle-corner {
     position: absolute;
-    width: 24px; height: 44px;
+    width: 24px;
     border-color: var(--accent); border-style: solid;
     animation: cornerPulse 1.5s ease-in-out infinite;
   }
-  .reticle-corner.tl { top: 33%; left: 4%; border-width: 3px 0 3px 3px; border-radius: 3px 0 0 3px; }
-  .reticle-corner.tr { top: 33%; right: 4%; border-width: 3px 3px 3px 0; border-radius: 0 3px 3px 0; }
+  .reticle-corner.tl { top: 33%; bottom: 33%; left: 4%; border-width: 3px 0 3px 3px; border-radius: 3px 0 0 3px; }
+  .reticle-corner.tr { top: 33%; bottom: 33%; right: 4%; border-width: 3px 3px 3px 0; border-radius: 0 3px 3px 0; }
   .reticle-corner.bl { display: none; }
   .reticle-corner.br { display: none; }
   @keyframes cornerPulse {
