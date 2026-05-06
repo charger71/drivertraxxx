@@ -150,6 +150,37 @@
   .filter-label { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
   .results-count { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
 
+  /* PAGINATION */
+  .pagination {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin: 20px 0 8px; padding: 14px 4px;
+    border-top: 1px solid var(--border);
+  }
+  .page-numbers {
+    display: flex; gap: 4px; align-items: center; flex-wrap: wrap;
+    justify-content: center; flex: 1;
+  }
+  .page-btn {
+    min-width: 36px; height: 36px; padding: 0 10px;
+    background: var(--card); color: var(--text2);
+    border: 1px solid var(--border); border-radius: 6px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+  }
+  .page-btn:active { background: var(--card2); }
+  .page-btn.active {
+    background: var(--accent); color: #000; border-color: var(--accent); font-weight: 800;
+  }
+  .page-btn.page-nav {
+    padding: 0 12px; font-size: 12px; white-space: nowrap;
+  }
+  .page-btn:disabled {
+    opacity: 0.35; cursor: not-allowed;
+  }
+  .page-ellipsis {
+    color: var(--muted); padding: 0 4px; font-size: 13px;
+  }
+
   /* DASHBOARD */
   .dash-section { margin-bottom: 24px; }
   .dash-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
@@ -1079,8 +1110,8 @@
   <div class="filter-bar">
     <div class="filter-row">
       <input type="text" id="fSearch" placeholder="Search serial..."
-        oninput="this.value=this.value.toUpperCase(); renderRecords()">
-      <select id="fStatus" onchange="renderRecords()">
+        oninput="this.value=this.value.toUpperCase(); resetRecordsPage(); renderRecords()">
+      <select id="fStatus" onchange="resetRecordsPage(); renderRecords()">
         <option value="">All Statuses</option>
         <option>CLEAN</option><option>DIRTY</option>
         <option>REWASH</option><option>TOP OFF FLUID</option>
@@ -1089,20 +1120,20 @@
       </select>
     </div>
     <div class="filter-row">
-      <select id="fNoTag" onchange="renderRecords()">
+      <select id="fNoTag" onchange="resetRecordsPage(); renderRecords()">
         <option value="">All Records</option>
         <option value="yes">No Tag Only</option>
         <option value="no">Has Tag Only</option>
       </select>
-      <select id="fDest" onchange="renderRecords()">
+      <select id="fDest" onchange="resetRecordsPage(); renderRecords()">
         <option value="">All Destinations</option>
         <option>GARAGE</option><option>QTA</option><option>BACKLOT</option>
         <option>ATLANTIC</option><option>BRANCH</option><option>OTHER</option>
       </select>
     </div>
     <div class="filter-row">
-      <input type="date" id="fDateFrom" onchange="renderRecords()">
-      <input type="date" id="fDateTo" onchange="renderRecords()">
+      <input type="date" id="fDateFrom" onchange="resetRecordsPage(); renderRecords()">
+      <input type="date" id="fDateTo" onchange="resetRecordsPage(); renderRecords()">
     </div>
     <button class="btn btn-secondary" style="margin-top:6px" onclick="clearFilters()">Clear Filters</button>
     <button class="btn btn-primary" style="margin-top:4px" onclick="exportCSV()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> EXPORT CSV</button>
@@ -1586,6 +1617,7 @@ function clearFilters() {
   ["fSearch","fDateFrom","fDateTo"].forEach(id => document.getElementById(id).value = "");
   ["fStatus","fNoTag","fDest"].forEach(id => document.getElementById(id).selectedIndex = 0);
   document.getElementById("recordsHeading").textContent = "Filter Records";
+  resetRecordsPage();
   renderRecords();
 }
 
@@ -1597,6 +1629,7 @@ function viewByDate(dateStr) {
   document.getElementById("fNoTag").selectedIndex = 0;
   document.getElementById("fDest").selectedIndex = 0;
   document.getElementById("recordsHeading").textContent = "Entries for " + dateStr;
+  resetRecordsPage();
   showTab("records");
 }
 
@@ -1608,6 +1641,7 @@ function viewByWeek(fromStr, toStr, label) {
   document.getElementById("fNoTag").selectedIndex = 0;
   document.getElementById("fDest").selectedIndex = 0;
   document.getElementById("recordsHeading").textContent = label;
+  resetRecordsPage();
   showTab("records");
 }
 
@@ -1965,17 +1999,88 @@ function deleteRecord(id) {
 // ============================
 // RENDER RECORDS TAB
 // ============================
+// ============================
+// RECORDS PAGINATION
+// ============================
+const RECORDS_PER_PAGE = 50;
+let recordsCurrentPage = 1;
+
+function changeRecordsPage(page) {
+  recordsCurrentPage = page;
+  renderRecords();
+  // Scroll back up to the records list
+  const el = document.getElementById("recordsHeading");
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function resetRecordsPage() {
+  recordsCurrentPage = 1;
+}
+
 function renderRecords() {
   const records = getFiltered();
-  document.getElementById("resultsCount").textContent =
-    records.length + " record" + (records.length !== 1 ? "s" : "") + " found";
-  if (records.length === 0) {
+  const total = records.length;
+  const totalPages = Math.max(1, Math.ceil(total / RECORDS_PER_PAGE));
+
+  // Clamp current page if filters reduced the total
+  if (recordsCurrentPage > totalPages) recordsCurrentPage = totalPages;
+  if (recordsCurrentPage < 1) recordsCurrentPage = 1;
+
+  const startIdx = (recordsCurrentPage - 1) * RECORDS_PER_PAGE;
+  const endIdx = Math.min(startIdx + RECORDS_PER_PAGE, total);
+  const pageRecords = records.slice(startIdx, endIdx);
+
+  // Update the results count to reflect pagination
+  const countEl = document.getElementById("resultsCount");
+  if (total === 0) {
+    countEl.textContent = "0 records found";
+  } else if (total <= RECORDS_PER_PAGE) {
+    countEl.textContent = total + " record" + (total !== 1 ? "s" : "") + " found";
+  } else {
+    countEl.textContent = `Showing ${startIdx + 1}-${endIdx} of ${total} records`;
+  }
+
+  if (total === 0) {
     document.getElementById("records").innerHTML =
       '<p style="color:var(--muted);text-align:center;padding:24px">No records match your filters.</p>';
   } else {
-    document.getElementById("records").innerHTML = records.map(r => recordCard(r, "deleteRecord")).join("");
+    let html = pageRecords.map(r => recordCard(r, "deleteRecord")).join("");
+    // Append pagination controls if needed
+    if (totalPages > 1) {
+      html += renderPaginationControls(recordsCurrentPage, totalPages);
+    }
+    document.getElementById("records").innerHTML = html;
   }
   renderRecordsMap(); // refresh map if open
+}
+
+function renderPaginationControls(current, total) {
+  const prevDisabled = current <= 1;
+  const nextDisabled = current >= total;
+
+  // Build numbered page buttons (max 5 visible: current ± 2)
+  let pageButtons = "";
+  const start = Math.max(1, current - 2);
+  const end = Math.min(total, current + 2);
+
+  if (start > 1) {
+    pageButtons += `<button class="page-btn" onclick="changeRecordsPage(1)">1</button>`;
+    if (start > 2) pageButtons += `<span class="page-ellipsis">...</span>`;
+  }
+  for (let i = start; i <= end; i++) {
+    pageButtons += `<button class="page-btn ${i === current ? 'active' : ''}" onclick="changeRecordsPage(${i})">${i}</button>`;
+  }
+  if (end < total) {
+    if (end < total - 1) pageButtons += `<span class="page-ellipsis">...</span>`;
+    pageButtons += `<button class="page-btn" onclick="changeRecordsPage(${total})">${total}</button>`;
+  }
+
+  return `
+    <div class="pagination">
+      <button class="page-btn page-nav" ${prevDisabled ? 'disabled' : ''} onclick="changeRecordsPage(${current - 1})">&#8592; Prev</button>
+      <div class="page-numbers">${pageButtons}</div>
+      <button class="page-btn page-nav" ${nextDisabled ? 'disabled' : ''} onclick="changeRecordsPage(${current + 1})">Next &#8594;</button>
+    </div>`;
 }
 
 // ============================
