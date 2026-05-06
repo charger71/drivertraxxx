@@ -148,7 +148,10 @@
   .filter-row { display: flex; gap: 8px; margin-bottom: 8px; }
   .filter-row input, .filter-row select { margin: 0; font-size: 13px; padding: 9px 10px; text-transform: none; flex: 1; }
   .filter-label { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-  .results-count { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .results-count {
+    font-size: 15px; font-weight: 700; color: var(--accent);
+    text-align: center; margin-bottom: 14px; letter-spacing: 0.3px;
+  }
 
   /* PAGINATION */
   .pagination {
@@ -2002,7 +2005,7 @@ function deleteRecord(id) {
 // ============================
 // RECORDS PAGINATION
 // ============================
-const RECORDS_PER_PAGE = 50;
+const RECORDS_PER_PAGE = 25;
 let recordsCurrentPage = 1;
 
 function changeRecordsPage(page) {
