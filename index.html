@@ -3034,11 +3034,6 @@ function openScanner() {
 
   try {
     const hints = new Map();
-    // Restrict to 1D linear barcode formats only - explicitly excludes QR codes
-    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
-      ZXing.BarcodeFormat.CODE_39,
-      ZXing.BarcodeFormat.CODE_128
-    ]);
     hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
     codeReader = new ZXing.BrowserMultiFormatReader(hints);
     scannerActive = true;
@@ -3061,6 +3056,15 @@ function openScanner() {
         }
 
         if (result) {
+          // Reject QR codes and other 2D formats - only accept linear barcodes
+          const fmt = result.getBarcodeFormat();
+          if (fmt === ZXing.BarcodeFormat.QR_CODE ||
+              fmt === ZXing.BarcodeFormat.DATA_MATRIX ||
+              fmt === ZXing.BarcodeFormat.AZTEC ||
+              fmt === ZXing.BarcodeFormat.PDF_417) {
+            return;
+          }
+
           const code = result.getText().trim().toUpperCase();
           const flash = document.getElementById("scannerFlash");
           flash.classList.remove("flash");
