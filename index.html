@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
 
 <style>
-  :root {
+:root {
     --bg: #1a1d21;
     --card: #22262b;
     --card2: #2a2f36;
@@ -127,10 +127,13 @@
   .badge-transport { background: #2a1f08; color: #f0b04a; border: 1px solid #f0b04a; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
   .status-CLEAN { background: #0d2e1a; color: #34c76a; }
   .status-DIRTY { background: #2d1515; color: #e87070; }
+  .status-REWASH { background: #0a1e1e; color: #3dcfcf; }
+  .status-TOPOFFFLUID { background: #0d1e36; color: #6aadff; }
   .status-PM { background: #0d1e36; color: #6aadff; }
   .status-MK { background: #2a1f08; color: #f0b04a; }
   .status-MR { background: #2a1f08; color: #f0b04a; }
-  .status-AUDIT { background: #1e0d2e; color: #b87be8; }
+  .status-OM { background: #1e0d2e; color: #b87be8; }
+  .status-AUDITFAIL { background: #2d1515; color: #e85550; border: 1px solid #e85550; }
   .status-OTHER { background: var(--card2); color: var(--muted); }
   .status-GLASS { background: #0a1e1e; color: #3dcfcf; }
   .status-TI { background: #2d1515; color: #e85550; border: 1px solid #e85550; }
@@ -731,7 +734,7 @@
     </a>
   </nav>
   <div class="menu-footer">
-    <div class="menu-version">DriverTraxxx v1.0</div>
+    <div class="menu-version">DriverTraxxx v2.0</div>
     <div class="menu-sync-status" id="menuSyncStatus"></div>
   </div>
 </div>
@@ -1013,10 +1016,13 @@
         <option value="">-- SELECT STATUS --</option>
         <option>CLEAN</option>
         <option>DIRTY</option>
+        <option>REWASH</option>
+        <option>TOP OFF FLUID</option>
         <option>PM</option>
         <option>MK</option>
         <option>MR</option>
-        <option>AUDIT</option>
+        <option>OM</option>
+        <option>AUDIT FAIL</option>
         <option>WI/DELETE</option>
         <option>GLASS</option>
         <option>TI</option>
@@ -1077,8 +1083,9 @@
       <select id="fStatus" onchange="renderRecords()">
         <option value="">All Statuses</option>
         <option>CLEAN</option><option>DIRTY</option>
-        <option>PM</option><option>MK</option><option>MR</option>
-        <option>AUDIT</option><option>WI/DELETE</option><option>GLASS</option><option>TI</option><option>OTHER</option>
+        <option>REWASH</option><option>TOP OFF FLUID</option>
+        <option>PM</option><option>MK</option><option>MR</option><option>OM</option>
+        <option>AUDIT FAIL</option><option>WI/DELETE</option><option>GLASS</option><option>TI</option><option>OTHER</option>
       </select>
     </div>
     <div class="filter-row">
@@ -1315,7 +1322,111 @@
     </div>
   </div>
 </div>
+
 <script>
+// ============================================================
+// DRIVERTRAXXX v2.0
+// Single-file PWA for rental car lot operations
+// ============================================================
+
+const APP_VERSION = "2.0";
+const SCHEMA_VERSION = 2;
+const SCHEMA_KEY = "drivertraxxx_schema_version";
+
+// ============================
+// SCHEMA MIGRATION
+// ============================
+function migrateSchema() {
+  const stored = parseInt(localStorage.getItem(SCHEMA_KEY) || "1");
+  if (stored === SCHEMA_VERSION) return;
+
+  try {
+    const records = JSON.parse(localStorage.getItem("drivertraxxx_records") || "[]");
+
+    if (stored < 2) {
+      // v1 -> v2: ensure every record has version field, default missing fields
+      records.forEach(r => {
+        if (!r.version) r.version = 2;
+        if (r.transport === undefined) r.transport = false;
+        if (r.tires === undefined) r.tires = [];
+      });
+      localStorage.setItem("drivertraxxx_records", JSON.stringify(records));
+    }
+
+    localStorage.setItem(SCHEMA_KEY, SCHEMA_VERSION.toString());
+    console.log(`Migrated schema from v${stored} to v${SCHEMA_VERSION}`);
+  } catch(e) {
+    console.error("Migration failed:", e);
+  }
+}
+migrateSchema();
+
+// ============================
+// GLOBAL ERROR HANDLER
+// ============================
+window.addEventListener("error", e => {
+  console.error("Uncaught error:", e.message, "at", e.filename + ":" + e.lineno);
+});
+window.addEventListener("unhandledrejection", e => {
+  console.warn("Unhandled promise rejection:", e.reason);
+});
+
+// ============================
+// MAP HELPER (Leaflet wrapper)
+// ============================
+function createMap(elementId, options = {}) {
+  if (!window.L) return null;
+  const el = document.getElementById(elementId);
+  if (!el) return null;
+
+  // Destroy existing map if present
+  if (el._leaflet_map) {
+    try { el._leaflet_map.remove(); } catch(e) {}
+    el._leaflet_map = null;
+    el.innerHTML = "";
+  }
+
+  const map = L.map(el, {
+    zoomControl: options.zoomControl !== false,
+    attributionControl: false
+  });
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
+
+  el._leaflet_map = map;
+  return map;
+}
+
+function destroyMap(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el || !el._leaflet_map) return;
+  try { el._leaflet_map.remove(); } catch(e) {}
+  el._leaflet_map = null;
+  el.innerHTML = "";
+}
+
+function createNumberedMarker(num, color, size = 26) {
+  if (!window.L) return null;
+  return L.divIcon({
+    className: "",
+    html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:#${color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.4)}px;font-weight:800;font-family:Arial,sans-serif;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.4);cursor:pointer;">${num}</div>`,
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2],
+    popupAnchor: [0, -(size/2)]
+  });
+}
+
+function recordPopupHTML(r) {
+  const time = new Date(r.timestamp).toLocaleTimeString("en-US", {
+    hour: "2-digit", minute: "2-digit", timeZone: "America/New_York"
+  });
+  return `
+    <div style="font-family:Arial,sans-serif;min-width:140px">
+      <div style="font-weight:800;font-size:14px;margin-bottom:4px">${sanitizeText(r.serialId)}</div>
+      <div style="font-size:12px;color:#555;margin-bottom:6px">${sanitizeText(r.status)}${r.destination ? " &middot; " + sanitizeText(r.destination) : ""}</div>
+      <div style="font-size:11px;color:#888;margin-bottom:8px">${time}</div>
+      <button onclick="openDetail('${r.id}', 'deleteRecord')" style="background:#00a651;color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;width:100%">View Record</button>
+    </div>`;
+}
 
 const DB_KEY = "drivertraxxx_records";
 function getRecords() { return JSON.parse(localStorage.getItem(DB_KEY) || "[]"); }
@@ -1944,20 +2055,11 @@ function openDetail(id, onDelete) {
       mapDiv.style.display = "block";
       // Small delay to ensure element is visible before Leaflet init
       setTimeout(() => {
-        if (mapDiv._leaflet_map) {
-          mapDiv._leaflet_map.remove();
-          mapDiv._leaflet_map = null;
-        }
-        mapDiv.innerHTML = "";
-        const m = L.map(mapDiv, { zoomControl: true, attributionControl: false });
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(m);
+        const m = createMap("detailMapFrame");
+        if (!m) return;
         m.setView([r.lat, r.lng], 17);
         const color = statusMapColor(r.status);
-        const icon = L.divIcon({
-          className: "",
-          html: `<div style="width:32px;height:32px;border-radius:50%;background:#${color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;font-family:Arial,sans-serif;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.5);">P</div>`,
-          iconSize: [32, 32], iconAnchor: [16, 16]
-        });
+        const icon = createNumberedMarker("P", color, 32);
         L.marker([r.lat, r.lng], { icon }).addTo(m);
         mapDiv._leaflet_map = m;
       }, 80);
@@ -2417,8 +2519,8 @@ function renderRecordsMap() {
 
   setTimeout(() => {
     if (!recordsLeafletMap) {
-      recordsLeafletMap = L.map('recordsMap', { zoomControl: true, attributionControl: false });
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(recordsLeafletMap);
+      recordsLeafletMap = createMap('recordsMap');
+      if (!recordsLeafletMap) return;
     } else {
       recordsMapMarkers.forEach(m => recordsLeafletMap.removeLayer(m));
       recordsMapMarkers = [];
@@ -2429,17 +2531,7 @@ function renderRecordsMap() {
 
     records.forEach((r, i) => {
       const color = statusMapColor(r.status);
-      const icon = L.divIcon({
-        className: '',
-        html: `<div style="
-          width:26px;height:26px;border-radius:50%;
-          background:#${color};color:#fff;
-          display:flex;align-items:center;justify-content:center;
-          font-size:11px;font-weight:800;font-family:Arial,sans-serif;
-          border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.4);
-          cursor:pointer;">${i+1}</div>`,
-        iconSize: [26, 26], iconAnchor: [13, 13], popupAnchor: [0, -14]
-      });
+      const icon = createNumberedMarker(i+1, color, 26);
       const time = new Date(r.timestamp).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', timeZone:'America/New_York' });
       const marker = L.marker([r.lat, r.lng], { icon })
         .addTo(recordsLeafletMap)
@@ -2473,14 +2565,7 @@ let leafletMarkers = [];
 
 function initLeafletMap() {
   if (leafletMap) return;
-  const el = document.getElementById("shiftMap");
-  if (!el) return;
-  el.style.display = "block";
-  leafletMap = L.map("shiftMap", { zoomControl: true, attributionControl: false });
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19
-  }).addTo(leafletMap);
-  L.control.attribution({ prefix: false }).addTo(leafletMap);
+  leafletMap = createMap("shiftMap");
 }
 
 function clearLeafletMarkers() {
@@ -2544,21 +2629,7 @@ function renderShiftMap(shiftIndex) {
     const num = i + 1;
 
     // Custom numbered SVG marker
-    const icon = L.divIcon({
-      className: "",
-      html: `<div style="
-        width:28px;height:28px;border-radius:50%;
-        background:#${color};color:#fff;
-        display:flex;align-items:center;justify-content:center;
-        font-size:12px;font-weight:800;font-family:Arial,sans-serif;
-        border:2px solid #fff;
-        box-shadow:0 2px 6px rgba(0,0,0,0.4);
-        cursor:pointer;
-      ">${num}</div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14],
-      popupAnchor: [0, -16]
-    });
+    const icon = createNumberedMarker(num, color, 28);
 
     const time = new Date(r.timestamp).toLocaleTimeString("en-US", {
       hour:"2-digit", minute:"2-digit", timeZone:"America/New_York"
@@ -2615,8 +2686,10 @@ function renderShiftMap(shiftIndex) {
 
 function statusMapColor(status) {
   const map = {
-    "CLEAN":"00a651","DIRTY":"e85550","PM":"4d9bff","MK":"f0b04a",
-    "MR":"e85550","AUDIT":"9b6aff","TI":"e85550","GLASS":"4d9bff",
+    "CLEAN":"00a651","DIRTY":"e85550",
+    "REWASH":"3dcfcf","TOP OFF FLUID":"6aadff",
+    "PM":"4d9bff","MK":"f0b04a","MR":"e85550","OM":"b87be8",
+    "AUDIT FAIL":"e85550","TI":"e85550","GLASS":"4d9bff",
     "OTHER":"888888","WI/DELETE":"e85550"
   };
   return map[status] || "888888";
@@ -2834,6 +2907,11 @@ function openScanner() {
   const hint = document.getElementById("scannerHint");
   const dotSvg = '<span class="scanner-dot"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" style="vertical-align:middle;display:inline-block"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg></span>';
   overlay.classList.add("open");
+
+  // Lock to portrait orientation while scanning
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock("portrait").catch(() => {});
+  }
   hint.className = "scanner-status scanning";
   hint.innerHTML = dotSvg + " Starting camera...";
   torchOn = false;
@@ -2848,6 +2926,11 @@ function openScanner() {
 
   try {
     const hints = new Map();
+    // Restrict to 1D linear barcode formats only - explicitly excludes QR codes
+    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+      ZXing.BarcodeFormat.CODE_39,
+      ZXing.BarcodeFormat.CODE_128
+    ]);
     hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
     codeReader = new ZXing.BrowserMultiFormatReader(hints);
     scannerActive = true;
@@ -2898,6 +2981,11 @@ function openScanner() {
 
 function closeScanner() {
   scannerActive = false;
+
+  // Unlock orientation
+  if (screen.orientation && screen.orientation.unlock) {
+    try { screen.orientation.unlock(); } catch(e) {}
+  }
   if (codeReader) {
     try { codeReader.reset(); } catch(e) {}
     codeReader = null;
@@ -3178,7 +3266,6 @@ setInterval(runBackup, BACKUP_INTERVAL_MS);
 updateBackupStatus();
 applyProfile();
 renderTodayEntries();
-
 </script>
 </body>
 </html>
