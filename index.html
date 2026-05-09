@@ -9,9 +9,10 @@
 <title>DriverTraxxx</title>
 <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
+<link rel="manifest" href="manifest.json">
 
 <style>
-  :root {
+:root {
     --bg: #1a1d21;
     --card: #22262b;
     --card2: #2a2f36;
@@ -60,6 +61,97 @@
     outline: none; border-color: var(--accent);
   }
   textarea { text-transform: none; height: 80px; resize: vertical; }
+
+  /* Input with clear button (X) */
+  .input-with-clear { position: relative; }
+  .input-with-clear input[type=text] { padding-right: 64px; cursor: pointer; }
+  .input-clear-btn {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    width: 56px; height: 32px; border-radius: 6px;
+    background: var(--card2); color: var(--text2);
+    border: none; cursor: pointer; display: none;
+    align-items: center; justify-content: center;
+    font-size: 20px; line-height: 1; padding: 0;
+    transition: background 0.15s, color 0.15s;
+  }
+  .input-clear-btn:active { background: var(--danger); color: #fff; }
+
+  .vin-charcount {
+    font-size: 11px; color: var(--muted); margin-top: 6px; text-align: right;
+    font-weight: 600; letter-spacing: 0.5px;
+  }
+  .vin-charcount.valid { color: var(--accent); }
+
+  /* VIN KEYPAD */
+  .vin-keypad-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    z-index: 2000; display: none;
+    align-items: flex-end; justify-content: center;
+  }
+  .vin-keypad-overlay.open { display: flex; }
+  .vin-keypad {
+    background: #13161a; width: 100%; max-width: 600px;
+    border-radius: 18px 18px 0 0;
+    padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+    animation: vinKeypadSlide 0.2s ease-out;
+  }
+  @keyframes vinKeypadSlide {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .vin-keypad-header {
+    background: var(--card); padding: 12px 14px;
+    border-radius: 8px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .vin-keypad-display {
+    flex: 1; font-family: 'Courier New', monospace;
+    font-size: 18px; font-weight: 700; color: var(--accent);
+    letter-spacing: 2px; min-height: 22px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .vin-keypad-count {
+    font-size: 12px; font-weight: 700; color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+  .vin-keypad-count.valid { color: var(--accent); }
+  .vin-keypad-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+  .vin-key {
+    color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: 26px; font-weight: 800; font-family: 'Courier New', monospace;
+    height: 56px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.1s, transform 0.05s;
+    user-select: none; -webkit-user-select: none;
+  }
+  .vin-key.vin-key-num {
+    background: #1a2a3a;
+    color: #6aadff;
+  }
+  .vin-key.vin-key-alpha {
+    background: var(--card2);
+    color: var(--text);
+  }
+  .vin-key:active {
+    background: var(--accent) !important;
+    color: #000 !important;
+    transform: scale(0.95);
+  }
+  .vin-key.vin-key-back {
+    background: #2d1515; color: #e87070;
+    font-size: 24px;
+  }
+  .vin-key.vin-key-back:active { background: var(--danger) !important; color: #fff !important; }
+  .vin-key.vin-key-done {
+    background: var(--accent); color: #000;
+    font-size: 14px; letter-spacing: 1px;
+  }
+  .vin-key.vin-key-done:active { background: var(--accent-dark) !important; }
 
   .notag-row {
     display: flex; align-items: center; gap: 14px;
@@ -127,10 +219,13 @@
   .badge-transport { background: #2a1f08; color: #f0b04a; border: 1px solid #f0b04a; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
   .status-CLEAN { background: #0d2e1a; color: #34c76a; }
   .status-DIRTY { background: #2d1515; color: #e87070; }
+  .status-REWASH { background: #0a1e1e; color: #3dcfcf; }
+  .status-TOPOFFFLUID { background: #0d1e36; color: #6aadff; }
   .status-PM { background: #0d1e36; color: #6aadff; }
   .status-MK { background: #2a1f08; color: #f0b04a; }
   .status-MR { background: #2a1f08; color: #f0b04a; }
-  .status-AUDIT { background: #1e0d2e; color: #b87be8; }
+  .status-OM { background: #1e0d2e; color: #b87be8; }
+  .status-AUDITFAIL { background: #2d1515; color: #e85550; border: 1px solid #e85550; }
   .status-OTHER { background: var(--card2); color: var(--muted); }
   .status-GLASS { background: #0a1e1e; color: #3dcfcf; }
   .status-TI { background: #2d1515; color: #e85550; border: 1px solid #e85550; }
@@ -145,7 +240,41 @@
   .filter-row { display: flex; gap: 8px; margin-bottom: 8px; }
   .filter-row input, .filter-row select { margin: 0; font-size: 13px; padding: 9px 10px; text-transform: none; flex: 1; }
   .filter-label { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-  .results-count { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .results-count {
+    font-size: 15px; font-weight: 700; color: var(--accent);
+    text-align: center; margin-bottom: 14px; letter-spacing: 0.3px;
+  }
+
+  /* PAGINATION */
+  .pagination {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin: 20px 0 8px; padding: 14px 4px;
+    border-top: 1px solid var(--border);
+  }
+  .page-numbers {
+    display: flex; gap: 4px; align-items: center; flex-wrap: wrap;
+    justify-content: center; flex: 1;
+  }
+  .page-btn {
+    min-width: 36px; height: 36px; padding: 0 10px;
+    background: var(--card); color: var(--text2);
+    border: 1px solid var(--border); border-radius: 6px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+  }
+  .page-btn:active { background: var(--card2); }
+  .page-btn.active {
+    background: var(--accent); color: #000; border-color: var(--accent); font-weight: 800;
+  }
+  .page-btn.page-nav {
+    padding: 0 12px; font-size: 12px; white-space: nowrap;
+  }
+  .page-btn:disabled {
+    opacity: 0.35; cursor: not-allowed;
+  }
+  .page-ellipsis {
+    color: var(--muted); padding: 0 4px; font-size: 13px;
+  }
 
   /* DASHBOARD */
   .dash-section { margin-bottom: 24px; }
@@ -731,7 +860,7 @@
     </a>
   </nav>
   <div class="menu-footer">
-    <div class="menu-version">DriverTraxxx v1.0</div>
+    <div class="menu-version">DriverTraxxx v2.1</div>
     <div class="menu-sync-status" id="menuSyncStatus"></div>
   </div>
 </div>
@@ -975,8 +1104,27 @@
 
   <div id="manualEntrySection" style="display:none">
     <div class="field-label">Serial ID</div>
-    <input type="text" id="serial" placeholder="Type Serial ID" autocomplete="off"
-      oninput="this.value = this.value.toUpperCase()">
+    <div class="input-with-clear">
+      <input type="text" id="serial" placeholder="Type Serial ID"
+        autocomplete="off" autocorrect="off" spellcheck="false"
+        readonly
+        onfocus="openVinKeypad()"
+        onclick="openVinKeypad()">
+      <button type="button" class="input-clear-btn" id="serialClearBtn"
+        onclick="clearSerial()" aria-label="Clear">&times;</button>
+    </div>
+    <div class="vin-charcount" id="vinCharCount">0 / 17</div>
+  </div>
+
+  <!-- VIN KEYPAD -->
+  <div id="vinKeypadOverlay" class="vin-keypad-overlay" onclick="closeVinKeypad(event)">
+    <div class="vin-keypad" onclick="event.stopPropagation()">
+      <div class="vin-keypad-header">
+        <div class="vin-keypad-display" id="vinKeypadDisplay"></div>
+        <div class="vin-keypad-count" id="vinKeypadCount">0 / 17</div>
+      </div>
+      <div class="vin-keypad-grid" id="vinKeypadGrid"></div>
+    </div>
   </div>
 
   <!-- TIRE SELECTOR - shown when TI is selected -->
@@ -1013,10 +1161,13 @@
         <option value="">-- SELECT STATUS --</option>
         <option>CLEAN</option>
         <option>DIRTY</option>
+        <option>REWASH</option>
+        <option>TOP OFF FLUID</option>
         <option>PM</option>
         <option>MK</option>
         <option>MR</option>
-        <option>AUDIT</option>
+        <option>OM</option>
+        <option>AUDIT FAIL</option>
         <option>WI/DELETE</option>
         <option>GLASS</option>
         <option>TI</option>
@@ -1073,29 +1224,30 @@
   <div class="filter-bar">
     <div class="filter-row">
       <input type="text" id="fSearch" placeholder="Search serial..."
-        oninput="this.value=this.value.toUpperCase(); renderRecords()">
-      <select id="fStatus" onchange="renderRecords()">
+        oninput="this.value=this.value.toUpperCase(); debouncedSearchUpdate()">
+      <select id="fStatus" onchange="resetRecordsPage(); renderRecords()">
         <option value="">All Statuses</option>
         <option>CLEAN</option><option>DIRTY</option>
-        <option>PM</option><option>MK</option><option>MR</option>
-        <option>AUDIT</option><option>WI/DELETE</option><option>GLASS</option><option>TI</option><option>OTHER</option>
+        <option>REWASH</option><option>TOP OFF FLUID</option>
+        <option>PM</option><option>MK</option><option>MR</option><option>OM</option>
+        <option>AUDIT FAIL</option><option>WI/DELETE</option><option>GLASS</option><option>TI</option><option>OTHER</option>
       </select>
     </div>
     <div class="filter-row">
-      <select id="fNoTag" onchange="renderRecords()">
+      <select id="fNoTag" onchange="resetRecordsPage(); renderRecords()">
         <option value="">All Records</option>
         <option value="yes">No Tag Only</option>
         <option value="no">Has Tag Only</option>
       </select>
-      <select id="fDest" onchange="renderRecords()">
+      <select id="fDest" onchange="resetRecordsPage(); renderRecords()">
         <option value="">All Destinations</option>
         <option>GARAGE</option><option>QTA</option><option>BACKLOT</option>
         <option>ATLANTIC</option><option>BRANCH</option><option>OTHER</option>
       </select>
     </div>
     <div class="filter-row">
-      <input type="date" id="fDateFrom" onchange="renderRecords()">
-      <input type="date" id="fDateTo" onchange="renderRecords()">
+      <input type="date" id="fDateFrom" onchange="resetRecordsPage(); renderRecords()">
+      <input type="date" id="fDateTo" onchange="resetRecordsPage(); renderRecords()">
     </div>
     <button class="btn btn-secondary" style="margin-top:6px" onclick="clearFilters()">Clear Filters</button>
     <button class="btn btn-primary" style="margin-top:4px" onclick="exportCSV()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> EXPORT CSV</button>
@@ -1315,11 +1467,141 @@
     </div>
   </div>
 </div>
+
 <script>
+// ============================================================
+// DRIVERTRAXXX v2.0
+// Single-file PWA for rental car lot operations
+// ============================================================
+
+const APP_VERSION = "2.1";
+const SCHEMA_VERSION = 2;
+const SCHEMA_KEY = "drivertraxxx_schema_version";
+
+// ============================
+// SERVICE WORKER REGISTRATION
+// ============================
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js")
+      .then((reg) => {
+        console.log("Service worker registered:", reg.scope);
+      })
+      .catch((err) => {
+        console.warn("Service worker registration failed:", err);
+      });
+  });
+}
+
+// ============================
+// SCHEMA MIGRATION
+// ============================
+function migrateSchema() {
+  const stored = parseInt(localStorage.getItem(SCHEMA_KEY) || "1");
+  if (stored === SCHEMA_VERSION) return;
+
+  try {
+    const records = JSON.parse(localStorage.getItem("drivertraxxx_records") || "[]");
+
+    if (stored < 2) {
+      // v1 -> v2: ensure every record has version field, default missing fields
+      records.forEach(r => {
+        if (!r.version) r.version = 2;
+        if (r.transport === undefined) r.transport = false;
+        if (r.tires === undefined) r.tires = [];
+      });
+      localStorage.setItem("drivertraxxx_records", JSON.stringify(records));
+    }
+
+    localStorage.setItem(SCHEMA_KEY, SCHEMA_VERSION.toString());
+    console.log(`Migrated schema from v${stored} to v${SCHEMA_VERSION}`);
+  } catch(e) {
+    console.error("Migration failed:", e);
+  }
+}
+migrateSchema();
+
+// ============================
+// GLOBAL ERROR HANDLER
+// ============================
+window.addEventListener("error", e => {
+  console.error("Uncaught error:", e.message, "at", e.filename + ":" + e.lineno);
+});
+window.addEventListener("unhandledrejection", e => {
+  console.warn("Unhandled promise rejection:", e.reason);
+});
+
+// ============================
+// MAP HELPER (Leaflet wrapper)
+// ============================
+function createMap(elementId, options = {}) {
+  if (!window.L) return null;
+  const el = document.getElementById(elementId);
+  if (!el) return null;
+
+  // Destroy existing map if present
+  if (el._leaflet_map) {
+    try { el._leaflet_map.remove(); } catch(e) {}
+    el._leaflet_map = null;
+    el.innerHTML = "";
+  }
+
+  const map = L.map(el, {
+    zoomControl: options.zoomControl !== false,
+    attributionControl: false
+  });
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
+
+  el._leaflet_map = map;
+  return map;
+}
+
+function destroyMap(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el || !el._leaflet_map) return;
+  try { el._leaflet_map.remove(); } catch(e) {}
+  el._leaflet_map = null;
+  el.innerHTML = "";
+}
+
+function createNumberedMarker(num, color, size = 26) {
+  if (!window.L) return null;
+  return L.divIcon({
+    className: "",
+    html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:#${color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.4)}px;font-weight:800;font-family:Arial,sans-serif;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.4);cursor:pointer;">${num}</div>`,
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2],
+    popupAnchor: [0, -(size/2)]
+  });
+}
+
+function recordPopupHTML(r) {
+  const time = new Date(r.timestamp).toLocaleTimeString("en-US", {
+    hour: "2-digit", minute: "2-digit", timeZone: "America/New_York"
+  });
+  return `
+    <div style="font-family:Arial,sans-serif;min-width:140px">
+      <div style="font-weight:800;font-size:14px;margin-bottom:4px">${sanitizeText(r.serialId)}</div>
+      <div style="font-size:12px;color:#555;margin-bottom:6px">${sanitizeText(r.status)}${r.destination ? " &middot; " + sanitizeText(r.destination) : ""}</div>
+      <div style="font-size:11px;color:#888;margin-bottom:8px">${time}</div>
+      <button onclick="openDetail('${r.id}', 'deleteRecord')" style="background:#00a651;color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;width:100%">View Record</button>
+    </div>`;
+}
 
 const DB_KEY = "drivertraxxx_records";
-function getRecords() { return JSON.parse(localStorage.getItem(DB_KEY) || "[]"); }
-function setRecords(r) { localStorage.setItem(DB_KEY, JSON.stringify(r)); }
+// Cached records - invalidated on every setRecords() call
+let _recordsCache = null;
+function getRecords() {
+  if (_recordsCache === null) {
+    _recordsCache = JSON.parse(localStorage.getItem(DB_KEY) || "[]");
+  }
+  return _recordsCache;
+}
+function setRecords(r) {
+  _recordsCache = r;
+  localStorage.setItem(DB_KEY, JSON.stringify(r));
+}
+function invalidateRecordsCache() { _recordsCache = null; }
 function statusClass(s) { return "status-" + s.replace(/[^A-Z]/g,""); }
 
 // ============================
@@ -1377,19 +1659,34 @@ function estDateStr(ts) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
 
+// Cached shift grouping - invalidated when records change
+let _shiftsCache = null;
+let _shiftsCacheKey = null;
 function getAllShifts() {
-  const all = getRecords().slice().sort((a,b) => a.timestamp - b.timestamp);
-  if (all.length === 0) return [];
+  const records = getRecords();
+  // Use record count + last timestamp as cheap cache key
+  const key = records.length > 0
+    ? records.length + ":" + records[records.length-1].timestamp + ":" + records[0].timestamp
+    : "empty";
+  if (_shiftsCache !== null && _shiftsCacheKey === key) return _shiftsCache;
+
+  const all = records.slice().sort((a,b) => a.timestamp - b.timestamp);
+  if (all.length === 0) {
+    _shiftsCache = []; _shiftsCacheKey = key;
+    return _shiftsCache;
+  }
   const shifts = [[all[0]]];
   for (let i = 1; i < all.length; i++) {
     if (all[i].timestamp - all[i-1].timestamp >= SHIFT_GAP_MS) shifts.push([]);
     shifts[shifts.length-1].push(all[i]);
   }
-  return shifts.map((records, idx) => ({
+  _shiftsCache = shifts.map((records, idx) => ({
     shiftIndex: idx,
     date: estDateStr(records[0].timestamp),
     records
   }));
+  _shiftsCacheKey = key;
+  return _shiftsCache;
 }
 
 function getShiftsForDate(dateStr) {
@@ -1451,6 +1748,16 @@ function updateAvgBanner() {
 // ============================
 // FILTER
 // ============================
+// Debounced search to avoid re-rendering on every keystroke
+let _searchDebounceTimer = null;
+function debouncedSearchUpdate() {
+  clearTimeout(_searchDebounceTimer);
+  _searchDebounceTimer = setTimeout(() => {
+    resetRecordsPage();
+    renderRecords();
+  }, 200);
+}
+
 function getFiltered() {
   const search = document.getElementById("fSearch").value.trim().toUpperCase();
   const status = document.getElementById("fStatus").value;
@@ -1475,6 +1782,7 @@ function clearFilters() {
   ["fSearch","fDateFrom","fDateTo"].forEach(id => document.getElementById(id).value = "");
   ["fStatus","fNoTag","fDest"].forEach(id => document.getElementById(id).selectedIndex = 0);
   document.getElementById("recordsHeading").textContent = "Filter Records";
+  resetRecordsPage();
   renderRecords();
 }
 
@@ -1486,6 +1794,7 @@ function viewByDate(dateStr) {
   document.getElementById("fNoTag").selectedIndex = 0;
   document.getElementById("fDest").selectedIndex = 0;
   document.getElementById("recordsHeading").textContent = "Entries for " + dateStr;
+  resetRecordsPage();
   showTab("records");
 }
 
@@ -1497,6 +1806,7 @@ function viewByWeek(fromStr, toStr, label) {
   document.getElementById("fNoTag").selectedIndex = 0;
   document.getElementById("fDest").selectedIndex = 0;
   document.getElementById("recordsHeading").textContent = label;
+  resetRecordsPage();
   showTab("records");
 }
 
@@ -1574,6 +1884,8 @@ function saveRecord() {
     records.unshift(recordData);
     setRecords(records);
     document.getElementById("serial").value = "";
+    toggleClearBtn();
+    updateVinCount();
     document.getElementById("notes").value = "";
     document.getElementById("status").selectedIndex = 0;
     document.getElementById("tireSelectorSection").style.display = "none";
@@ -1713,6 +2025,110 @@ function showManualEntry() {
   const btn = document.querySelector(".btn-manual-toggle");
   section.style.display = "block";
   btn.innerHTML = "Hide Manual Entry";
+}
+
+function clearSerial() {
+  const input = document.getElementById("serial");
+  input.value = "";
+  toggleClearBtn();
+  updateVinCount();
+  input.focus();
+}
+
+function toggleClearBtn() {
+  const input = document.getElementById("serial");
+  const btn = document.getElementById("serialClearBtn");
+  if (btn) btn.style.display = input.value.length > 0 ? "flex" : "none";
+}
+
+// ============================
+// VIN KEYPAD
+// ============================
+const VIN_KEYS = [
+  '1','2','3','4','5',
+  '6','7','8','9','0',
+  'A','B','C','D','E',
+  'F','G','H','J','K',
+  'L','M','N','P','R',
+  'S','T','U','V','W',
+  'X','Y','Z'
+];
+
+function buildVinKeypad() {
+  const grid = document.getElementById("vinKeypadGrid");
+  if (!grid) return;
+  if (grid.dataset.built === "1") return;
+
+  let html = VIN_KEYS.map(k => {
+    const typeClass = /[0-9]/.test(k) ? "vin-key-num" : "vin-key-alpha";
+    return `<button class="vin-key ${typeClass}" type="button" onclick="vinKeypadType('${k}')">${k}</button>`;
+  }).join("");
+  // Backspace and Done on the last row
+  html += `<button class="vin-key vin-key-back" type="button" onclick="vinKeypadBackspace()">&#9003;</button>`;
+  html += `<button class="vin-key vin-key-done" type="button" onclick="closeVinKeypad()">DONE</button>`;
+  grid.innerHTML = html;
+  grid.dataset.built = "1";
+}
+
+function openVinKeypad() {
+  buildVinKeypad();
+  const overlay = document.getElementById("vinKeypadOverlay");
+  if (!overlay) return;
+  overlay.classList.add("open");
+  syncKeypadDisplay();
+
+  // Blur the input to dismiss any iOS keyboard that might pop up
+  const input = document.getElementById("serial");
+  if (input) input.blur();
+}
+
+function closeVinKeypad(event) {
+  // If event passed (clicked overlay backdrop), only close if target is overlay itself
+  if (event && event.target && event.target.id !== "vinKeypadOverlay") {
+    if (event.currentTarget && event.target !== event.currentTarget) return;
+  }
+  document.getElementById("vinKeypadOverlay").classList.remove("open");
+}
+
+function vinKeypadType(ch) {
+  const input = document.getElementById("serial");
+  if (input.value.length >= 30) return;
+  input.value = (input.value + ch).toUpperCase();
+  syncKeypadDisplay();
+  toggleClearBtn();
+  updateVinCount();
+  // Light haptic
+  if (navigator.vibrate) navigator.vibrate(8);
+}
+
+function vinKeypadBackspace() {
+  const input = document.getElementById("serial");
+  input.value = input.value.slice(0, -1);
+  syncKeypadDisplay();
+  toggleClearBtn();
+  updateVinCount();
+  if (navigator.vibrate) navigator.vibrate(8);
+}
+
+function syncKeypadDisplay() {
+  const input = document.getElementById("serial");
+  const display = document.getElementById("vinKeypadDisplay");
+  const count = document.getElementById("vinKeypadCount");
+  if (display) display.textContent = input.value || "...";
+  if (count) {
+    const len = input.value.length;
+    count.textContent = `${len} / 17`;
+    count.classList.toggle("valid", len === 17);
+  }
+}
+
+function updateVinCount() {
+  const input = document.getElementById("serial");
+  const c = document.getElementById("vinCharCount");
+  if (!c) return;
+  const len = input.value.length;
+  c.textContent = `${len} / 17`;
+  c.classList.toggle("valid", len === 17);
 }
 function toggleNoTagStyle() {
   const checked = document.getElementById("noTag").checked;
@@ -1854,17 +2270,88 @@ function deleteRecord(id) {
 // ============================
 // RENDER RECORDS TAB
 // ============================
+// ============================
+// RECORDS PAGINATION
+// ============================
+const RECORDS_PER_PAGE = 25;
+let recordsCurrentPage = 1;
+
+function changeRecordsPage(page) {
+  recordsCurrentPage = page;
+  renderRecords();
+  // Scroll back up to the records list
+  const el = document.getElementById("recordsHeading");
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function resetRecordsPage() {
+  recordsCurrentPage = 1;
+}
+
 function renderRecords() {
   const records = getFiltered();
-  document.getElementById("resultsCount").textContent =
-    records.length + " record" + (records.length !== 1 ? "s" : "") + " found";
-  if (records.length === 0) {
+  const total = records.length;
+  const totalPages = Math.max(1, Math.ceil(total / RECORDS_PER_PAGE));
+
+  // Clamp current page if filters reduced the total
+  if (recordsCurrentPage > totalPages) recordsCurrentPage = totalPages;
+  if (recordsCurrentPage < 1) recordsCurrentPage = 1;
+
+  const startIdx = (recordsCurrentPage - 1) * RECORDS_PER_PAGE;
+  const endIdx = Math.min(startIdx + RECORDS_PER_PAGE, total);
+  const pageRecords = records.slice(startIdx, endIdx);
+
+  // Update the results count to reflect pagination
+  const countEl = document.getElementById("resultsCount");
+  if (total === 0) {
+    countEl.textContent = "0 records found";
+  } else if (total <= RECORDS_PER_PAGE) {
+    countEl.textContent = total + " record" + (total !== 1 ? "s" : "") + " found";
+  } else {
+    countEl.textContent = `Showing ${startIdx + 1}-${endIdx} of ${total} records`;
+  }
+
+  if (total === 0) {
     document.getElementById("records").innerHTML =
       '<p style="color:var(--muted);text-align:center;padding:24px">No records match your filters.</p>';
   } else {
-    document.getElementById("records").innerHTML = records.map(r => recordCard(r, "deleteRecord")).join("");
+    let html = pageRecords.map(r => recordCard(r, "deleteRecord")).join("");
+    // Append pagination controls if needed
+    if (totalPages > 1) {
+      html += renderPaginationControls(recordsCurrentPage, totalPages);
+    }
+    document.getElementById("records").innerHTML = html;
   }
   renderRecordsMap(); // refresh map if open
+}
+
+function renderPaginationControls(current, total) {
+  const prevDisabled = current <= 1;
+  const nextDisabled = current >= total;
+
+  // Build numbered page buttons (max 5 visible: current ± 2)
+  let pageButtons = "";
+  const start = Math.max(1, current - 2);
+  const end = Math.min(total, current + 2);
+
+  if (start > 1) {
+    pageButtons += `<button class="page-btn" onclick="changeRecordsPage(1)">1</button>`;
+    if (start > 2) pageButtons += `<span class="page-ellipsis">...</span>`;
+  }
+  for (let i = start; i <= end; i++) {
+    pageButtons += `<button class="page-btn ${i === current ? 'active' : ''}" onclick="changeRecordsPage(${i})">${i}</button>`;
+  }
+  if (end < total) {
+    if (end < total - 1) pageButtons += `<span class="page-ellipsis">...</span>`;
+    pageButtons += `<button class="page-btn" onclick="changeRecordsPage(${total})">${total}</button>`;
+  }
+
+  return `
+    <div class="pagination">
+      <button class="page-btn page-nav" ${prevDisabled ? 'disabled' : ''} onclick="changeRecordsPage(${current - 1})">&#8592; Prev</button>
+      <div class="page-numbers">${pageButtons}</div>
+      <button class="page-btn page-nav" ${nextDisabled ? 'disabled' : ''} onclick="changeRecordsPage(${current + 1})">Next &#8594;</button>
+    </div>`;
 }
 
 // ============================
@@ -1944,20 +2431,11 @@ function openDetail(id, onDelete) {
       mapDiv.style.display = "block";
       // Small delay to ensure element is visible before Leaflet init
       setTimeout(() => {
-        if (mapDiv._leaflet_map) {
-          mapDiv._leaflet_map.remove();
-          mapDiv._leaflet_map = null;
-        }
-        mapDiv.innerHTML = "";
-        const m = L.map(mapDiv, { zoomControl: true, attributionControl: false });
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(m);
+        const m = createMap("detailMapFrame");
+        if (!m) return;
         m.setView([r.lat, r.lng], 17);
         const color = statusMapColor(r.status);
-        const icon = L.divIcon({
-          className: "",
-          html: `<div style="width:32px;height:32px;border-radius:50%;background:#${color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;font-family:Arial,sans-serif;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.5);">P</div>`,
-          iconSize: [32, 32], iconAnchor: [16, 16]
-        });
+        const icon = createNumberedMarker("P", color, 32);
         L.marker([r.lat, r.lng], { icon }).addTo(m);
         mapDiv._leaflet_map = m;
       }, 80);
@@ -2417,8 +2895,8 @@ function renderRecordsMap() {
 
   setTimeout(() => {
     if (!recordsLeafletMap) {
-      recordsLeafletMap = L.map('recordsMap', { zoomControl: true, attributionControl: false });
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(recordsLeafletMap);
+      recordsLeafletMap = createMap('recordsMap');
+      if (!recordsLeafletMap) return;
     } else {
       recordsMapMarkers.forEach(m => recordsLeafletMap.removeLayer(m));
       recordsMapMarkers = [];
@@ -2429,17 +2907,7 @@ function renderRecordsMap() {
 
     records.forEach((r, i) => {
       const color = statusMapColor(r.status);
-      const icon = L.divIcon({
-        className: '',
-        html: `<div style="
-          width:26px;height:26px;border-radius:50%;
-          background:#${color};color:#fff;
-          display:flex;align-items:center;justify-content:center;
-          font-size:11px;font-weight:800;font-family:Arial,sans-serif;
-          border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.4);
-          cursor:pointer;">${i+1}</div>`,
-        iconSize: [26, 26], iconAnchor: [13, 13], popupAnchor: [0, -14]
-      });
+      const icon = createNumberedMarker(i+1, color, 26);
       const time = new Date(r.timestamp).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', timeZone:'America/New_York' });
       const marker = L.marker([r.lat, r.lng], { icon })
         .addTo(recordsLeafletMap)
@@ -2473,14 +2941,7 @@ let leafletMarkers = [];
 
 function initLeafletMap() {
   if (leafletMap) return;
-  const el = document.getElementById("shiftMap");
-  if (!el) return;
-  el.style.display = "block";
-  leafletMap = L.map("shiftMap", { zoomControl: true, attributionControl: false });
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19
-  }).addTo(leafletMap);
-  L.control.attribution({ prefix: false }).addTo(leafletMap);
+  leafletMap = createMap("shiftMap");
 }
 
 function clearLeafletMarkers() {
@@ -2544,21 +3005,7 @@ function renderShiftMap(shiftIndex) {
     const num = i + 1;
 
     // Custom numbered SVG marker
-    const icon = L.divIcon({
-      className: "",
-      html: `<div style="
-        width:28px;height:28px;border-radius:50%;
-        background:#${color};color:#fff;
-        display:flex;align-items:center;justify-content:center;
-        font-size:12px;font-weight:800;font-family:Arial,sans-serif;
-        border:2px solid #fff;
-        box-shadow:0 2px 6px rgba(0,0,0,0.4);
-        cursor:pointer;
-      ">${num}</div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14],
-      popupAnchor: [0, -16]
-    });
+    const icon = createNumberedMarker(num, color, 28);
 
     const time = new Date(r.timestamp).toLocaleTimeString("en-US", {
       hour:"2-digit", minute:"2-digit", timeZone:"America/New_York"
@@ -2615,8 +3062,10 @@ function renderShiftMap(shiftIndex) {
 
 function statusMapColor(status) {
   const map = {
-    "CLEAN":"00a651","DIRTY":"e85550","PM":"4d9bff","MK":"f0b04a",
-    "MR":"e85550","AUDIT":"9b6aff","TI":"e85550","GLASS":"4d9bff",
+    "CLEAN":"00a651","DIRTY":"e85550",
+    "REWASH":"3dcfcf","TOP OFF FLUID":"6aadff",
+    "PM":"4d9bff","MK":"f0b04a","MR":"e85550","OM":"b87be8",
+    "AUDIT FAIL":"e85550","TI":"e85550","GLASS":"4d9bff",
     "OTHER":"888888","WI/DELETE":"e85550"
   };
   return map[status] || "888888";
@@ -2834,6 +3283,11 @@ function openScanner() {
   const hint = document.getElementById("scannerHint");
   const dotSvg = '<span class="scanner-dot"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8" style="vertical-align:middle;display:inline-block"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg></span>';
   overlay.classList.add("open");
+
+  // Lock to portrait orientation while scanning
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock("portrait").catch(() => {});
+  }
   hint.className = "scanner-status scanning";
   hint.innerHTML = dotSvg + " Starting camera...";
   torchOn = false;
@@ -2870,7 +3324,43 @@ function openScanner() {
         }
 
         if (result) {
+          const fmt = result.getBarcodeFormat();
           const code = result.getText().trim().toUpperCase();
+          const is2D = fmt === ZXing.BarcodeFormat.QR_CODE ||
+                       fmt === ZXing.BarcodeFormat.DATA_MATRIX ||
+                       fmt === ZXing.BarcodeFormat.AZTEC ||
+                       fmt === ZXing.BarcodeFormat.PDF_417;
+
+          if (is2D) {
+            // 2D codes are only allowed if they encode a valid VIN
+            // Some 2D codes contain URLs with the VIN embedded - try to extract it
+            let extractedVin = null;
+            if (isValidVIN(code)) {
+              extractedVin = code;
+            } else {
+              // Look for a 17-char VIN substring inside the decoded text
+              const match = code.match(/[A-HJ-NPR-Z0-9]{17}/);
+              if (match && isValidVIN(match[0])) {
+                extractedVin = match[0];
+              }
+            }
+            if (!extractedVin) return; // not a VIN-bearing QR, ignore
+            // Use the extracted VIN as the code
+            const flash = document.getElementById("scannerFlash");
+            flash.classList.remove("flash");
+            void flash.offsetWidth;
+            flash.classList.add("flash");
+            navigator.vibrate && navigator.vibrate([80, 40, 80]);
+            playScanBeep();
+            hint.className = "scanner-status success";
+            hint.textContent = extractedVin;
+            document.getElementById("serial").value = extractedVin;
+            toggleClearBtn();
+            updateVinCount();
+            showManualEntry();
+            setTimeout(() => closeScanner(), 600);
+            return;
+          }
           const flash = document.getElementById("scannerFlash");
           flash.classList.remove("flash");
           void flash.offsetWidth;
@@ -2898,6 +3388,11 @@ function openScanner() {
 
 function closeScanner() {
   scannerActive = false;
+
+  // Unlock orientation
+  if (screen.orientation && screen.orientation.unlock) {
+    try { screen.orientation.unlock(); } catch(e) {}
+  }
   if (codeReader) {
     try { codeReader.reset(); } catch(e) {}
     codeReader = null;
@@ -3178,7 +3673,6 @@ setInterval(runBackup, BACKUP_INTERVAL_MS);
 updateBackupStatus();
 applyProfile();
 renderTodayEntries();
-
 </script>
 </body>
 </html>
